@@ -13,6 +13,8 @@ MACHINE = raspi3
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
 
+SDPATH = /media/k-mrm/9016-4EF8
+
 %.o: %.c
 	$(GCC) $(CCFLAGS) -c $< -o $@
 
@@ -25,6 +27,11 @@ kernel8.img: boot.o $(OBJS)
 
 qemu: kernel8.img
 	$(QEMU) -cpu $(CPU) -machine $(MACHINE) -kernel kernel8.img
+
+raspi: kernel8.img
+	cp kernel8.img $(SDPATH)
+	cp bin/start4.elf $(SDPATH)
+	cp bin/fixup.dat $(SDPATH)
 
 .PHONY: clean
 
