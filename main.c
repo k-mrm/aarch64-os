@@ -1,11 +1,11 @@
+#include "uni.h"
 #include "gpio.h"
+#include "framebuffer.h"
 
-int main(void) {
-  REG(GPFSEL4) = 0x01 << 21;
-  REG(GPSET0) = 0x01 << (47-32);
+void main(void) {
+  fb_init();
 
-  for(;;) {
-    ;
-  }
-  return 0;
+  fb_wtest();
+
+  for(;;) {}
 }
