@@ -9,8 +9,8 @@ SECTIONS {
     .data : {
       *(.data)
     }
-    
-    . = ALIGN(8);
+
+    . = ALIGN(16);
     __bss_start = .;
     .bss : {
       *(.bss*)
