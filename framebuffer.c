@@ -1,6 +1,7 @@
 #include "uni.h"
 #include "framebuffer.h"
 #include "mailbox.h"
+#include "font.h"
 
 struct framebuffer display_fb = {1920, 1080, 1920, 1080, 0, 16, 0, 0, 0, 0};
 volatile u32 __attribute__((aligned(16))) mbox_msg[26];
@@ -66,7 +67,25 @@ void fb_init() {
 
 void drawpxl(u32 x, u32 y, u16 c) {
   u32 off = y * display_fb.pitch + x * (display_fb.depth / 8);
-  *(u16 *)(display_fb.buf + off) = c;
+  *(u16 *)((u8 *)display_fb.buf + off) = c;
+}
+
+void drawchar(u32 x, u32 y, char c) {
+  const char *glyph = font[c];
+
+  for(int i = 0; i < 8; i++) {
+    for(int j = 0; j < 8; j++) {
+      if(glyph[i] & (1 << j))
+        drawpxl(x + j, y + i, 0xffff);
+    }
+  }
+}
+
+void drawstr(u32 x, u32 y, char *s) {
+  while(*s) {
+    drawchar(x, y, *s++);
+    x += 8;
+  }
 }
 
 void fb_wtest() {
@@ -90,4 +109,6 @@ void fb_wtest() {
   drawpxl(131, 56, 0xffff);
   drawpxl(131, 57, 0xffff);
   drawpxl(131, 58, 0xffff);
+
+  drawstr(120, 100, "Hello, World!");
 }
