@@ -1,10 +1,19 @@
 #include "uni.h"
 #include "framebuffer.h"
 
-void cswritec(char c) {
+struct cursor {
+  u64 x;
+  u64 y;
+} cursor;
+
+void cs_init() {
   ;
 }
 
-void cswrites(char *s) {
+void csputc(char c) {
+  ;
+}
+
+void csputs(char *s) {
   ;
 }

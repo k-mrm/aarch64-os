@@ -18,6 +18,15 @@
 
 #define MBOX_SUCCESS  0x80000000
 
+enum mbox_proptag {
+  PROP_END = 0,
+  PROP_FB_ALLOC_BUFFER = 0x40001,
+  PROP_FB_GET_PITCH = 0x40008,
+  PROP_FB_SET_PHY_WH = 0x48003,
+  PROP_FB_SET_VIRT_WH = 0x48004,
+  PROP_FB_SET_DEPTH = 0x48005,
+};
+
 u32 mbox_read(int ch);
 void mbox_write(int ch, u32 data);
 
