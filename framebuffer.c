@@ -3,7 +3,7 @@
 #include "mailbox.h"
 #include "font.h"
 
-struct framebuffer display_fb = {1920, 1080, 960, 540, 0, 16, 0, 0, 0, 0};
+struct framebuffer display_fb = {1920, 1080, 1440, 810, 0, 16, 0, 0, 0, 0};
 volatile u32 __attribute__((aligned(16))) mbox_msg[26];
 
 void fb_init() {
@@ -65,29 +65,32 @@ void fb_init() {
   display_fb.nbuf = mbox_msg[24];
 }
 
-void drawpxl(u32 x, u32 y, u16 c) {
-  u32 off = y * display_fb.pitch + x * (display_fb.depth >> 3);
-  *(u16 *)((u8 *)display_fb.buf + off) = c;
+void drawpxl(struct framebuffer *fb, u32 x, u32 y, u16 c) {
+  u32 off = y * fb->pitch + x * (fb->depth >> 3);
+  *(u16 *)((u8 *)fb->buf + off) = c;
 }
 
-void drawchar(u32 x, u32 y, char c) {
-  const char *glyph = font[c];
+void drawchar(struct framebuffer *fb, struct font *font, u32 *x, u32 *y, char c) {
+  if(c == '\n') {
+    *x = 20;
+    *y += 10;
+    return;
+  }
 
-  for(int i = 0; i < 8; i++) {
-    for(int j = 0; j < 8; j++) {
+  const char *glyph = font->data[c];
+
+  for(int i = 0; i < font->h; i++) {
+    for(int j = 0; j < font->w; j++) {
       if(glyph[i] & (1 << j))
-        drawpxl(x + j, y + i, 0xffff);
+        drawpxl(fb, *x + j, *y + i, 0xffff);
     }
   }
+
+  *x += 8;
 }
 
-void drawstr(u32 x, u32 y, char *s) {
+void drawstr(struct framebuffer *fb, struct font *font, u32 *x, u32 *y, char *s) {
   while(*s) {
-    drawchar(x, y, *s++);
-    x += 8;
+    drawchar(fb, font, x, y, *s++);
   }
-}
-
-void fb_wtest() {
-  drawstr(120, 100, "Hello, World!");
 }

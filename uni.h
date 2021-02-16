@@ -12,4 +12,6 @@ typedef signed char i8;
 
 #define NULL ((void *)0)
 
+#define UART_ENABLED  0
+
 #endif

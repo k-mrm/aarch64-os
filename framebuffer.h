@@ -2,6 +2,7 @@
 #define UNI_FRAMEBUFFER_H
 
 #include "uni.h"
+#include "font.h"
 
 struct framebuffer {
   u32 phy_w;
@@ -19,6 +20,8 @@ struct framebuffer {
 extern struct framebuffer display_fb;
 
 void fb_init(void);
-void fb_wtest(void);
+void drawpxl(struct framebuffer *fb, u32 x, u32 y, u16 c);
+void drawchar(struct framebuffer *fb, struct font *font, u32 *x, u32 *y, char c);
+void drawstr(struct framebuffer *fb, struct font *font, u32 *x, u32 *y, char *s);
 
 #endif
