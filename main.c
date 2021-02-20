@@ -10,6 +10,7 @@ void main(void) {
 
   csputs(&cons1, "Hello, World!\n");
   csputs(&cons1, "Hello");
+  csputc(&cons1, '0' + cur_el());
 
   for(;;) {}
 }
