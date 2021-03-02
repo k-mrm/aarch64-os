@@ -13,7 +13,9 @@ SECTIONS {
     . = ALIGN(16);
     __bss_start = .;
     .bss : {
-      *(.bss*)
+      *(.bss .bss.*)
     }
     __bss_end = .;
 }
+
+__bss_size = (__bss_end - __bss_start) >> 3;

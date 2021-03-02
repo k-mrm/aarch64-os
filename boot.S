@@ -9,7 +9,7 @@ _start:
   and x1, x1, #3
   cbz x1, swtch_el1
 
-  b loop
+  b hang
 
 /* switch EL2 to EL1 */
 swtch_el1:
@@ -26,8 +26,18 @@ kernel_start:
   ldr x1, =_start
   mov sp, x1
 
+  /* clear bss */
+  ldr x1, =__bss_start
+  ldr w2, =__bss_size
+1:
+  cbz w2, 2f
+  str xzr, [x1], #8
+  sub w2, w2, #1
+  b 1b
+2:
+
   bl main
 
-loop:
+hang:
   wfe
-  b loop
+  b hang
