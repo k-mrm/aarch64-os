@@ -3,6 +3,7 @@
 #include "gpio.h"
 #include "framebuffer.h"
 #include "console.h"
+#include "printf.h"
 #include "systimer.h"
 
 int test;
@@ -11,11 +12,13 @@ int main(void) {
   fb_init();
   cs_init();
 
-  csputs(&cons1, "Hello, World!\n");
-  csputs(&cons1, "Hello");
+  printf("Hello, World!\n");
+  printf("%d%%\n", 24000);
+  printf("%d %u\n", -1, -1);
   sleep(5);
-  csputc(&cons1, '0' + cur_el());
-  csputc(&cons1, '0' + (test == 0));
+  printf("current EL: %d\n", cur_el());
+  printf("%s%c\n", "Hello, raspi4", '!');
+  printf("addr: %p\n", printf);
 
   for(;;) {}
 
