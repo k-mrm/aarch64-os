@@ -12,17 +12,18 @@ MACHINE = raspi3
 
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
+OBJS += boot.o vectortable.o
 
 SDPATH = /media/k-mrm/09D0-F0A8
 
 %.o: %.c
 	$(GCC) $(CCFLAGS) -c $< -o $@
 
-boot.o: boot.S
-	$(GCC) $(CCFLAGS) -c boot.S -o boot.o
+%.o: %.S
+	$(GCC) $(CCFLAGS) -c $< -o $@
 
-kernel8.img: boot.o $(OBJS) link.ld
-	$(LD) $(LDFLAGS) boot.o $(OBJS) -T link.ld -o kernel8.elf
+kernel8.img: $(OBJS) link.ld
+	$(LD) $(LDFLAGS) $(OBJS) -T link.ld -o kernel8.elf
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img
@@ -34,4 +35,4 @@ raspi: kernel8.img
 .PHONY: clean
 
 clean:
-	$(RM) boot.o $(OBJS) kernel8.elf kernel8.img
+	$(RM) $(OBJS) kernel8.elf kernel8.img

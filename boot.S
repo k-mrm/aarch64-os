@@ -38,6 +38,7 @@ kernel_start:
 
   bl main
 
+.global hang
 hang:
   wfe
   b hang

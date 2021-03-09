@@ -5,12 +5,14 @@
 #include "console.h"
 #include "printf.h"
 #include "systimer.h"
+#include "interrupt.h"
 
 int test;
 
 int main(void) {
   fb_init();
   cs_init();
+  intr_init();
 
   printf("Hello, World!\n");
   printf("%d%%\n", 24000);
