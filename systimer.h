@@ -1,7 +1,7 @@
-#ifndef UNI_SYSTIMER_H
-#define UNI_SYSTIMER_H
+#ifndef MONO_SYSTIMER_H
+#define MONO_SYSTIMER_H
 
-#include "uni.h"
+#include "mono.h"
 #include "memmap.h"
 
 #define SYSTIMER_BASE (PERIPHERAL_BASE + 0x3000)

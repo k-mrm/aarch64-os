@@ -1,7 +1,7 @@
-#ifndef UNI_FRAMEBUFFER_H
-#define UNI_FRAMEBUFFER_H
+#ifndef MONO_FRAMEBUFFER_H
+#define MONO_FRAMEBUFFER_H
 
-#include "uni.h"
+#include "mono.h"
 #include "font.h"
 
 struct framebuffer {

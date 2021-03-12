@@ -1,7 +1,7 @@
-#ifndef UNI_FONT_H
-#define UNI_FONT_H
+#ifndef MONO_FONT_H
+#define MONO_FONT_H
 
-#include "uni.h"
+#include "mono.h"
 
 struct font {
   char (*data)[8];

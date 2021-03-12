@@ -1,7 +1,7 @@
-#ifndef UNI_CONSOLE_H
-#define UNI_CONSOLE_H
+#ifndef MONO_CONSOLE_H
+#define MONO_CONSOLE_H
 
-#include "uni.h"
+#include "mono.h"
 #include "framebuffer.h"
 #include "font.h"
 

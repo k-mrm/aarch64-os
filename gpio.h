@@ -1,5 +1,5 @@
-#ifndef UNI_GPIO_H
-#define UNI_GPIO_H
+#ifndef MONO_GPIO_H
+#define MONO_GPIO_H
 
 #include "memmap.h"
 

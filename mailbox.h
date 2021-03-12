@@ -1,7 +1,7 @@
-#ifndef UNI_MAILBOX_H
-#define UNI_MAILBOX_H
+#ifndef MONO_MAILBOX_H
+#define MONO_MAILBOX_H
 
-#include "uni.h"
+#include "mono.h"
 #include "memmap.h"
 
 #define MBOXBASE  (PERIPHERAL_BASE + 0xb880)

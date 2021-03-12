@@ -1,5 +1,5 @@
-#ifndef UNI_LIB_PRINTF_H
-#define UNI_LIB_PRINTF_H
+#ifndef MONO_LIB_PRINTF_H
+#define MONO_LIB_PRINTF_H
 
 int printf(const char *fmt, ...);
 

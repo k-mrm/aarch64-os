@@ -1,7 +1,7 @@
-#ifndef UNI_MEMMAP_H
-#define UNI_MEMMAP_H
+#ifndef MONO_MEMMAP_H
+#define MONO_MEMMAP_H
 
-#include "uni.h"
+#include "mono.h"
 
 /* BCM2711 */
 

@@ -1,3 +1,3 @@
-# uni
+# mono
 
-a simple OS for raspberry pi 4
+mono os: a simple OS for raspberry pi 4

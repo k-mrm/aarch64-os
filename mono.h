@@ -1,5 +1,5 @@
-#ifndef UNI_KERNEL_H
-#define UNI_KERNEL_H
+#ifndef MONO_KERNEL_H
+#define MONO_KERNEL_H
 
 typedef unsigned long u64;
 typedef long i64;

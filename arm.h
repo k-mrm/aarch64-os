@@ -1,7 +1,7 @@
-#ifndef UNI_ARM_H
-#define UNI_ARM_H
+#ifndef MONO_ARM_H
+#define MONO_ARM_H
 
-#include "uni.h"
+#include "mono.h"
 
 static inline int cur_el() {
   int el;
