@@ -1,5 +1,3 @@
-#define SPSR_M_EL1H 0x5
-
 .section ".text.boot"
 
 .global _start
@@ -11,15 +9,23 @@ _start:
 
   b hang
 
+.section ".text"
+
 /* switch EL2 to EL1 */
 swtch_el1:
   mov x0, #(1 << 31) 
   orr x0, x0, #(1 << 1)
   msr hcr_el2, x0
+
+  ldr x0, =vectortable
+  msr vbar_el1, x0
+
   adr x0, kernel_start
   msr elr_el2, x0
-  mov x0, SPSR_M_EL1H
+
+  mov x0, #0x3c5  /* DAIF=1, M=0b101(EL1H) */
   msr spsr_el2, x0
+
   eret
 
 kernel_start:

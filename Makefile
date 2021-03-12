@@ -11,8 +11,8 @@ CPU = cortex-a72
 MACHINE = raspi3
 
 SRCS = $(wildcard *.c)
-OBJS = $(SRCS:.c=.o)
-OBJS += boot.o vectortable.o
+OBJS = boot.o vectortable.o
+OBJS += $(SRCS:.c=.o)
 
 SDPATH = /media/k-mrm/09D0-F0A8
 

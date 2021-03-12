@@ -7,12 +7,10 @@
 #include "systimer.h"
 #include "interrupt.h"
 
-int test;
-
 int main(void) {
+  intr_init();
   fb_init();
   cs_init();
-  intr_init();
 
   printf("Hello, World!\n");
   printf("%d%%\n", 24000);
@@ -21,6 +19,10 @@ int main(void) {
   printf("current EL: %d\n", cur_el());
   printf("%s%c\n", "Hello, raspi4", '!');
   printf("addr: %p\n", printf);
+  printf("var_el1: %p\n", vbar_el1());
+
+  int r = *((volatile int *)0xffffffffff000000);
+  r++;
 
   for(;;) {}
 
