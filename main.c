@@ -15,7 +15,9 @@ int main(void) {
   printf("Hello, World!\n");
   printf("%d%%\n", 24000);
   printf("%d %u\n", -1, -1);
+  printf("systime %d\n", systime());
   sleep(5);
+  printf("systime %d\n", systime());
   printf("current EL: %d\n", cur_el());
   printf("%s%c\n", "Hello, raspi4", '!');
   printf("addr: %p\n", printf);

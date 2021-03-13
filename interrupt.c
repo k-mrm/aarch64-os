@@ -8,5 +8,5 @@ void intr_init() {
 }
 
 void sync_handler() {
-  printf("sync\n");
+  panic("exception!");
 }

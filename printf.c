@@ -90,7 +90,16 @@ int printf(const char *fmt, ...) {
       csputc(&cons1, c);
     }
   }
+
   __builtin_va_end(ap);
 
   return 0;
+}
+
+extern void hang(void);
+
+void panic(const char *s) {
+  printf("[panic]: %s\n", s);
+
+  for(;;) {}
 }
