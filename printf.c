@@ -1,4 +1,5 @@
 #include "mono.h"
+#include "arm.h"
 #include "printf.h"
 #include "console.h"
 
@@ -101,5 +102,6 @@ extern void hang(void);
 void panic(const char *s) {
   printf("[panic]: %s\n", s);
 
-  for(;;) {}
+  for(;;)
+    wfe();
 }

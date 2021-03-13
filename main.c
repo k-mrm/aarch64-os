@@ -5,10 +5,9 @@
 #include "console.h"
 #include "printf.h"
 #include "systimer.h"
-#include "interrupt.h"
+#include "exception.h"
 
 int main(void) {
-  intr_init();
   fb_init();
   cs_init();
 

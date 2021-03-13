@@ -21,4 +21,15 @@ static inline void set_vbar_el1(u64 *v) {
   asm volatile("msr vbar_el1, %0" : : "r"(v));
 }
 
+static inline void wfe() {
+  asm volatile("wfe");
+}
+
+static inline u64 esr_el1() {
+  u64 esr;
+  asm volatile("mrs %0, esr_el1" : "=r"(esr));
+
+  return esr;
+}
+
 #endif
