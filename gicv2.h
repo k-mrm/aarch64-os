@@ -1,0 +1,12 @@
+#ifndef MONO_GICV2_H
+#define MONO_GICV2_H
+
+#define GICV2_BASE  0xff841000
+
+#define GICD_BASE (GICV2_BASE)
+#define GICC_BASE (GICV2_BASE + 0x1000)
+#define GICH_BASE (GICV2_BASE + 0x3000)
+#define GICV_BASE (GICV2_BASE + 0x5000)
+
+#endif
+

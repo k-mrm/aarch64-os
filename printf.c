@@ -97,8 +97,6 @@ int printf(const char *fmt, ...) {
   return 0;
 }
 
-extern void hang(void);
-
 void panic(const char *s) {
   printf("[panic]: %s\n", s);
 

@@ -10,6 +10,9 @@ void sync_handler(struct trapframe *tf) {
     case 0b100101:
       panic("data abort");
       break;
+    case 0b010101:
+      printf("software interrupt\n");
+      break;
     default:
       panic("unknown");
       break;
