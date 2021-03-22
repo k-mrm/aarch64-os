@@ -14,7 +14,9 @@
 #define SYSTIMER_C2 (SYSTIMER_BASE + 0x14)
 #define SYSTIMER_C3 (SYSTIMER_BASE + 0x18)
 
+void systimer_init(u32 interval);
 u64 systime(void);
 void sleep(u32 sec);
+void set_systimer_c1(u32 ms);
 
 #endif

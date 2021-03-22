@@ -1,6 +1,6 @@
 #include "mono.h"
 #include "arm.h"
-#include "printf.h"
+#include "printk.h"
 #include "console.h"
 
 static void printiu32(i32 num, int base, bool sign) {
@@ -53,7 +53,7 @@ static void printiu64(i64 num, int base, bool sign) {
   csputs(&cons1, cur);
 }
 
-int printf(const char *fmt, ...) {
+int printk(const char *fmt, ...) {
   __builtin_va_list ap;
   __builtin_va_start(ap, fmt);
 
@@ -98,7 +98,7 @@ int printf(const char *fmt, ...) {
 }
 
 void panic(const char *s) {
-  printf("[panic]: %s\n", s);
+  printk("[panic]: %s\n", s);
 
   for(;;)
     wfe();

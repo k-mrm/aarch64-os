@@ -1,5 +1,10 @@
 #include "systimer.h"
 
+void systimer_init(u32 interval) {
+  u64 t = REG(SYSTIMER_CLO) + interval * 1000;
+  REG(SYSTIMER_C1) = t;
+}
+
 u64 systime() {
   u32 lo = REG(SYSTIMER_CLO);
   u32 hi = REG(SYSTIMER_CHI);

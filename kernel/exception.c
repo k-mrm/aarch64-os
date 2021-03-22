@@ -1,7 +1,7 @@
 #include "exception.h"
 #include "arm.h"
 #include "mono.h"
-#include "printf.h"
+#include "printk.h"
 
 void sync_handler(struct trapframe *tf) {
   u64 esr = esr_el1();
@@ -11,11 +11,15 @@ void sync_handler(struct trapframe *tf) {
       panic("data abort");
       break;
     case 0b010101:
-      printf("software interrupt\n");
+      printk("software interrupt\n");
       break;
     default:
       panic("unknown");
       break;
   }
-  printf("%p\n", tf->x30);
+  printk("%p\n", tf->x30);
+}
+
+void irq_handler(struct trapframe *tf) {
+  printk("irq\n");
 }

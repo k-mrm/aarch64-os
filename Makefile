@@ -10,9 +10,9 @@ QEMU = qemu-system-aarch64
 CPU = cortex-a72
 MACHINE = raspi3
 
-SRCS = $(wildcard *.c)
-OBJS = boot.o vectortable.o
-OBJS += $(SRCS:.c=.o)
+OBJS = kernel/boot.o kernel/vectortable.o	\
+			 kernel/console.o kernel/exception.o kernel/font.o kernel/framebuffer.o kernel/gicv2.o \
+			 kernel/gpio.o kernel/mailbox.o kernel/main.o kernel/printk.o kernel/systimer.o
 
 SDPATH = /media/k-mrm/09D0-F0A8
 
@@ -22,8 +22,8 @@ SDPATH = /media/k-mrm/09D0-F0A8
 %.o: %.S
 	$(GCC) $(CCFLAGS) -c $< -o $@
 
-kernel8.img: $(OBJS) link.ld
-	$(LD) $(LDFLAGS) $(OBJS) -T link.ld -o kernel8.elf
+kernel8.img: $(OBJS) kernel/link.ld
+	$(LD) $(LDFLAGS) $(OBJS) -T kernel/link.ld -o kernel8.elf
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img
