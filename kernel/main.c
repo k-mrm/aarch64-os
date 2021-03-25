@@ -24,7 +24,7 @@ int main(void) {
   printk("var_el1: %p\n", vbar_el1());
 
   enable_irq();
-  systimer_init(1000);
+  systimer_init(5000);
 
   for(;;) {}
 

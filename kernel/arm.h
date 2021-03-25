@@ -25,11 +25,25 @@ static inline void wfe() {
   asm volatile("wfe");
 }
 
+static inline u64 elr_el1() {
+  u64 elr;
+  asm volatile("mrs %0, elr_el1" : "=r"(elr));
+
+  return elr;
+}
+
 static inline u64 esr_el1() {
   u64 esr;
   asm volatile("mrs %0, esr_el1" : "=r"(esr));
 
   return esr;
+}
+
+static inline u64 far_el1() {
+  u64 far;
+  asm volatile("mrs %0, far_el1" : "=r"(far));
+
+  return far;
 }
 
 static inline void enable_irq() {

@@ -4,22 +4,25 @@
 #include "memmap.h"
 #include "printk.h"
 #include "gicv2.h"
+#include "systimer.h"
 
 void sync_handler(struct trapframe *tf) {
+  printk("elr: %p far: %p\n", elr_el1(), far_el1());
+
   u64 esr = esr_el1();
   esr >>= 26;
   switch(esr & 0x3f) {
     case 0b100101:
       panic("data abort");
-      break;
     case 0b010101:
       printk("software interrupt\n");
       break;
+    case 0b100110:
+      panic("sp alignment fault");
     default:
+      printk("%d \n", esr & 0x3f);
       panic("unknown");
-      break;
   }
-  printk("%p\n", tf->x30);
 }
 
 void irq_handler(struct trapframe *tf) {

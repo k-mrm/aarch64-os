@@ -100,6 +100,8 @@ int printk(const char *fmt, ...) {
 void panic(const char *s) {
   printk("[panic]: %s\n", s);
 
+  disable_irq();
+
   for(;;)
     wfe();
 }

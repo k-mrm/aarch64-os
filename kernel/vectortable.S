@@ -1,5 +1,5 @@
 .macro savereg
-  sub sp, sp, 248
+  sub sp, sp, 256
   stp x0, x1, [sp, #16 * 0]
   stp x2, x3, [sp, #16 * 1]
   stp x4, x5, [sp, #16 * 2]
@@ -35,7 +35,7 @@
   ldp x26, x27, [sp, #16 * 13]
   ldp x28, x29, [sp, #16 * 14]
   ldr x30, [sp, #16 * 15]
-  add sp, sp, 248
+  add sp, sp, 256
 .endm
 
 .global vectortable
