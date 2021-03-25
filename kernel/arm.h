@@ -32,4 +32,12 @@ static inline u64 esr_el1() {
   return esr;
 }
 
+static inline void enable_irq() {
+  asm volatile("msr daifclr, #2");
+}
+
+static inline void disable_irq() {
+  asm volatile("msr daifset, #2");
+}
+
 #endif

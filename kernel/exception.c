@@ -1,7 +1,9 @@
 #include "exception.h"
 #include "arm.h"
 #include "mono.h"
+#include "memmap.h"
 #include "printk.h"
+#include "gicv2.h"
 
 void sync_handler(struct trapframe *tf) {
   u64 esr = esr_el1();
@@ -21,5 +23,13 @@ void sync_handler(struct trapframe *tf) {
 }
 
 void irq_handler(struct trapframe *tf) {
-  printk("irq\n");
+  u32 iar = REG(GICC_IAR);
+  u32 intid = iar & 0x3ff;
+
+  printk("irq: %d\n", intid);
+  if(intid == 32 + 64) {
+    systimer_handle_irq();
+  }
+
+  REG(GICC_EOIR) = iar;
 }

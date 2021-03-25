@@ -1,8 +1,18 @@
 #include "systimer.h"
+#include "printk.h"
 
 void systimer_init(u32 interval) {
-  u64 t = REG(SYSTIMER_CLO) + interval * 1000;
-  REG(SYSTIMER_C1) = t;
+  printk("systimer init\n");
+  u32 t = REG(SYSTIMER_CLO) + interval * 1000;
+  REG(SYSTIMER_C(0)) = t;
+}
+
+void systimer_handle_irq(void) {
+  u32 t = REG(SYSTIMER_CLO) + 1000 * 1000;
+
+  REG(SYSTIMER_C(0)) = t;
+  REG(SYSTIMER_CS) = 1;
+  printk("systimer irq\n");
 }
 
 u64 systime() {
