@@ -16,9 +16,13 @@
 
 #define GICC_CTLR (GICC_BASE)
 #define GICC_IAR  (GICC_BASE + 0xc)
-#define GICC_EOIR  (GICC_BASE + 0x10)
+#define GICC_EOIR (GICC_BASE + 0x10)
+#define GICC_AIAR (GICC_BASE + 0x20)
+#define GICC_AEOIR  (GICC_BASE + 0x24)
 
 void gicv2_init(void);
+void gic_eoi(u32 iar);
+u32 gic_iar(void);
 
 #endif
 

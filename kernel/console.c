@@ -5,7 +5,8 @@
 
 struct console cons1;
 
-void cs_init() {
+void console_init() {
+  fb_init();
   font_init();
   cons1.fb = &display_fb;
   cons1.font = &default_font;

@@ -54,4 +54,10 @@ static inline void disable_irq() {
   asm volatile("msr daifset, #2");
 }
 
+static inline u64 daif() {
+  u64 d;
+  asm volatile("mrs %0, daif" : "=r"(d));
+  return d;
+}
+
 #endif

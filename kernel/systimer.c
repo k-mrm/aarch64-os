@@ -8,11 +8,12 @@ void systimer_init(u32 interval) {
 }
 
 void systimer_handle_irq(void) {
+  static int counter = 1;
   u32 t = REG(SYSTIMER_CLO) + 1000 * 1000;
 
   REG(SYSTIMER_C(0)) = t;
-  REG(SYSTIMER_CS) = 1;
-  printk("systimer irq\n");
+  REG(SYSTIMER_CS) = 1 << 0;
+  printk("systimer irq %d\n", counter++);
 }
 
 u64 systime() {

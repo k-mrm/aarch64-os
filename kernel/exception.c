@@ -20,19 +20,22 @@ void sync_handler(struct trapframe *tf) {
     case 0b100110:
       panic("sp alignment fault");
     default:
-      printk("%d \n", esr & 0x3f);
+      printk("%d ", esr & 0x3f);
       panic("unknown");
   }
 }
 
 void irq_handler(struct trapframe *tf) {
-  u32 iar = REG(GICC_IAR);
+  printk("c %d d %d", REG(GICC_CTLR), REG(GICD_CTLR));
+  u32 iar = gic_iar();
+  u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
 
-  printk("irq: %d\n", intid);
-  if(intid == 32 + 64) {
-    systimer_handle_irq();
-  }
+  asm volatile("isb");
+  asm volatile("dsb sy");
 
-  REG(GICC_EOIR) = iar;
+  printk("irq: %d cpu: %d\n", intid, targetcpuid);
+  systimer_handle_irq();
+
+  gic_eoi(iar);
 }

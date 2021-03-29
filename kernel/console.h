@@ -14,7 +14,7 @@ struct console {
 
 extern struct console cons1;
 
-void cs_init(void);
+void console_init(void);
 void csputc(struct console *cs, char c);
 void csputs(struct console *cs, char *s);
 
