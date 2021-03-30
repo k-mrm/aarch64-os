@@ -14,7 +14,7 @@ int main(void) {
   systimer_init(1000);
 
   printk("mono os for raspberry pi 4\n");
-  printk("%d%%\n", 24000);
+  printk("cpuid: %d\n", mpidr_el1() & 0xff);
   printk("%d %u\n", -1, -1);
   printk("systime %d\n", systime());
   printk("current EL: %d\n", cur_el());

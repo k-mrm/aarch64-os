@@ -35,7 +35,9 @@ void irq_handler(struct trapframe *tf) {
   asm volatile("dsb sy");
 
   printk("irq: %d cpu: %d\n", intid, targetcpuid);
-  systimer_handle_irq();
+  if(intid == 97) {
+    systimer_handle_irq();
+  }
 
   gic_eoi(iar);
 }

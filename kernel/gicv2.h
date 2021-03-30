@@ -15,8 +15,10 @@
 #define GICD_ITARGETSR(n)  (GICD_BASE + 0x800 + (u64)(n) * 4)
 
 #define GICC_CTLR (GICC_BASE)
+#define GICC_PMR  (GICC_BASE + 0x4)
 #define GICC_IAR  (GICC_BASE + 0xc)
 #define GICC_EOIR (GICC_BASE + 0x10)
+#define GICC_HPPIR  (GICC_BASE + 0x18)
 #define GICC_AIAR (GICC_BASE + 0x20)
 #define GICC_AEOIR  (GICC_BASE + 0x24)
 

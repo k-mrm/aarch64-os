@@ -60,4 +60,10 @@ static inline u64 daif() {
   return d;
 }
 
+static inline u64 mpidr_el1() {
+  u64 m;
+  asm volatile("mrs %0, mpidr_el1" : "=r"(m));
+  return m;
+}
+
 #endif
