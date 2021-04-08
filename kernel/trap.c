@@ -1,4 +1,4 @@
-#include "exception.h"
+#include "trap.h"
 #include "arm.h"
 #include "mono.h"
 #include "memmap.h"
@@ -26,13 +26,9 @@ void sync_handler(struct trapframe *tf) {
 }
 
 void irq_handler(struct trapframe *tf) {
-  printk("c %d d %d", REG(GICC_CTLR), REG(GICD_CTLR));
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
-
-  asm volatile("isb");
-  asm volatile("dsb sy");
 
   printk("irq: %d cpu: %d\n", intid, targetcpuid);
   if(intid == 97) {

@@ -9,7 +9,7 @@ void systimer_init(u32 interval) {
 
 void systimer_handle_irq(void) {
   static int counter = 1;
-  u32 t = REG(SYSTIMER_CLO) + 1000 * 1000;
+  u32 t = REG(SYSTIMER_CLO) + 2000 * 1000;
 
   REG(SYSTIMER_C(1)) = t;
   REG(SYSTIMER_CS) = 1 << 1;

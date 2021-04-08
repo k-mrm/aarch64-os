@@ -5,7 +5,7 @@
 #include "console.h"
 #include "printk.h"
 #include "systimer.h"
-#include "exception.h"
+#include "trap.h"
 #include "gicv2.h"
 
 int main(void) {

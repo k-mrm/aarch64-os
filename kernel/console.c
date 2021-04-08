@@ -1,3 +1,4 @@
+#include "string.h"
 #include "mono.h"
 #include "framebuffer.h"
 #include "font.h"
@@ -10,14 +11,45 @@ void console_init() {
   font_init();
   cons1.fb = &display_fb;
   cons1.font = &default_font;
-  cons1.cur_x = 20;
-  cons1.cur_y = 20;
+  cons1.cur_x = 0;
+  cons1.cur_y = 0;
+  cons1.w = display_fb.w;
+  cons1.h = display_fb.h;
+  cons1.initx = 0;
+  cons1.lineh = 10;
+  cons1.bpl = display_fb.pitch * cons1.lineh;
+}
+
+void csscroll(struct console *cs) {
+  memmove(cs->fb->buf, (char *)cs->fb->buf + cs->bpl, cs->fb->pitch * (cs->h - cs->lineh));
+  memset((char *)cs->fb->buf + cs->fb->pitch * (cs->h - cs->lineh), 0, cs->bpl);
+
+  cs->cur_x = cs->initx;
+  cs->cur_y = cs->h - cs->lineh;
+}
+
+void csnewline(struct console *cs) {
+  if(cs->cur_y == cs->h) {
+    csscroll(cs);
+  }
+  else {
+    cs->cur_x = cs->initx;
+    cs->cur_y += cs->lineh;
+  }
 }
 
 void csputc(struct console *cs, char c) {
-  drawchar(cs->fb, cs->font, &cs->cur_x, &cs->cur_y, c);
+  if(c == '\n') {
+    csnewline(cs);
+    return;
+  }
+
+  drawchar(cs->fb, cs->font, cs->cur_x, cs->cur_y, c);
+  cs->cur_x += cs->font->w;
 }
 
 void csputs(struct console *cs, char *s) {
-  drawstr(cs->fb, cs->font, &cs->cur_x, &cs->cur_y, s);
+  while(*s) {
+    csputc(cs, *s++);
+  }
 }

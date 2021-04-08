@@ -8,8 +8,18 @@
 struct console {
   struct framebuffer *fb;
   struct font *font;
+
   u32 cur_x;
   u32 cur_y;
+
+  u32 w;
+  u32 h;
+
+  u32 initx;
+
+  u32 lineh;
+
+  u32 bpl;
 };
 
 extern struct console cons1;

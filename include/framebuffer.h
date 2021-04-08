@@ -21,7 +21,6 @@ extern struct framebuffer display_fb;
 
 void fb_init(void);
 void drawpxl(struct framebuffer *fb, u32 x, u32 y, u16 c);
-void drawchar(struct framebuffer *fb, struct font *font, u32 *x, u32 *y, char c);
-void drawstr(struct framebuffer *fb, struct font *font, u32 *x, u32 *y, char *s);
+void drawchar(struct framebuffer *fb, struct font *font, u32 x, u32 y, char c);
 
 #endif

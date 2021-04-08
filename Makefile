@@ -4,15 +4,21 @@ LD = $(PREFIX)ld
 OBJCOPY = $(PREFIX)objcopy
 
 CCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
+CCFLAGS += -I ./include/
+CCFLAGS += -I ./include/lib/
 LDFLAGS = -nostdlib -nostartfiles
 
 QEMU = qemu-system-aarch64
 CPU = cortex-a72
 MACHINE = raspi3
 
-OBJS = kernel/boot.o kernel/vectortable.o	\
-			 kernel/console.o kernel/exception.o kernel/font.o kernel/framebuffer.o kernel/gicv2.o \
+KOBJS = kernel/boot.o kernel/vectortable.o	\
+			 kernel/console.o kernel/trap.o kernel/font.o kernel/framebuffer.o kernel/gicv2.o \
 			 kernel/gpio.o kernel/mailbox.o kernel/main.o kernel/printk.o kernel/systimer.o
+
+LIBS = lib/string.o
+
+OBJS = $(KOBJS)	$(LIBS)
 
 SDPATH = /media/k-mrm/09D0-F0A8
 

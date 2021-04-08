@@ -1,5 +1,5 @@
-#ifndef MONO_EXCEPTION_H
-#define MONO_EXCEPTION_H
+#ifndef MONO_TRAP_H
+#define MONO_TRAP_H
 
 #include "mono.h"
 

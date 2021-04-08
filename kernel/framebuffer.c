@@ -70,27 +70,13 @@ void drawpxl(struct framebuffer *fb, u32 x, u32 y, u16 c) {
   *(u16 *)((u8 *)fb->buf + off) = c;
 }
 
-void drawchar(struct framebuffer *fb, struct font *font, u32 *x, u32 *y, char c) {
-  if(c == '\n') {
-    *x = 20;
-    *y += 10;
-    return;
-  }
-
+void drawchar(struct framebuffer *fb, struct font *font, u32 x, u32 y, char c) {
   const char *glyph = font->data[c];
 
   for(int i = 0; i < font->h; i++) {
     for(int j = 0; j < font->w; j++) {
       if(glyph[i] & (1 << j))
-        drawpxl(fb, *x + j, *y + i, 0xffff);
+        drawpxl(fb, x + j, y + i, 0xffff);
     }
-  }
-
-  *x += 8;
-}
-
-void drawstr(struct framebuffer *fb, struct font *font, u32 *x, u32 *y, char *s) {
-  while(*s) {
-    drawchar(fb, font, x, y, *s++);
   }
 }
