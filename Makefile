@@ -14,7 +14,8 @@ MACHINE = raspi3
 
 KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/console.o kernel/trap.o kernel/font.o kernel/framebuffer.o kernel/gicv2.o \
-			 kernel/gpio.o kernel/mailbox.o kernel/main.o kernel/printk.o kernel/systimer.o
+			 kernel/gpio.o kernel/mailbox.o kernel/main.o kernel/printk.o kernel/systimer.o	\
+			 kernel/proc.o
 
 LIBS = lib/string.o
 
