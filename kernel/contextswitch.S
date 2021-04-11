@@ -1,7 +1,9 @@
 .global contextswitch
 
 contextswitch: /* contextswitch(struct context *old, struct context *new) */
-  stp sp, x0, [x0, #16 * 0]
+  mov x9, sp
+
+  stp x9, x0, [x0, #16 * 0]
   stp x1, x2, [x0, #16 * 1]
   stp x3, x4, [x0, #16 * 2]
   stp x5, x6, [x0, #16 * 3]
@@ -15,7 +17,7 @@ contextswitch: /* contextswitch(struct context *old, struct context *new) */
   stp x28, x29, [x0, #16 * 11]
   str x30, [x0, #16 * 12]
 
-  ldp sp, x0, [x1, #16 * 0]
+  ldp x9, x0, [x1, #16 * 0]
   ldp x1, x2, [x1, #16 * 1]
   ldp x3, x4, [x1, #16 * 2]
   ldp x5, x6, [x1, #16 * 3]
