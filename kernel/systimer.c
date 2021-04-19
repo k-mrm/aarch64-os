@@ -1,19 +1,26 @@
 #include "systimer.h"
 #include "printk.h"
+#include "trap.h"
 
-void systimer_init(u32 interval) {
+struct systimer timer1, timer3;
+
+void systimer1_init(u32 interval) {
   printk("systimer init\n");
+  timer1.id = 1;
+  timer1.interval = interval;
   u32 t = REG(SYSTIMER_CLO) + interval * 1000;
   REG(SYSTIMER_C(1)) = t;
+
+  new_irq(97, systimer1_handle_irq);
 }
 
-void systimer_handle_irq(void) {
+void systimer1_handle_irq(void) {
   static int counter = 1;
-  u32 t = REG(SYSTIMER_CLO) + 2000 * 1000;
+  u32 t = REG(SYSTIMER_CLO) + timer1.interval * 1000;
 
   REG(SYSTIMER_C(1)) = t;
   REG(SYSTIMER_CS) = 1 << 1;
-  printk("systimer irq %d\n", counter++);
+  printk("systimer1 irq %d\n", counter++);
 }
 
 u64 systime() {

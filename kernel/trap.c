@@ -6,6 +6,24 @@
 #include "gicv2.h"
 #include "systimer.h"
 
+typedef void (*handler_t)(void);
+
+handler_t irqhandler[256];
+
+static void default_handler() {
+  panic("unknown irq");
+}
+
+void trap_init() {
+  for(int i = 0; i < 256; i++) {
+    irqhandler[i] = default_handler;
+  }
+}
+
+void new_irq(int intid, hanler_t handler) {
+  irqhandler[intid] = handler;
+}
+
 void sync_handler(struct trapframe *tf) {
   printk("elr: %p far: %p\n", elr_el1(), far_el1());
 
@@ -31,9 +49,8 @@ void irq_handler(struct trapframe *tf) {
   u32 intid = iar & 0x3ff;
 
   printk("irq: %d cpu: %d\n", intid, targetcpuid);
-  if(intid == 97) {
-    systimer_handle_irq();
-  }
+
+  irqhandler[intid]();
 
   gic_eoi(iar);
 }

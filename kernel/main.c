@@ -8,10 +8,15 @@
 #include "trap.h"
 #include "gicv2.h"
 
+void proc() {
+  ;
+}
+
 int main(void) {
   console_init();
   gicv2_init();
-  systimer_init(1000);
+  trap_init();
+  systimer1_init(1000);
 
   printk("mono os for raspberry pi 4\n");
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
@@ -23,6 +28,8 @@ int main(void) {
   printk("var_el1: %p\n", vbar_el1());
 
   enable_irq();
+
+  schedule();
 
   for(;;) {}
 

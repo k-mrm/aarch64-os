@@ -11,10 +11,15 @@
 #define SYSTIMER_CHI (SYSTIMER_BASE + 0x8)
 #define SYSTIMER_C(n) (SYSTIMER_BASE + 0xc + (n) * 4)
 
-void systimer_init(u32 interval);
-void systimer_handle_irq(void);
+void systimer1_init(u32 interval);
+void systimer1_handle_irq(void);
 u64 systime(void);
 void sleep(u32 sec);
 void set_systimer_c1(u32 ms);
+
+struct systimer {
+  int id;
+  u32 interval;
+};
 
 #endif

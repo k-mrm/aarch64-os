@@ -9,6 +9,7 @@ void gicv2_init() {
   u32 typer = REG(GICD_TYPER);
   u32 max_nint = ((typer & 0x1f) + 1) * 32;
 
+  /* FIXME */
   u32 systimer1_id = 32 + 65; /* timer1: GIC_SPI 65 */
 
   REG(GICD_ISENABLER(systimer1_id / 32)) |= 1 << (systimer1_id % 32);

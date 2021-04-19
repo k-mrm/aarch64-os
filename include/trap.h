@@ -38,5 +38,6 @@ struct trapframe {
 };
 
 void sync_handler(struct trapframe *tf);
+void new_irq(int intid, hanler_t handler);
 
 #endif
