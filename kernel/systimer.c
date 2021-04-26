@@ -20,7 +20,6 @@ void systimer1_handle_irq(void) {
 
   REG(SYSTIMER_C(1)) = t;
   REG(SYSTIMER_CS) = 1 << 1;
-  printk("systimer1 irq %d\n", counter++);
 }
 
 u64 systime() {

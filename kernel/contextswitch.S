@@ -15,7 +15,7 @@ contextswitch: /* contextswitch(struct context *old, struct context *new) */
   stp x24, x25, [x0, #16 * 9]
   stp x26, x27, [x0, #16 * 10]
   stp x28, x29, [x0, #16 * 11]
-  str x30, [x0, #16 * 12]
+  stp x30, xzr, [x0, #16 * 12]
 
   ldp x9, x0, [x1, #16 * 0]
   ldp x1, x2, [x1, #16 * 1]
@@ -29,6 +29,6 @@ contextswitch: /* contextswitch(struct context *old, struct context *new) */
   ldp x24, x25, [x1, #16 * 9]
   ldp x26, x27, [x1, #16 * 10]
   ldp x28, x29, [x1, #16 * 11]
-  ldr x30, [x1, #16 * 12]
+  ldp x30, xzr, [x1, #16 * 12]
   
   ret

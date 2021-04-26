@@ -30,7 +30,6 @@ struct context {
   u64 x28;
   u64 x29;
   u64 x30;  /* lr */
-  u64 pc;
 };
 
 enum procstate {
@@ -45,9 +44,10 @@ struct proc {
   enum procstate state;
   pid_t pid;
   struct context context;
+  char *stack;
   char name[16];
 };
 
-struct proc proctable[128];
+struct proc proctable[256];
 
 #endif
