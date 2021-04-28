@@ -48,6 +48,8 @@ struct proc {
   char name[16];
 };
 
-struct proc proctable[256];
+#define NPROC 256
+
+struct proc proctable[NPROC];
 
 #endif

@@ -27,15 +27,13 @@ found:
   return pid;
 }
 
+void schedule() {
+  for(int i = 0; i < NPROC; i++) {
+  }
+}
+
 void yield() {
   curproc->state = RUNNABLE;
   schedule();
 }
 
-void schedule() {
-  for(int i = 0; i < NPROC; i++) {
-    if(p->state == RUNNABLE) {
-      ;
-    }
-  }
-}

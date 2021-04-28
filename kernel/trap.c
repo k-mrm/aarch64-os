@@ -6,7 +6,6 @@
 #include "gicv2.h"
 #include "systimer.h"
 
-typedef void (*handler_t)(void);
 
 handler_t irqhandler[256];
 
@@ -20,7 +19,7 @@ void trap_init() {
   }
 }
 
-void new_irq(int intid, hanler_t handler) {
+void new_irq(int intid, handler_t handler) {
   irqhandler[intid] = handler;
 }
 

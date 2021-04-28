@@ -6,6 +6,7 @@
 #include "printk.h"
 #include "systimer.h"
 #include "trap.h"
+#include "uart.h"
 #include "gicv2.h"
 
 /* test */
@@ -31,10 +32,14 @@ void proc2() {
 }
 
 int main(void) {
+  uart_init(0);
   console_init();
   gicv2_init();
   trap_init();
   systimer1_init(200);
+
+  uart_putc(0, 'a');
+  uart_puts(0, "Hello, uart!\n");
 
   printk("mono os for raspberry pi 4\n");
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
@@ -47,10 +52,12 @@ int main(void) {
 
   enable_irq();
 
+  /*
   newproc(proc1);
   newproc(proc2);
 
   schedule();
+  */
 
   for(;;) {}
 

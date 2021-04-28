@@ -37,7 +37,11 @@ struct trapframe {
   u64 x30;  /* lr */
 };
 
+typedef void (*handler_t)(void);
+
 void sync_handler(struct trapframe *tf);
-void new_irq(int intid, hanler_t handler);
+void new_irq(int intid, handler_t handler);
+
+void trap_init(void);
 
 #endif

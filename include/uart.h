@@ -1,25 +1,22 @@
 #ifndef MONO_UART_H
 #define MONO_UART_H
 
+#include "mono.h"
 #include "memmap.h"
 
-#define UART0BASE (PERIPHERAL_BASE + 0x201000)
-#define UART0_DR  (UART0BASE + 0x00)
-#define UART0_FR  (UART0BASE + 0x18)
-#define UART0_IBRD  (UART0BASE + 0x24)
-#define UART0_FBRD  (UART0BASE + 0x28)
-#define UART0_LCRH  (UART0BASE + 0x2c)
-#define UART0_CR  (UART0BASE + 0x30)
-
-
-#define UART2BASE (PERIPHERAL_BASE + 0x201400)
-
-#define UART3BASE (PERIPHERAL_BASE + 0x201600)
-
-#define UART4BASE (PERIPHERAL_BASE + 0x201800)
-
-#define UART5BASE (PERIPHERAL_BASE + 0x201a00)
+#define UARTBASE(n) (PERIPHERAL_BASE + 0x201000 + (n) * 0x200)
+#define UART_DR(n)  (UARTBASE(n) + 0x00)
+#define UART_FR(n)  (UARTBASE(n) + 0x18)
+#define UART_IBRD(n)  (UARTBASE(n) + 0x24)
+#define UART_FBRD(n)  (UARTBASE(n) + 0x28)
+#define UART_LCRH(n)  (UARTBASE(n) + 0x2c)
+#define UART_CR(n)  (UARTBASE(n) + 0x30)
 
 #define UART_FREQ 48000000
+#define UART_BAUD 115200
+
+void uart_init(int n);
+void uart_putc(int n, char c);
+void uart_puts(int n, char *s);
 
 #endif
