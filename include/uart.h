@@ -12,7 +12,7 @@
 #define UART_LCRH(n)  (UARTBASE(n) + 0x2c)
 #define UART_CR(n)  (UARTBASE(n) + 0x30)
 
-#define UART_FREQ 48000000
+#define UART_FREQ 48000000ull
 #define UART_BAUD 115200
 
 void uart_init(int n);

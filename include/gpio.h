@@ -23,6 +23,11 @@ enum pinmode {
   ALT5 = 0b010,
 };
 
+enum pullmode {
+  PULLUP = 1,
+  PULLDOWN = 2,
+};
+
 void set_pinmode(int pin, enum pinmode mode);
 
 #endif

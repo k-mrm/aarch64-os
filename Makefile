@@ -34,7 +34,7 @@ kernel8.img: $(OBJS) kernel/link.ld
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img
-	$(QEMU) -cpu $(CPU) -machine $(MACHINE) -kernel kernel8.img
+	$(QEMU) -cpu $(CPU) -machine $(MACHINE) -kernel kernel8.img -serial stdio
 
 raspi: kernel8.img
 	cp kernel8.img $(SDPATH)

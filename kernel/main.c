@@ -32,13 +32,16 @@ void proc2() {
 }
 
 int main(void) {
-  uart_init(0);
   console_init();
+  uart_init(0);
   gicv2_init();
   trap_init();
   systimer1_init(200);
 
-  uart_putc(0, 'a');
+  for(;;) {
+    uart_putc(0, 'a');
+    sleep(1);
+  }
   uart_puts(0, "Hello, uart!\n");
 
   printk("mono os for raspberry pi 4\n");
