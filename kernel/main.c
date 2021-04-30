@@ -38,10 +38,6 @@ int main(void) {
   trap_init();
   systimer1_init(200);
 
-  for(;;) {
-    uart_putc(0, 'a');
-    sleep(1);
-  }
   uart_puts(0, "Hello, uart!\n");
 
   printk("mono os for raspberry pi 4\n");
