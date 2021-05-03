@@ -28,6 +28,10 @@ void uart_init(int n) {
   REG(UART_CR(n)) = 0x301;  /* RXE, TXE, UARTEN */
 }
 
+static bool uart_txff(int n) {
+  return REG(UART_FR(n)) & (1 << 5);
+}
+
 void uart_putc(int n, char c) {
   REG(UART_DR(n)) = c;
 }
@@ -35,6 +39,7 @@ void uart_putc(int n, char c) {
 void uart_puts(int n, char *s) {
   char c;
   while((c = *s)) {
+    while(uart_txff(n)) {}
     REG(UART_DR(n)) = c;
     s++;
   }
