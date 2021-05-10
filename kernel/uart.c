@@ -6,12 +6,10 @@ void disable_uart(int n) {
   REG(UART_CR(n)) = 0;
 }
 
-void set_uart_baudrate(int n, u64 baud) {
+static void set_uart_baudrate(int n, u64 baud) {
   u64 bauddiv = (UART_FREQ * 1000) / (16 * baud);
   u64 ibrd = bauddiv / 1000;
   u64 fbrd = ((bauddiv - ibrd * 1000) * 64 + 500) / 1000;
-
-  printk("bird %d %d\n", ibrd, fbrd);
 
   REG(UART_IBRD(n)) = (u32)ibrd;
   REG(UART_FBRD(n)) = (u32)fbrd;

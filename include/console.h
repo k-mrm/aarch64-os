@@ -5,7 +5,12 @@
 #include "framebuffer.h"
 #include "font.h"
 
+#define USE_UART
+
 struct console {
+#ifdef USE_UART
+  int uartid;
+#else
   struct framebuffer *fb;
   struct font *font;
 
@@ -20,6 +25,7 @@ struct console {
   u32 lineh;
 
   u32 bpl;
+#endif
 };
 
 extern struct console cons1;

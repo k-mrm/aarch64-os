@@ -3,10 +3,15 @@
 #include "framebuffer.h"
 #include "font.h"
 #include "console.h"
+#include "uart.h"
 
 struct console cons1;
 
 void console_init() {
+#ifdef USE_UART
+  uart_init(0);
+  cons1.uartid = 0;
+#else
   fb_init();
   font_init();
   cons1.fb = &display_fb;
@@ -18,9 +23,19 @@ void console_init() {
   cons1.initx = 0;
   cons1.lineh = 10;
   cons1.bpl = display_fb.pitch * cons1.lineh;
+#endif
 }
 
-void csscroll(struct console *cs) {
+#ifdef USE_UART
+void csputc(struct console *cs, char c) {
+  uart_putc(cs->uartid, c);
+}
+
+void csputs(struct console *cs, char *s) {
+  uart_puts(cs->uartid, s);
+}
+#else
+static void csscroll(struct console *cs) {
   memmove(cs->fb->buf, (char *)cs->fb->buf + cs->bpl, cs->fb->pitch * (cs->h - cs->lineh));
   memset((char *)cs->fb->buf + cs->fb->pitch * (cs->h - cs->lineh), 0, cs->bpl);
 
@@ -28,7 +43,7 @@ void csscroll(struct console *cs) {
   cs->cur_y = cs->h - cs->lineh;
 }
 
-void csnewline(struct console *cs) {
+static void csnewline(struct console *cs) {
   if(cs->cur_y == cs->h) {
     csscroll(cs);
   }
@@ -53,3 +68,4 @@ void csputs(struct console *cs, char *s) {
     csputc(cs, *s++);
   }
 }
+#endif

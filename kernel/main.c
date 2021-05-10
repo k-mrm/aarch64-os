@@ -33,7 +33,6 @@ void proc2() {
 
 int main(void) {
   console_init();
-  uart_init(0);
   gicv2_init();
   trap_init();
   systimer1_init(200);
