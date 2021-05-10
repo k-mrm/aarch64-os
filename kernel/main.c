@@ -37,8 +37,6 @@ int main(void) {
   trap_init();
   systimer1_init(200);
 
-  uart_puts(0, "Hello, uart!\n");
-
   printk("mono os for raspberry pi 4\n");
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
   printk("%d %u\n", -1, -1);

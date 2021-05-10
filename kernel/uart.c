@@ -31,6 +31,7 @@ static bool uart_txff(int n) {
 }
 
 void uart_putc(int n, char c) {
+  while(uart_txff(n)) {}
   REG(UART_DR(n)) = c;
 }
 
