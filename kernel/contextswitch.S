@@ -1,6 +1,6 @@
-.global contextswitch
+.global swtch
 
-contextswitch: /* contextswitch(struct context *old, struct context *new) */
+swtch: /* swtch(struct context *old, struct context *new) */
   mov x9, sp
 
   stp x9, x0, [x0, #16 * 0]
@@ -31,4 +31,4 @@ contextswitch: /* contextswitch(struct context *old, struct context *new) */
   ldp x28, x29, [x1, #16 * 11]
   ldp x30, xzr, [x1, #16 * 12]
   
-  ret
+  ret // lr(x30) == forkret

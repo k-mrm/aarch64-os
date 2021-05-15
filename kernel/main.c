@@ -10,24 +10,23 @@
 #include "gicv2.h"
 
 /* test */
-int fib(int n) {
-  if(n < 2) {
-    return n;
-  }
-  else {
-    return fib(n - 1) + fib(n - 2);
+int sum(int n, int id) {
+  int s = 0;
+  for(int i = 0; i < n; i++) {
+    s += i;
+    printk("proc %d: %d\n", id, s);
   }
 }
 
 void proc1() {
   while(1) {
-    printk("proc1 %d", fib(40));
+    sum(10, 1);
   }
 }
 
 void proc2() {
   while(1) {
-    printk("proc2 %d", fib(40));
+    sum(10, 2);
   }
 }
 
@@ -36,26 +35,19 @@ int main(void) {
   gicv2_init();
   trap_init();
   systimer1_init(200);
+  proc_init();
 
   printk("mono os for raspberry pi 4\n");
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
-  printk("%d %u\n", -1, -1);
-  printk("systime %d\n", systime());
   printk("current EL: %d\n", cur_el());
-  printk("%s%c\n", "Hello, raspi4", '!');
-  printk("addr: %p\n", printk);
   printk("var_el1: %p\n", vbar_el1());
 
   enable_irq();
 
-  /*
   newproc(proc1);
   newproc(proc2);
 
   schedule();
-  */
-
-  for(;;) {}
 
   return 0;
 }

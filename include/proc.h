@@ -29,7 +29,7 @@ struct context {
   u64 x27;
   u64 x28;
   u64 x29;
-  u64 x30;  /* lr */
+  u64 lr;  /* x30 */
 };
 
 enum procstate {
@@ -50,6 +50,9 @@ struct proc {
 
 #define NPROC 256
 
-struct proc proctable[NPROC];
+void proc_init(void);
+void schedule() __attribute__((noreturn));
+
+extern struct proc proctable[NPROC];
 
 #endif
