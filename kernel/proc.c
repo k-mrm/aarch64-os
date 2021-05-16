@@ -3,6 +3,8 @@
 #include "proc.h"
 #include "string.h"
 
+#define PAGESIZE 4096
+
 struct proc proctable[NPROC];
 /* proctable[0] == kernel proc */
 
@@ -13,6 +15,12 @@ void proc_init() {
   memset(&kproc, 0, sizeof(kproc));
   kproc.state = RUNNING;
   proctable[0] = kproc;
+}
+
+#define MEMBASE 0x200000llu
+void *allocpage() {
+  static int i = 0;
+  return (void *)(MEMBASE + (i++) * PAGESIZE);
 }
 
 /* FIXME: tmp */
@@ -32,8 +40,11 @@ found:
   p->pid = pid++;
   memset(&p->context, 0, sizeof(p->context));
 
-  p->context.x9 = (u64)fn;
+  char *stack = allocpage();
+
+  p->context.x0 = (u64)fn;
   p->context.lr = (u64)forkret;
+  p->context.sp = (u64)stack + PAGESIZE;
 
   p->state = RUNNABLE;
 
@@ -52,10 +63,9 @@ void schedule() {
       }
     }
   }
-
 }
 
-void swtch_sched() {
+static void swtch_sched() {
   swtch(&curproc->context, &kproc.context);
 }
 
@@ -64,3 +74,6 @@ void yield() {
   swtch_sched();
 }
 
+void curproc_dump() {
+  ;
+}

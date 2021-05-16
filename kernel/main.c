@@ -8,9 +8,10 @@
 #include "trap.h"
 #include "uart.h"
 #include "gicv2.h"
+#include "proc.h"
 
 /* test */
-int sum(int n, int id) {
+void sum(int n, int id) {
   int s = 0;
   for(int i = 0; i < n; i++) {
     s += i;
@@ -48,6 +49,4 @@ int main(void) {
   newproc(proc2);
 
   schedule();
-
-  return 0;
 }

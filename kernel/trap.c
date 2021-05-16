@@ -47,8 +47,6 @@ void irq_handler(struct trapframe *tf) {
   u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
 
-  printk("irq: %d cpu: %d\n", intid, targetcpuid);
-
   irqhandler[intid]();
 
   gic_eoi(iar);

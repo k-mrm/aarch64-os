@@ -30,7 +30,7 @@ struct context {
   u64 x28;
   u64 x29;
   u64 lr;  /* x30 */
-};
+} __attribute__((aligned(16)));
 
 enum procstate {
   UNUSED,
@@ -52,6 +52,13 @@ struct proc {
 
 void proc_init(void);
 void schedule() __attribute__((noreturn));
+pid_t newproc(void (*fn)(void));
+
+void swtch(struct context *old, struct context *new);
+
+void forkret(void);
+
+void yield(void);
 
 extern struct proc proctable[NPROC];
 

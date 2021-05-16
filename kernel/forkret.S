@@ -1,3 +1,3 @@
 .global forkret
 forkret:
-  blr x19
+  blr x0

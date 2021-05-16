@@ -1,6 +1,7 @@
 #include "systimer.h"
 #include "printk.h"
 #include "trap.h"
+#include "proc.h"
 
 struct systimer timer1, timer3;
 
@@ -20,6 +21,8 @@ void systimer1_handle_irq(void) {
 
   REG(SYSTIMER_C(1)) = t;
   REG(SYSTIMER_CS) = 1 << 1;
+
+  yield();
 }
 
 u64 systime() {
