@@ -16,7 +16,6 @@ void systimer1_init(u32 interval) {
 }
 
 void systimer1_handle_irq(void) {
-  static int counter = 1;
   u32 t = REG(SYSTIMER_CLO) + timer1.interval * 1000;
 
   REG(SYSTIMER_C(1)) = t;

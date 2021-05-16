@@ -11,24 +11,19 @@
 #include "proc.h"
 
 /* test */
-void sum(int n, int id) {
-  int s = 0;
-  for(int i = 0; i < n; i++) {
-    s += i;
-    printk("proc %d: %d\n", id, s);
+void task(int id) {
+  u64 s = 0;
+  for(;;) {
+    printk("proc %d: %p\n", id, s++);
   }
 }
 
 void proc1() {
-  while(1) {
-    sum(10, 1);
-  }
+  task(1);
 }
 
 void proc2() {
-  while(1) {
-    sum(10, 2);
-  }
+  task(2);
 }
 
 int main(void) {
@@ -43,8 +38,13 @@ int main(void) {
   printk("current EL: %d\n", cur_el());
   printk("var_el1: %p\n", vbar_el1());
 
+  /*
   newproc(proc1);
   newproc(proc2);
 
   schedule();
+  */
+  enable_irq();
+
+  for(;;);
 }

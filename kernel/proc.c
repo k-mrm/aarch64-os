@@ -24,11 +24,6 @@ void *allocpage() {
   return (void *)(MEMBASE + (i++) * PAGESIZE);
 }
 
-void _forkret() {
-  printk("forkret!\n");
-  forkret();
-}
-
 /* FIXME: tmp */
 pid_t newproc(void (*fn)(void)) {
   printk("neeeeeeeeewproc %p\n", fn);
@@ -50,7 +45,7 @@ found:
   char *stack = allocpage();
 
   p->context.x0 = (u64)fn;
-  p->context.lr = (u64)_forkret;
+  p->context.lr = (u64)forkret;
   p->context.sp = (u64)stack + PAGESIZE;
 
   p->state = RUNNABLE;
@@ -66,10 +61,11 @@ void schedule() {
     for(int i = 1; i < NPROC; i++) {
       struct proc *p = &proctable[i];
       if(p->state == RUNNABLE) {
-        printk("found runnable proc\n");
+        printk("found runnable proc %d\n", i);
         p->state = RUNNING;
         curproc = p;
         cswitch(&kproc.context, &p->context);
+        printk("okaeriiiiiiiii %d\n", i);
       }
     }
   }
