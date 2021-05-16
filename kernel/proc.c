@@ -1,4 +1,5 @@
 #include "mono.h"
+#include "arm.h"
 #include "printk.h"
 #include "proc.h"
 #include "string.h"
@@ -8,7 +9,7 @@
 struct proc proctable[NPROC];
 /* proctable[0] == kernel proc */
 
-struct proc *curproc;
+struct proc *curproc = NULL;
 struct proc kproc;
 
 void proc_init() {
@@ -23,8 +24,14 @@ void *allocpage() {
   return (void *)(MEMBASE + (i++) * PAGESIZE);
 }
 
+void _forkret() {
+  printk("forkret!\n");
+  forkret();
+}
+
 /* FIXME: tmp */
 pid_t newproc(void (*fn)(void)) {
+  printk("neeeeeeeeewproc %p\n", fn);
   static pid_t pid = 1;
   struct proc *p;
 
@@ -43,7 +50,7 @@ found:
   char *stack = allocpage();
 
   p->context.x0 = (u64)fn;
-  p->context.lr = (u64)forkret;
+  p->context.lr = (u64)_forkret;
   p->context.sp = (u64)stack + PAGESIZE;
 
   p->state = RUNNABLE;
@@ -51,25 +58,32 @@ found:
   return pid;
 }
 
-/* tmp */
 void schedule() {
+  printk("schhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhed\n");
   for(;;) {
+    enable_irq();
+
     for(int i = 1; i < NPROC; i++) {
       struct proc *p = &proctable[i];
       if(p->state == RUNNABLE) {
+        printk("found runnable proc\n");
         p->state = RUNNING;
         curproc = p;
-        swtch(&kproc.context, &p->context);
+        cswitch(&kproc.context, &p->context);
       }
     }
   }
 }
 
 static void swtch_sched() {
-  swtch(&curproc->context, &kproc.context);
+  cswitch(&curproc->context, &kproc.context);
 }
 
 void yield() {
+  printk("yyyyyyyield\n");
+  if(!curproc) {
+    panic("bad yield");
+  }
   curproc->state = RUNNABLE;
   swtch_sched();
 }

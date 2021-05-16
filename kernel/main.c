@@ -43,8 +43,6 @@ int main(void) {
   printk("current EL: %d\n", cur_el());
   printk("var_el1: %p\n", vbar_el1());
 
-  enable_irq();
-
   newproc(proc1);
   newproc(proc2);
 

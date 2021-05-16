@@ -54,12 +54,13 @@ void proc_init(void);
 void schedule() __attribute__((noreturn));
 pid_t newproc(void (*fn)(void));
 
-void swtch(struct context *old, struct context *new);
+void cswitch(struct context *old, struct context *new);
 
 void forkret(void);
 
 void yield(void);
 
 extern struct proc proctable[NPROC];
+extern struct proc *curproc;
 
 #endif
