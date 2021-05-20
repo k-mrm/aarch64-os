@@ -41,22 +41,22 @@
 .global vectortable
 .balign 0x800
 vectortable:
-  b hang
+  b unknownint
 .balign 0x80
-  b hang
+  b unknownint
 .balign 0x80
-  b hang
+  b unknownint
 .balign 0x80
-  b hang
+  b unknownint
 
 .balign 0x80
   b cur_sp_elx_sync
 .balign 0x80
   b cur_sp_elx_irq
 .balign 0x80
-  b hang
+  b unknownint
 .balign 0x80
-  b hang
+  b unknownint
 
 .balign 0x80
   b hang

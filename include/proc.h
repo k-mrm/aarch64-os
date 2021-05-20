@@ -37,7 +37,6 @@ enum procstate {
   RUNNING,
   RUNNABLE,
   SLEEPING,
-  DEAD,
 };
 
 struct proc {

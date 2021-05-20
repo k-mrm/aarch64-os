@@ -14,7 +14,7 @@
 void task(int id) {
   u64 s = 0;
   for(;;) {
-    printk("proc %d: %p\n", id, s++);
+    printk("proc %d: %p daif %p\n", id, s++, daif());
   }
 }
 
@@ -24,6 +24,10 @@ void proc1() {
 
 void proc2() {
   task(2);
+}
+
+void proc3() {
+  task(3);
 }
 
 int main(void) {
@@ -36,15 +40,11 @@ int main(void) {
   printk("mono os for raspberry pi 4\n");
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
   printk("current EL: %d\n", cur_el());
-  printk("var_el1: %p\n", vbar_el1());
+  printk("vbar_el1: %p\n", vbar_el1());
 
-  /*
-  newproc(proc1);
   newproc(proc2);
+  newproc(proc1);
+  newproc(proc3);
 
   schedule();
-  */
-  enable_irq();
-
-  for(;;);
 }

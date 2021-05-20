@@ -26,7 +26,6 @@ void *allocpage() {
 
 /* FIXME: tmp */
 pid_t newproc(void (*fn)(void)) {
-  printk("neeeeeeeeewproc %p\n", fn);
   static pid_t pid = 1;
   struct proc *p;
 
@@ -44,6 +43,8 @@ found:
 
   char *stack = allocpage();
 
+  printk("neeeeeeeeewproc %p %p\n", fn, stack);
+
   p->context.x0 = (u64)fn;
   p->context.lr = (u64)forkret;
   p->context.sp = (u64)stack + PAGESIZE;
@@ -56,16 +57,17 @@ found:
 void schedule() {
   printk("schhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhed\n");
   for(;;) {
-    enable_irq();
-
     for(int i = 1; i < NPROC; i++) {
+      enable_irq();
       struct proc *p = &proctable[i];
       if(p->state == RUNNABLE) {
         printk("found runnable proc %d\n", i);
+        printk("daiffffff %p\n", daif());
         p->state = RUNNING;
         curproc = p;
         cswitch(&kproc.context, &p->context);
-        printk("okaeriiiiiiiii %d\n", i);
+        curproc = NULL;
+        printk("okaeriiiiiiiii %d %p\n", i, daif());
       }
     }
   }

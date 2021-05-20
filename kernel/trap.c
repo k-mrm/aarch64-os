@@ -51,3 +51,7 @@ void irq_handler(struct trapframe *tf) {
 
   gic_eoi(iar);
 }
+
+void unknownint() {
+  panic("unknown interrupt");
+}

@@ -16,12 +16,12 @@ void systimer1_init(u32 interval) {
 }
 
 void systimer1_handle_irq(void) {
+  printk("systimer irq\n");
+
   u32 t = REG(SYSTIMER_CLO) + timer1.interval * 1000;
 
   REG(SYSTIMER_C(1)) = t;
   REG(SYSTIMER_CS) = 1 << 1;
-
-  printk("systimer irq\n");
 
   if(curproc && curproc->state == RUNNING)
     yield();
