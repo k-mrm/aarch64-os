@@ -25,6 +25,10 @@ void gicv2_init() {
   REG(GICD_CTLR) = 0x1;
 }
 
+bool gic_enabled() {
+  return (REG(GICC_CTLR) & 0x1) && (REG(GICD_CTLR) & 0x1);
+}
+
 void gic_eoi(u32 iar) {
   REG(GICC_EOIR) = iar;
 }

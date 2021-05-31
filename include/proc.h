@@ -50,7 +50,7 @@ struct proc {
 #define NPROC 256
 
 void proc_init(void);
-void schedule() __attribute__((noreturn));
+void schedule(void);
 pid_t newproc(void (*fn)(void));
 
 void cswitch(struct context *old, struct context *new);

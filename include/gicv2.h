@@ -26,5 +26,7 @@ void gicv2_init(void);
 void gic_eoi(u32 iar);
 u32 gic_iar(void);
 
+bool gic_enabled(void);
+
 #endif
 

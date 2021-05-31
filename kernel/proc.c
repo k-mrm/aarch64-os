@@ -16,6 +16,7 @@ void proc_init() {
   memset(&kproc, 0, sizeof(kproc));
   kproc.state = RUNNING;
   proctable[0] = kproc;
+  curproc = &proctable[0];
 }
 
 #define MEMBASE 0x200000llu
@@ -55,22 +56,38 @@ found:
 }
 
 void schedule() {
+  static int firstcall = 1;
+  int f = 0;
+  struct proc *old;
+
   printk("schhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhed\n");
   for(;;) {
+    enable_irq();
+
     for(int i = 1; i < NPROC; i++) {
-      enable_irq();
       struct proc *p = &proctable[i];
-      if(p->state == RUNNABLE) {
+
+      if(p->state == RUNNING) {
+        p->state = RUNNABLE;
+        f = 1;
+      }
+      else if((f || firstcall) && p->state == RUNNABLE) {
+        firstcall = 0;
+        f = 0;
+
+        old = curproc;
         printk("found runnable proc %d\n", i);
         printk("daiffffff %p\n", daif());
         p->state = RUNNING;
         curproc = p;
-        cswitch(&kproc.context, &p->context);
-        curproc = NULL;
-        printk("okaeriiiiiiiii %d %p\n", i, daif());
+        goto sw;
       }
     }
   }
+
+sw:
+  cswitch(&old->context, &curproc->context);
+  printk("okaeriiiiiiiii %p\n", daif());
 }
 
 static void swtch_sched() {
@@ -82,8 +99,7 @@ void yield() {
   if(!curproc) {
     panic("bad yield");
   }
-  curproc->state = RUNNABLE;
-  swtch_sched();
+  schedule();
   printk("konnnnnnnnnnnnichiah????\n");
 }
 

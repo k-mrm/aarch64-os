@@ -14,21 +14,14 @@
 void proc1() {
   u64 s = 0;
   for(;;) {
-    printk("proc1: %p daif %p\n", s++, daif());
+    printk("proc1: %p daif %d\n", s++, gic_enabled());
   }
 }
 
 void proc2() {
   u64 s = 0;
   for(;;) {
-    printk("proc2: %p daif %p\n", s++, daif());
-  }
-}
-
-void proc3() {
-  u64 s = 0;
-  for(;;) {
-    printk("proc3: %p daif %p\n", s++, daif());
+    printk("proc2: %p daif %d\n", s++, gic_enabled());
   }
 }
 
@@ -48,4 +41,6 @@ int main(void) {
   newproc(proc2);
 
   schedule();
+
+  panic("why");
 }
