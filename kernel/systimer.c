@@ -24,7 +24,9 @@ void systimer1_handle_irq(void) {
   REG(SYSTIMER_CS) = 1 << 1;
 
   if(curproc && curproc->state == RUNNING)
-    yield();
+    yield();  // koko de buttobu
+
+  printk("irq owari");
 }
 
 u64 systime() {

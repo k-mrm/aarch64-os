@@ -11,30 +11,32 @@
 #include "proc.h"
 
 /* test */
-void task(int id) {
+void proc1() {
   u64 s = 0;
   for(;;) {
-    printk("proc %d: %p daif %p\n", id, s++, daif());
+    printk("proc1: %p daif %p\n", s++, daif());
   }
 }
 
-void proc1() {
-  task(1);
-}
-
 void proc2() {
-  task(2);
+  u64 s = 0;
+  for(;;) {
+    printk("proc2: %p daif %p\n", s++, daif());
+  }
 }
 
 void proc3() {
-  task(3);
+  u64 s = 0;
+  for(;;) {
+    printk("proc3: %p daif %p\n", s++, daif());
+  }
 }
 
 int main(void) {
   console_init();
   gicv2_init();
   trap_init();
-  systimer1_init(200);
+  systimer1_init(100);
   proc_init();
 
   printk("mono os for raspberry pi 4\n");
@@ -42,9 +44,8 @@ int main(void) {
   printk("current EL: %d\n", cur_el());
   printk("vbar_el1: %p\n", vbar_el1());
 
-  newproc(proc2);
   newproc(proc1);
-  newproc(proc3);
+  newproc(proc2);
 
   schedule();
 }

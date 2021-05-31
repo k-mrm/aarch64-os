@@ -84,6 +84,7 @@ void yield() {
   }
   curproc->state = RUNNABLE;
   swtch_sched();
+  printk("konnnnnnnnnnnnichiah????\n");
 }
 
 void curproc_dump() {

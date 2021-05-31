@@ -6,7 +6,6 @@
 #include "gicv2.h"
 #include "systimer.h"
 
-
 handler_t irqhandler[256];
 
 static void default_handler() {
