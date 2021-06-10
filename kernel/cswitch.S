@@ -1,6 +1,6 @@
 .global cswitch
 
-cswitch: /* cswitch(struct context **old, struct context *new) */
+cswitch: /* cswitch(struct context *old, struct context *new) */
   mov x9, x0
   mov x10, sp
 

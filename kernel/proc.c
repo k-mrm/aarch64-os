@@ -16,7 +16,7 @@ void proc_init() {
   memset(&kproc, 0, sizeof(kproc));
   kproc.state = RUNNING;
   proctable[0] = kproc;
-  curproc = &proctable[0];
+  curproc = &kproc;
 }
 
 #define MEMBASE 0x200000llu
@@ -58,9 +58,15 @@ found:
 void schedule() {
   static int firstcall = 1;
   int f = 0;
-  struct proc *old;
+  struct proc *old = curproc;
 
   printk("schhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhed\n");
+
+  if(old->pid != 0) {
+    curproc = &kproc;
+    goto sw;
+  }
+
   for(;;) {
     enable_irq();
 
@@ -75,7 +81,6 @@ void schedule() {
         firstcall = 0;
         f = 0;
 
-        old = curproc;
         printk("found runnable proc %d\n", i);
         printk("daiffffff %p\n", daif());
         p->state = RUNNING;

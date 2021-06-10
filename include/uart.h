@@ -4,7 +4,12 @@
 #include "mono.h"
 #include "memmap.h"
 
+#ifdef USE_ARMVIRT
+#define UARTBASE(n) 0x9000000
+#else
 #define UARTBASE(n) (PERIPHERAL_BASE + 0x201000 + (n) * 0x200)
+#endif
+
 #define UART_DR(n)  (UARTBASE(n) + 0x00)
 #define UART_FR(n)  (UARTBASE(n) + 0x18)
 #define UART_IBRD(n)  (UARTBASE(n) + 0x24)

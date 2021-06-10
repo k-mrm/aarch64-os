@@ -40,7 +40,8 @@ int main(void) {
   newproc(proc1);
   newproc(proc2);
 
-  schedule();
+  for(;;)
+    schedule();
 
   panic("why");
 }

@@ -3,14 +3,15 @@ GCC = $(PREFIX)gcc
 LD = $(PREFIX)ld
 OBJCOPY = $(PREFIX)objcopy
 
-CCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
+CCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -DUSE_ARMVIRT
 CCFLAGS += -I ./include/
 CCFLAGS += -I ./include/lib/
 LDFLAGS = -nostdlib -nostartfiles
 
 QEMU = qemu-system-aarch64
 CPU = cortex-a72
-MACHINE = raspi3
+MACHINE = virt
+MACHINE_GIC = gic-version=2
 
 KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/console.o kernel/trap.o kernel/font.o kernel/framebuffer.o kernel/gicv2.o \
@@ -22,7 +23,6 @@ LIBS = lib/string.o
 OBJS = $(KOBJS)	$(LIBS)
 
 SDPATH = /media/k-mrm/09D0-F0A8
-
 %.o: %.c
 	$(GCC) $(CCFLAGS) -c $< -o $@
 
@@ -34,7 +34,7 @@ kernel8.img: $(OBJS) kernel/link.ld
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img
-	$(QEMU) -cpu $(CPU) -machine $(MACHINE) -kernel kernel8.img -serial stdio
+	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -nographic -kernel kernel8.img
 
 raspi: kernel8.img
 	cp kernel8.img $(SDPATH)
