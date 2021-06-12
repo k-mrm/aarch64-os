@@ -53,3 +53,5 @@ dkms.conf
 
 *.img
 /bin/
+
+*.dtb
