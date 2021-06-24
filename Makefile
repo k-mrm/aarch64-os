@@ -14,7 +14,7 @@ MACHINE = virt
 MACHINE_GIC = gic-version=2
 
 KOBJS = kernel/boot.o kernel/vectortable.o	\
-			 kernel/console.o kernel/trap.o kernel/font.o kernel/framebuffer.o kernel/gicv2.o \
+			 kernel/console.o kernel/trap.o kernel/font.o kernel/gicv2.o \
 			 kernel/main.o kernel/printk.o kernel/systimer.o	\
 			 kernel/proc.o kernel/cswitch.o	kernel/forkret.o
 

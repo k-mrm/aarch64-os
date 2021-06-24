@@ -1,7 +1,6 @@
 #include "mono.h"
 #include "arm.h"
 #include "gpio.h"
-#include "framebuffer.h"
 #include "console.h"
 #include "printk.h"
 #include "systimer.h"
@@ -26,10 +25,10 @@ void proc2() {
 
 int main(void) {
   console_init();
-  gicv2_init();
+  // gicv2_init();
   trap_init();
-  systimer1_init(100);
-  proc_init();
+  // systimer1_init(100);
+  // proc_init();
 
   printk("mono os for raspberry pi 4\n");
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
