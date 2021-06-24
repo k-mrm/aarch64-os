@@ -3,14 +3,13 @@
 #include "framebuffer.h"
 #include "font.h"
 #include "console.h"
-#include "uart.h"
+#include "driver/uart.h"
 
 struct console cons1;
 
 void console_init() {
 #ifdef USE_UART
-  uart_init(0);
-  cons1.uartid = 0;
+  uart_init();
 #else
   fb_init();
   font_init();
@@ -28,11 +27,11 @@ void console_init() {
 
 #ifdef USE_UART
 void csputc(struct console *cs, char c) {
-  uart_putc(cs->uartid, c);
+  uart_putc(c);
 }
 
 void csputs(struct console *cs, char *s) {
-  uart_puts(cs->uartid, s);
+  uart_puts(s);
 }
 #else
 static void csscroll(struct console *cs) {

@@ -16,6 +16,10 @@ SECTIONS {
       *(.bss .bss.*)
     }
     __bss_end = .;
+
+    . = ALIGN(16);
+    . += 0x1000;
+    stacktop = .;
 }
 
 __bss_size = (__bss_end - __bss_start) >> 3;

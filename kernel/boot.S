@@ -29,7 +29,7 @@ swtch_el1:
   eret
 
 kernel_start:
-  ldr x1, =_start
+  ldr x1, =stacktop
   mov sp, x1
 
   /* clear bss */

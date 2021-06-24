@@ -6,7 +6,6 @@
 #include "printk.h"
 #include "systimer.h"
 #include "trap.h"
-#include "uart.h"
 #include "gicv2.h"
 #include "proc.h"
 
