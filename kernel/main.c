@@ -24,19 +24,6 @@ void proc2() {
 }
 
 int main(void) {
-  volatile u64 *uart0 = (volatile u64 *)0x09000000llu;
-
-  *uart0 = 'H';
-  *uart0 = 'H';
-  *uart0 = 'H';
-  *uart0 = 'H';
-  *uart0 = 'H';
-
-  for(;;);
-}
-
-/*
-int main(void) {
   console_init();
   // gicv2_init();
   trap_init();
@@ -56,4 +43,3 @@ int main(void) {
 
   panic("why");
 }
-*/

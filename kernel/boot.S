@@ -16,9 +16,6 @@ swtch_el1:
   orr x0, x0, #(1 << 1)
   msr hcr_el2, x0
 
-  ldr x0, =vectortable
-  msr vbar_el1, x0
-
   adr x0, kernel_start
   msr elr_el2, x0
 
@@ -29,6 +26,9 @@ swtch_el1:
   */
 
 kernel_start:
+  ldr x0, =vectortable
+  msr vbar_el1, x0
+
   ldr x1, =stacktop
   mov sp, x1
 
