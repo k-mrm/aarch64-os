@@ -40,6 +40,9 @@ kernel8.img: $(OBJS) kernel/link.ld
 qemu: kernel8.img
 	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -nographic -kernel kernel8.elf
 
+gdb: kernel8.img
+	$(QEMU) -S -gdb tcp::1234 -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -nographic -kernel kernel8.elf
+
 raspi: kernel8.img
 	cp kernel8.img $(SDPATH)
 

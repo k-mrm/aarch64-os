@@ -2,22 +2,26 @@ ENTRY(_start)
 
 SECTIONS {
     . = 0x40000000;
-    .text : { *(.text .text.*) }
+    .text : { KEEP(*(.text.boot)) *(.text) }
+
+    . = ALIGN(4096);
     .rodata : {
       *(.rodata)
     }
+
+    . = ALIGN(4096);
     .data : {
       *(.data)
     }
 
-    . = ALIGN(16);
+    . = ALIGN(4096);
     __bss_start = .;
     .bss : {
       *(.bss .bss.*)
     }
     __bss_end = .;
 
-    . = ALIGN(16);
+    . = ALIGN(4096);
     . += 0x1000;
     stacktop = .;
 }

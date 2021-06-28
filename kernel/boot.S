@@ -5,13 +5,12 @@
 _start:
   mrs x1, mpidr_el1
   and x1, x1, #3
-  cbz x1, swtch_el1
+  cbz x1, kernel_start
 
   b hang
 
-.section ".text"
-
 /* switch EL2 to EL1 */
+/*
 swtch_el1:
   mov x0, #(1 << 31) 
   orr x0, x0, #(1 << 1)
@@ -23,10 +22,11 @@ swtch_el1:
   adr x0, kernel_start
   msr elr_el2, x0
 
-  mov x0, #0x3c5  /* DAIF=1, M=0b101(EL1H) */
+  mov x0, #0x3c5  // DAIF=1, M=0b101(EL1H)
   msr spsr_el2, x0
 
   eret
+  */
 
 kernel_start:
   ldr x1, =stacktop
