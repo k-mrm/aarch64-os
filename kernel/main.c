@@ -1,5 +1,5 @@
 #include "mono.h"
-#include "arm.h"
+#include "aarch64.h"
 #include "gpio.h"
 #include "console.h"
 #include "printk.h"
@@ -30,7 +30,7 @@ int main(void) {
   // systimer1_init(100);
   // proc_init();
 
-  printk("mono os for raspberry pi 4\n");
+  printk("mono os for aarch64\n");
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
   printk("current EL: %d\n", cur_el());
   printk("vbar_el1: %p\n", vbar_el1());

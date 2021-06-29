@@ -1,5 +1,5 @@
-#ifndef MONO_ARM_H
-#define MONO_ARM_H
+#ifndef MONO_AARCH64_H
+#define MONO_AARCH64_H
 
 #include "mono.h"
 

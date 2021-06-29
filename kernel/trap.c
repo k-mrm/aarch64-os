@@ -1,5 +1,5 @@
 #include "trap.h"
-#include "arm.h"
+#include "aarch64.h"
 #include "mono.h"
 #include "memmap.h"
 #include "printk.h"
