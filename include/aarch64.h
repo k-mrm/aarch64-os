@@ -66,4 +66,36 @@ static inline u64 mpidr_el1() {
   return m;
 }
 
+static inline u64 cntv_ctl_el0() {
+  u64 c;
+  asm volatile("mrs %0, cntv_ctl_el0" : "=r"(c));
+  return c;
+};
+
+static inline void set_cntv_ctl_el0(u64 c) {
+  asm volatile("msr cntv_ctl_el0, %0" : : "r"(c));
+};
+
+static inline u64 cntv_tval_el0() {
+  u64 t;
+  asm volatile("mrs %0, cntv_tval_el0" : "=r"(t));
+  return t;
+}
+
+static inline void set_cntv_tval_el0(u64 t) {
+  asm volatile("msr cntv_tval_el0, %0" : : "r"(t));
+}
+
+static inline u64 cntvct_el0() {
+  u64 c;
+  asm volatile("mrs %0, cntvct_el0" : "=r"(c));
+  return c;
+};
+
+static inline u64 cntfrq_el0() {
+  u64 f;
+  asm volatile("mrs %0, cntfrq_el0" : "=r"(f));
+  return f;
+}
+
 #endif
