@@ -27,16 +27,16 @@ void gicv2_init() {
   u32 max_nint = ((typer & 0x1f) + 1) * 32;
 
   /* FIXME */
-  u32 systimer1_id = 32 + 65; /* timer1: GIC_SPI 65 */
+  u32 archtimer_id = 27; /* arch timer intid: 27 */
 
-  REG(GICD_ISENABLER(systimer1_id / 32)) |= 1 << (systimer1_id % 32);
+  REG(GICD_ISENABLER(archtimer_id / 32)) |= 1 << (archtimer_id % 32);
 
-  REG(GICD_IPRIORITYR(systimer1_id / 4)) &= ~((u32)0xff << (systimer1_id % 4 * 8));
+  REG(GICD_IPRIORITYR(archtimer_id / 4)) &= ~((u32)0xff << (archtimer_id % 4 * 8));
 
   u32 target = 0;
-  u32 itargetsr = REG(GICD_ITARGETSR(systimer1_id / 4));
-  itargetsr &= ~((u32)0xff << (systimer1_id % 4 * 8));
-  REG(GICD_ITARGETSR(systimer1_id / 4)) = itargetsr | ((u32)(1 << target) << (systimer1_id % 4 * 8));
+  u32 itargetsr = REG(GICD_ITARGETSR(archtimer_id / 4));
+  itargetsr &= ~((u32)0xff << (archtimer_id % 4 * 8));
+  REG(GICD_ITARGETSR(archtimer_id / 4)) = itargetsr | ((u32)(1 << target) << (archtimer_id % 4 * 8));
 
   REG(GICC_CTLR) = 0x1;
   REG(GICD_CTLR) = 0x1;

@@ -34,6 +34,7 @@ int main(void) {
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
   printk("current EL: %d\n", cur_el());
   printk("vbar_el1: %p\n", vbar_el1());
+  printk("cntfrq_el0: %d\n", cntfrq_el0());
 
   newproc(proc1);
   newproc(proc2);
