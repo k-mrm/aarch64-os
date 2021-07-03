@@ -18,7 +18,7 @@ KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/main.o kernel/printk.o kernel/proc.o	\
 			 kernel/cswitch.o	kernel/forkret.o
 
-DRIVER = kernel/driver/gicv2.o
+DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o
 
 VIRTDRV = $(DRIVER) kernel/driver/virt/uart.o
 

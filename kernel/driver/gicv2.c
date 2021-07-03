@@ -21,6 +21,8 @@
 #define GICC_AEOIR  (GICC_BASE + 0x24)
 
 void gicv2_init() {
+  printk("gicv2 init\n");
+
   REG(GICD_CTLR) = 0;
 
   u32 typer = REG(GICD_TYPER);

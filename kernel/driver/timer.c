@@ -1,5 +1,6 @@
 #include "mono.h"
 #include "aarch64.h"
+#include "driver/timer.h"
 
 /* aarch64 generic timer driver */
 
@@ -33,11 +34,19 @@ static void reload_timer(u64 interval_ms) {
 }
 
 void timer_irq_handler() {
-  ;
+  disable_timer();
+  reload_timer(atimer.interval_ms);
+  enable_timer();
 }
 
 void timer_init(u64 interval_ms) {
+  printk("timer init\n");
+
+  atimer.interval_ms = interval_ms;
+
+  disable_timer();
+  reload_timer(interval_ms);
   enable_timer();
 
-  reload_timer(interval_ms);
+  new_irq(27, timer_irq_handler);
 }

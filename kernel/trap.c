@@ -48,6 +48,10 @@ void irq_handler(struct trapframe *tf) {
 
   irqhandler[intid]();
 
+  if(intid == 27) {
+    printk("chas!!!!!!!!!!!\n");
+  }
+
   gic_eoi(iar);
 }
 
