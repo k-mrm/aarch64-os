@@ -1,6 +1,5 @@
 #include "string.h"
 #include "mono.h"
-#include "framebuffer.h"
 #include "font.h"
 #include "console.h"
 #include "driver/uart.h"

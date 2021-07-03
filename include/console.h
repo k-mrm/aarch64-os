@@ -2,7 +2,6 @@
 #define MONO_CONSOLE_H
 
 #include "mono.h"
-#include "framebuffer.h"
 #include "font.h"
 
 #define USE_UART

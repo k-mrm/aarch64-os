@@ -1,12 +1,10 @@
 #include "mono.h"
 #include "aarch64.h"
-#include "gpio.h"
 #include "console.h"
 #include "printk.h"
-#include "systimer.h"
 #include "trap.h"
-#include "gicv2.h"
 #include "proc.h"
+#include "driver/gicv2.h"
 #include "driver/timer.h"
 
 /* test */
@@ -25,20 +23,22 @@ void proc2() {
 }
 
 int main(void) {
+  enable_irq();
+
   console_init();
   gicv2_init();
   trap_init();
   timer_init(100);
-  // systimer1_init(100);
   // proc_init();
-
-  enable_irq();
 
   printk("mono os for aarch64\n");
   printk("cpuid: %d\n", mpidr_el1() & 0xff);
   printk("current EL: %d\n", cur_el());
   printk("vbar_el1: %p\n", vbar_el1());
   printk("cntfrq_el0: %d\n", cntfrq_el0());
+  printk("daif: %p\n", daif());
+
+  gic_set_pending(27);
 
   /*
   newproc(proc1);

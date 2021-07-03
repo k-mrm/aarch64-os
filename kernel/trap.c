@@ -3,8 +3,7 @@
 #include "mono.h"
 #include "memmap.h"
 #include "printk.h"
-#include "gicv2.h"
-#include "systimer.h"
+#include "driver/gicv2.h"
 
 handler_t irqhandler[256];
 

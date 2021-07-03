@@ -9,6 +9,9 @@
 #define GICD_CTLR (GICD_BASE)
 #define GICD_TYPER  (GICD_BASE + 0x4)
 #define GICD_ISENABLER(n) (GICD_BASE + 0x100 + (u64)(n) * 4)
+#define GICD_ICENABLER(n) (GICD_BASE + 0x180 + (u64)(n) * 4)
+#define GICD_ISPENDR(n) (GICD_BASE + 0x200 + (u64)(n) * 4)
+#define GICD_ICPENDR(n) (GICD_BASE + 0x280 + (u64)(n) * 4)
 #define GICD_IPRIORITYR(n)  (GICD_BASE + 0x400 + (u64)(n) * 4)
 #define GICD_ITARGETSR(n)  (GICD_BASE + 0x800 + (u64)(n) * 4)
 
@@ -20,8 +23,25 @@
 #define GICC_AIAR (GICC_BASE + 0x20)
 #define GICC_AEOIR  (GICC_BASE + 0x24)
 
+
+void gic_enable_int(u32 intid) {
+  REG(GICD_ISENABLER(intid / 32)) |= 1 << (intid % 32);
+}
+
+void gic_disable_int(u32 intid) {
+  REG(GICD_ICENABLER(intid / 32)) |= 1 << (intid % 32);
+}
+
+void gic_set_pending(u32 intid) {
+  REG(GICD_ISPENDR(intid / 32)) |= 1 << (intid % 32);
+}
+
+void gic_clear_pending(u32 intid) {
+  REG(GICD_ICPENDR(intid / 32)) |= 1 << (intid % 32);
+}
+
 void gicv2_init() {
-  printk("gicv2 init\n");
+  printk("gicv2 init base: %p\n", GICD_BASE);
 
   REG(GICD_CTLR) = 0;
 
@@ -31,7 +51,7 @@ void gicv2_init() {
   /* FIXME */
   u32 archtimer_id = 27; /* arch timer intid: 27 */
 
-  REG(GICD_ISENABLER(archtimer_id / 32)) |= 1 << (archtimer_id % 32);
+  gic_enable_int(archtimer_id);
 
   REG(GICD_IPRIORITYR(archtimer_id / 4)) &= ~((u32)0xff << (archtimer_id % 4 * 8));
 
@@ -42,6 +62,8 @@ void gicv2_init() {
 
   REG(GICC_CTLR) = 0x1;
   REG(GICD_CTLR) = 0x1;
+
+  printk("gic enabled: %s\n", gic_enabled()? "true" : "false");
 }
 
 bool gic_enabled() {

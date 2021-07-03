@@ -1,5 +1,7 @@
 #include "mono.h"
 #include "aarch64.h"
+#include "printk.h"
+#include "trap.h"
 #include "driver/timer.h"
 
 /* aarch64 generic timer driver */
