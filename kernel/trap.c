@@ -41,6 +41,8 @@ void sync_handler(struct trapframe *tf) {
 }
 
 void irq_handler(struct trapframe *tf) {
+  printk("irq handler\n");
+
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;

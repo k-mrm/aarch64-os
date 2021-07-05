@@ -12,6 +12,7 @@ QEMU = qemu-system-aarch64
 CPU = cortex-a72
 MACHINE = virt
 MACHINE_GIC = gic-version=2
+NCPU = 2
 
 KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/console.o kernel/trap.o kernel/font.o \
@@ -40,10 +41,14 @@ kernel8.img: $(OBJS) kernel/link.ld
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img
-	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -nographic -kernel kernel8.elf
+	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -nographic -kernel kernel8.elf
 
 gdb: kernel8.img
-	$(QEMU) -S -gdb tcp::1234 -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -nographic -kernel kernel8.elf
+	$(QEMU) -S -gdb tcp::1234 -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -nographic -kernel kernel8.elf
+
+dts:
+	$(QEMU) -S -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC),dumpdtb=virt.dtb -smp $(NCPU) -nographic
+	dtc -I dtb -O dts -o virt.dts virt.dtb
 
 raspi: kernel8.img
 	cp kernel8.img $(SDPATH)

@@ -23,7 +23,6 @@
 #define GICC_AIAR (GICC_BASE + 0x20)
 #define GICC_AEOIR  (GICC_BASE + 0x24)
 
-
 void gic_enable_int(u32 intid) {
   REG(GICD_ISENABLER(intid / 32)) |= 1 << (intid % 32);
 }
@@ -38,6 +37,15 @@ void gic_set_pending(u32 intid) {
 
 void gic_clear_pending(u32 intid) {
   REG(GICD_ICPENDR(intid / 32)) |= 1 << (intid % 32);
+}
+
+bool gic_is_pending(u32 intid) {
+  return (REG(GICD_ISPENDR(intid / 32)) & (1 << (intid % 32))) != 0;
+}
+
+void gic_enable() {
+  REG(GICC_CTLR) = 0x1;
+  REG(GICD_CTLR) = 0x1;
 }
 
 void gicv2_init() {
@@ -55,13 +63,14 @@ void gicv2_init() {
 
   REG(GICD_IPRIORITYR(archtimer_id / 4)) &= ~((u32)0xff << (archtimer_id % 4 * 8));
 
+  /*
   u32 target = 0;
   u32 itargetsr = REG(GICD_ITARGETSR(archtimer_id / 4));
   itargetsr &= ~((u32)0xff << (archtimer_id % 4 * 8));
   REG(GICD_ITARGETSR(archtimer_id / 4)) = itargetsr | ((u32)(1 << target) << (archtimer_id % 4 * 8));
+  */
 
-  REG(GICC_CTLR) = 0x1;
-  REG(GICD_CTLR) = 0x1;
+  gic_enable();
 
   printk("gic enabled: %s\n", gic_enabled()? "true" : "false");
 }
