@@ -14,6 +14,7 @@
 #define GICD_ICPENDR(n) (GICD_BASE + 0x280 + (u64)(n) * 4)
 #define GICD_IPRIORITYR(n)  (GICD_BASE + 0x400 + (u64)(n) * 4)
 #define GICD_ITARGETSR(n)  (GICD_BASE + 0x800 + (u64)(n) * 4)
+#define GICD_ICFGR(n)   (GICD_BASE + 0xc00 + (u64)(n) * 4)
 
 #define GICC_CTLR (GICC_BASE)
 #define GICC_PMR  (GICC_BASE + 0x4)
@@ -22,6 +23,11 @@
 #define GICC_HPPIR  (GICC_BASE + 0x18)
 #define GICC_AIAR (GICC_BASE + 0x20)
 #define GICC_AEOIR  (GICC_BASE + 0x24)
+
+enum gicd_cfg {
+  GICD_CFG_LEVEL = 0,
+  GICD_CFG_EDGE = 2,
+};
 
 void gic_enable_int(u32 intid) {
   REG(GICD_ISENABLER(intid / 32)) |= 1 << (intid % 32);
@@ -48,6 +54,23 @@ void gic_enable() {
   REG(GICD_CTLR) = 0x1;
 }
 
+void gic_set_prio(u32 intid, u32 prio) {
+  REG(GICD_IPRIORITYR(intid / 4)) &= ~((u32)0xff << (intid % 4 * 8)); // set to 0
+  // FIXME
+}
+
+void gic_set_target(u32 intid, u32 cpuid) {
+  u32 itargetsr = REG(GICD_ITARGETSR(intid / 4));
+  itargetsr &= ~((u32)0xff << (intid % 4 * 8));
+  REG(GICD_ITARGETSR(intid / 4)) = itargetsr | ((u32)(1 << cpuid) << (intid % 4 * 8));
+}
+
+void gic_config(u32 intid, enum gicd_cfg cfg) {
+  u32 icfgr = REG(GICD_ICFGR(intid / 16));
+  icfgr &= ~((u32)3 << (intid % 16 * 2));
+  REG(GICD_ICFGR(intid / 16)) = icfgr | ((u32)cfg << (intid % 16 * 2));
+}
+
 void gicv2_init() {
   printk("gicv2 init base: %p\n", GICD_BASE);
 
@@ -58,17 +81,11 @@ void gicv2_init() {
 
   /* FIXME */
   u32 archtimer_id = 27; /* arch timer intid: 27 */
-
+  gic_config(archtimer_id, GICD_CFG_EDGE);
+  gic_set_prio(archtimer_id, 0);
+  gic_set_target(archtimer_id, 0);
+  gic_clear_pending(archtimer_id);
   gic_enable_int(archtimer_id);
-
-  REG(GICD_IPRIORITYR(archtimer_id / 4)) &= ~((u32)0xff << (archtimer_id % 4 * 8));
-
-  /*
-  u32 target = 0;
-  u32 itargetsr = REG(GICD_ITARGETSR(archtimer_id / 4));
-  itargetsr &= ~((u32)0xff << (archtimer_id % 4 * 8));
-  REG(GICD_ITARGETSR(archtimer_id / 4)) = itargetsr | ((u32)(1 << target) << (archtimer_id % 4 * 8));
-  */
 
   gic_enable();
 
