@@ -22,7 +22,7 @@ SECTIONS {
     __bss_end = .;
 
     . = ALIGN(4096);
-    . += 0x1000000;
+    . += 0x3000000;
     stacktop = .;
 }
 

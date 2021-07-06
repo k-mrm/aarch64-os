@@ -19,7 +19,7 @@ void proc_init() {
   curproc = &kproc;
 }
 
-#define MEMBASE 0x200000llu
+#define MEMBASE 0x44000000llu
 void *allocpage() {
   static int i = 0;
   return (void *)(MEMBASE + (i++) * PAGESIZE);

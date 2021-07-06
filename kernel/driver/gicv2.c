@@ -1,6 +1,7 @@
 #include "mono.h"
 #include "memmap.h"
 #include "printk.h"
+#include "trap.h"
 #include "driver/gicv2.h"
 
 #define GICD_BASE (GICV2_BASE)
@@ -87,13 +88,11 @@ void gicv2_init() {
   gicc_init();
   gicd_init();
 
-  /* FIXME */
-  u32 archtimer_id = 27; /* arch timer intid: 27 */
-  gic_config(archtimer_id, GICD_CFG_EDGE);
-  gic_set_prio(archtimer_id, 0);
-  gic_set_target(archtimer_id, 0);
-  gic_clear_pending(archtimer_id);
-  gic_enable_int(archtimer_id);
+  gic_config(TIMER_IRQ, GICD_CFG_EDGE);
+  gic_set_prio(TIMER_IRQ, 0);
+  gic_set_target(TIMER_IRQ, 0);
+  gic_clear_pending(TIMER_IRQ);
+  gic_enable_int(TIMER_IRQ);
 
   gic_enable();
 

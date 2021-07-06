@@ -51,7 +51,7 @@ void timer_init(u64 interval_ms) {
 
   atimer.interval_ms = interval_ms;
 
-  new_irq(27, timer_irq_handler);
+  new_irq(TIMER_IRQ, timer_irq_handler);
 
   disable_timer();
   reload_timer(interval_ms);

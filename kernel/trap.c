@@ -3,6 +3,7 @@
 #include "mono.h"
 #include "memmap.h"
 #include "printk.h"
+#include "proc.h"
 #include "driver/gicv2.h"
 
 handler_t irqhandler[256];
@@ -41,16 +42,14 @@ void sync_handler(struct trapframe *tf) {
 }
 
 void irq_handler(struct trapframe *tf) {
-  printk("irq handler\n");
-
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
 
   irqhandler[intid]();
 
-  if(intid == 27) {
-    printk("chas!!!!!!!!!!!\n");
+  if(curproc && curproc->state == RUNNING && intid == TIMER_IRQ) {
+    yield();
   }
 
   gic_eoi(iar);

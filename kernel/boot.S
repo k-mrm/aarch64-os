@@ -29,7 +29,7 @@ kernel_start:
   ldr x0, =vectortable
   msr vbar_el1, x0
 
-  ldr x1, =stacktop
+  adrp x1, stacktop
   mov sp, x1
 
   /* clear bss */

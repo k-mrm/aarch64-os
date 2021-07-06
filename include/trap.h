@@ -3,6 +3,8 @@
 
 #include "mono.h"
 
+#define TIMER_IRQ   27
+
 struct trapframe {
   u64 x0;
   u64 x1;
