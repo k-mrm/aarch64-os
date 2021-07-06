@@ -36,12 +36,8 @@ static bool timer_enabled() {
 static void reload_timer(u64 interval_ms) {
   u64 interval_us = interval_ms * 1000;
   u64 interval_clk = interval_us * (cntfrq_el0() / 1000000);
-  u64 curclk = cntvct_el0();
 
-  set_cntv_cval_el0(curclk + interval_clk);
-
-  printk("current vct: %d\n", curclk);
-  printk("current cval: %d\n", cntv_cval_el0());
+  set_cntv_tval_el0(interval_clk);
 }
 
 void timer_irq_handler() {

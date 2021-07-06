@@ -26,6 +26,7 @@ int main(void) {
   console_init();
   gicv2_init();
   trap_init();
+  timer_init(1000);
   // proc_init();
 
   printk("mono os for aarch64\n");
@@ -34,7 +35,6 @@ int main(void) {
   printk("vbar_el1: %p\n", vbar_el1());
   printk("cntfrq_el0: %d\n", cntfrq_el0());
 
-  timer_init(100);
 
   enable_irq();
 
