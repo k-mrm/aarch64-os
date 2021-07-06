@@ -23,12 +23,9 @@ void proc2() {
 }
 
 int main(void) {
-  enable_irq();
-
   console_init();
   gicv2_init();
   trap_init();
-  timer_init(100);
   // proc_init();
 
   printk("mono os for aarch64\n");
@@ -36,9 +33,10 @@ int main(void) {
   printk("current EL: %d\n", cur_el());
   printk("vbar_el1: %p\n", vbar_el1());
   printk("cntfrq_el0: %d\n", cntfrq_el0());
-  printk("daif: %p\n", daif());
 
-  gic_set_pending(27);
+  timer_init(100);
+
+  enable_irq();
 
   /*
   newproc(proc1);
@@ -47,7 +45,9 @@ int main(void) {
   for(;;)
     schedule();
     */
-  for(;;);
+  printk("cntvct_el0: %d\n", cntvct_el0());
+
+  for(;;) {}
 
   panic("why");
 }

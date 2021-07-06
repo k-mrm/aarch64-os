@@ -50,8 +50,8 @@ bool gic_is_pending(u32 intid) {
 }
 
 void gic_enable() {
-  REG(GICC_CTLR) = 0x1;
-  REG(GICD_CTLR) = 0x1;
+  REG(GICC_CTLR) |= 0x1;
+  REG(GICD_CTLR) |= 0x1;
 }
 
 void gic_set_prio(u32 intid, u32 prio) {
@@ -71,13 +71,21 @@ void gic_config(u32 intid, enum gicd_cfg cfg) {
   REG(GICD_ICFGR(intid / 16)) = icfgr | ((u32)cfg << (intid % 16 * 2));
 }
 
+void gicc_init() {
+  REG(GICC_CTLR) = 0;
+
+  REG(GICC_PMR) = 0xff;
+}
+
+void gicd_init() {
+  REG(GICD_CTLR) = 0;
+}
+
 void gicv2_init() {
   printk("gicv2 init base: %p\n", GICD_BASE);
 
-  REG(GICD_CTLR) = 0;
-
-  u32 typer = REG(GICD_TYPER);
-  u32 max_nint = ((typer & 0x1f) + 1) * 32;
+  gicc_init();
+  gicd_init();
 
   /* FIXME */
   u32 archtimer_id = 27; /* arch timer intid: 27 */

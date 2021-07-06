@@ -3,16 +3,17 @@ GCC = $(PREFIX)gcc
 LD = $(PREFIX)ld
 OBJCOPY = $(PREFIX)objcopy
 
-CCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -DUSE_ARMVIRT
+CPU = cortex-a72
+
+CCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -DUSE_ARMVIRT -mcpu=$(CPU)
 CCFLAGS += -I ./include/
 CCFLAGS += -I ./include/lib/
 LDFLAGS = -nostdlib -nostartfiles
 
 QEMU = qemu-system-aarch64
-CPU = cortex-a72
 MACHINE = virt
 MACHINE_GIC = gic-version=2
-NCPU = 2
+NCPU = 1
 
 KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/console.o kernel/trap.o kernel/font.o \

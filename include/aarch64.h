@@ -25,6 +25,10 @@ static inline void wfe() {
   asm volatile("wfe");
 }
 
+static inline void wfi() {
+  asm volatile("wfi");
+}
+
 static inline u64 elr_el1() {
   u64 elr;
   asm volatile("mrs %0, elr_el1" : "=r"(elr));
@@ -84,6 +88,16 @@ static inline u64 cntv_tval_el0() {
 
 static inline void set_cntv_tval_el0(u64 t) {
   asm volatile("msr cntv_tval_el0, %0" : : "r"(t));
+}
+
+static inline u64 cntv_cval_el0() {
+  u64 c;
+  asm volatile("mrs %0, cntv_cval_el0" : "=r"(c));
+  return c;
+}
+
+static inline void set_cntv_cval_el0(u64 c) {
+  asm volatile("msr cntv_cval_el0, %0" : : "r"(c));
 }
 
 static inline u64 cntvct_el0() {

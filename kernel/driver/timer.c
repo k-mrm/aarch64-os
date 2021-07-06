@@ -17,22 +17,31 @@ struct timer {
 static void enable_timer() {
   u64 c = cntv_ctl_el0();
   c |= CNTV_CTL_ENABLE;
-  c &= ~CNTV_CTL_IMASK;
+  // c &= ~CNTV_CTL_IMASK;
   set_cntv_ctl_el0(c);
 }
 
 static void disable_timer() {
   u64 c = cntv_ctl_el0();
   c &= ~CNTV_CTL_ENABLE;
-  c |= CNTV_CTL_IMASK;
+  // c |= CNTV_CTL_IMASK;
   set_cntv_ctl_el0(c);
+}
+
+static bool timer_enabled() {
+  u64 c = cntv_ctl_el0();
+  return c & 1;
 }
 
 static void reload_timer(u64 interval_ms) {
   u64 interval_us = interval_ms * 1000;
   u64 interval_clk = interval_us * (cntfrq_el0() / 1000000);
+  u64 curclk = cntvct_el0();
 
-  set_cntv_tval_el0(interval_clk);
+  set_cntv_cval_el0(curclk + interval_clk);
+
+  printk("current vct: %d\n", curclk);
+  printk("current cval: %d\n", cntv_cval_el0());
 }
 
 void timer_irq_handler() {
@@ -46,9 +55,11 @@ void timer_init(u64 interval_ms) {
 
   atimer.interval_ms = interval_ms;
 
+  new_irq(27, timer_irq_handler);
+
   disable_timer();
   reload_timer(interval_ms);
   enable_timer();
 
-  new_irq(27, timer_irq_handler);
+  printk("timer enable: %s\n", timer_enabled()? "true" : "false");
 }
