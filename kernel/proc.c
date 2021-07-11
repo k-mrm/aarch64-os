@@ -67,35 +67,28 @@ found:
 }
 
 void schedule() {
-  printk("schhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhed\n");
-
   for(;;) {
     for(int i = 1; i < NPROC; i++) {
       enable_irq();
       struct proc *p = &proctable[i];
 
       if(p->state == RUNNABLE) {
-        printk("found runnable proc %d\n", i);
-        printk("daiffffff %p\n", daif());
         p->state = RUNNING;
         curproc = p;
 
         cswitch(&kproc.context, &p->context);
 
-        printk("p->context.lr %p\n", p->context.lr);
-
         curproc = NULL;
-        printk("okaeriiiiiiiii %p\n", daif());
       }
     }
   }
 }
 
 void yield() {
-  printk("yyyyyyyield\n");
   if(!curproc) {
     panic("bad yield");
   }
+
   curproc->state = RUNNABLE;
   cswitch(&curproc->context, &kproc.context);
 }

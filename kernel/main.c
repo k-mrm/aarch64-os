@@ -11,14 +11,14 @@
 void proc1() {
   u64 s = 0;
   for(;;) {
-    printk("proc1: %p daif %d\n", s++, gic_enabled());
+    printk("proc1: %p\n", s++);
   }
 }
 
 void proc2() {
   u64 s = 0;
   for(;;) {
-    printk("proc2: %p daif %d\n", s++, gic_enabled());
+    printk("proc2: %p\n", s++);
   }
 }
 
@@ -26,7 +26,7 @@ int main(void) {
   console_init();
   gicv2_init();
   trap_init();
-  timer_init(50);
+  timer_init(100);
   proc_init();
 
   printk("mono os for aarch64\n");
