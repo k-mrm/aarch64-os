@@ -57,9 +57,7 @@ found:
   p->tf->spsr = 0x0;    // switch EL1 to EL0
   p->tf->sp = (u64)usp; // sp_el0
 
-  printk("neeeeeeeeewproc %p %p %p\n", fn, kstack, ustack);
-
-  p->stack = kstack;
+  p->kstack = kstack;
   p->context.lr = (u64)forkret;
   p->context.sp = (u64)sp;    //== p->tf
 
@@ -72,9 +70,8 @@ void schedule() {
   printk("schhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhed\n");
 
   for(;;) {
-    enable_irq();
-
     for(int i = 1; i < NPROC; i++) {
+      enable_irq();
       struct proc *p = &proctable[i];
 
       if(p->state == RUNNABLE) {
@@ -83,7 +80,9 @@ void schedule() {
         p->state = RUNNING;
         curproc = p;
 
-        cswitch(&kproc.context, &curproc->context);
+        cswitch(&kproc.context, &p->context);
+
+        printk("p->context.lr %p\n", p->context.lr);
 
         curproc = NULL;
         printk("okaeriiiiiiiii %p\n", daif());
@@ -99,7 +98,6 @@ void yield() {
   }
   curproc->state = RUNNABLE;
   cswitch(&curproc->context, &kproc.context);
-  printk("konnnnnnnnnnnnichiah????\n");
 }
 
 void curproc_dump() {
@@ -121,7 +119,7 @@ static void init_firstproc() {
   first->tf->elr = 0x0; // FIXME
   first->tf->spsr = 0x0;  // switch to EL0
 
-  first->stack = kstack;
+  first->kstack = kstack;
   first->context.lr = (u64)forkret;
   first->context.sp = (u64)sp;
 

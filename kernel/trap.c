@@ -44,7 +44,7 @@ void sync_handler(struct trapframe *tf) {
 }
 
 void irq_handler(struct trapframe *tf) {
-  printk("irq handler: elr %p\n", tf->elr);
+  printk("irq handler: elr %p EL%d\n", tf->elr, cur_el());
 
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
@@ -52,13 +52,13 @@ void irq_handler(struct trapframe *tf) {
 
   irqhandler[intid]();
 
+  gic_eoi(iar);
+
   if(curproc && curproc->state == RUNNING && intid == TIMER_IRQ) {
     // curproc->state = RUNNABLE;
     // cswitch(&curproc->context, &kproc->context);
     yield();
   }
-
-  gic_eoi(iar);
 }
 
 void unknownint(int arg) {

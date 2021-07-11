@@ -44,7 +44,7 @@ struct proc {
   pid_t pid;
   struct context context;
   struct trapframe *tf;
-  char *stack;
+  char *kstack;
   char name[16];
 };
 
