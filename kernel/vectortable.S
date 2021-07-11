@@ -18,17 +18,19 @@
 
   mrs x9, elr_el1
   mrs x10, spsr_el1
+  mrs x11, sp_el0
 
   stp x30, x9, [sp, #16 * 15]
-  str x10, [sp, #16 * 16]
+  stp x10, x11, [sp, #16 * 16]
 .endm
 
 .macro restorereg
   ldp x30, x9, [sp, #16 * 15]
-  ldr x10, [sp, #16 * 16]
+  ldp x10, x11, [sp, #16 * 16]
 
   msr elr_el1, x9
   msr spsr_el1, x10
+  msr sp_el0, x11
 
   ldp x0, x1, [sp, #16 * 0]
   ldp x2, x3, [sp, #16 * 1]
@@ -51,40 +53,56 @@
 .global vectortable
 .balign 0x800
 vectortable:
+/* Current EL with sp0 */
+  mov x0, 0
   b unknownint
 .balign 0x80
+  mov x0, 1
   b unknownint
 .balign 0x80
+  mov x0, 2
   b unknownint
 .balign 0x80
+  mov x0, 3
   b unknownint
 
+/* Current EL with spx */
 .balign 0x80
   b cur_sp_elx_sync
 .balign 0x80
   b cur_sp_elx_irq
 .balign 0x80
+  mov x0, 4
   b unknownint
 .balign 0x80
+  mov x0, 5
   b unknownint
 
+/* Lower EL using aarch64 */
 .balign 0x80
-  b hang
+  b cur_sp_elx_sync
 .balign 0x80
-  b hang
+  b cur_sp_elx_irq
 .balign 0x80
-  b hang
+  mov x0, 8
+  b unknownint
 .balign 0x80
-  b hang
+  mov x0, 9
+  b unknownint
 
+/* Lower EL using aarch32 */
 .balign 0x80
-  b hang
+  mov x0, 10
+  b unknownint
 .balign 0x80
-  b hang
+  mov x0, 11
+  b unknownint
 .balign 0x80
-  b hang
+  mov x0, 12
+  b unknownint
 .balign 0x80
-  b hang
+  mov x0, 13
+  b unknownint
 
 cur_sp_elx_sync:
   savereg
@@ -102,6 +120,8 @@ cur_sp_elx_irq:
   mov x0, sp
   bl  irq_handler
 
+.global trapret
+trapret:
   restorereg
 
   eret

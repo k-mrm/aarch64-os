@@ -22,13 +22,11 @@ void proc2() {
   }
 }
 
-extern volatile u64 stacktop;
-
 int main(void) {
   console_init();
   gicv2_init();
   trap_init();
-  timer_init(100);
+  timer_init(50);
   proc_init();
 
   printk("mono os for aarch64\n");

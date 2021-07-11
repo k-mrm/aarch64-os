@@ -35,6 +35,8 @@ void sync_handler(struct trapframe *tf) {
       break;
     case 0b100110:
       panic("sp alignment fault");
+    case 0b100100:
+      panic("data abort with lower EL");
     default:
       printk("%d ", esr & 0x3f);
       panic("unknown");
@@ -42,6 +44,8 @@ void sync_handler(struct trapframe *tf) {
 }
 
 void irq_handler(struct trapframe *tf) {
+  printk("irq handler: elr %p\n", tf->elr);
+
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
@@ -49,12 +53,15 @@ void irq_handler(struct trapframe *tf) {
   irqhandler[intid]();
 
   if(curproc && curproc->state == RUNNING && intid == TIMER_IRQ) {
+    // curproc->state = RUNNABLE;
+    // cswitch(&curproc->context, &kproc->context);
     yield();
   }
 
   gic_eoi(iar);
 }
 
-void unknownint() {
+void unknownint(int arg) {
+  printk("elr: %p arg: %d\n", elr_el1(), arg);
   panic("unknown interrupt");
 }

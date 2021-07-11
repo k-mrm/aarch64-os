@@ -43,6 +43,13 @@ static inline u64 esr_el1() {
   return esr;
 }
 
+static inline u64 spsr_el1() {
+  u64 spsr;
+  asm volatile("mrs %0, spsr_el1" : "=r"(spsr));
+
+  return spsr;
+}
+
 static inline u64 far_el1() {
   u64 far;
   asm volatile("mrs %0, far_el1" : "=r"(far));

@@ -43,6 +43,7 @@ struct proc {
   enum procstate state;
   pid_t pid;
   struct context context;
+  struct trapframe *tf;
   char *stack;
   char name[16];
 };

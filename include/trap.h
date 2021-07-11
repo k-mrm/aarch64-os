@@ -37,6 +37,9 @@ struct trapframe {
   u64 x28;
   u64 x29;
   u64 x30;  /* lr */
+  u64 elr;
+  u64 spsr;
+  u64 sp;
 };
 
 typedef void (*handler_t)(void);
