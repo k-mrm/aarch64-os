@@ -22,11 +22,18 @@ void proc2() {
   }
 }
 
+void proc3() {
+  u64 s = 0;
+  for(;;) {
+    printk("proc3: %p\n", s++);
+  }
+}
+
 int main(void) {
   console_init();
   gicv2_init();
   trap_init();
-  timer_init(100);
+  timer_init(1000);
   proc_init();
 
   printk("mono os for aarch64\n");
@@ -39,10 +46,7 @@ int main(void) {
 
   newproc(proc1);
   newproc(proc2);
+  newproc(proc3);
 
   schedule();
-
-  for(;;) {}
-
-  panic("why");
 }

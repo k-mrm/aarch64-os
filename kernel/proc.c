@@ -22,7 +22,6 @@ void *allocpage() {
 void trapret(void);
 
 void forkret() {
-  printk("forkret");
   trapret();
 }
 
