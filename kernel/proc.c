@@ -65,6 +65,10 @@ found:
   return pid;
 }
 
+int sys_getpid(void) {
+  return curproc->pid;
+}
+
 void schedule() {
   for(;;) {
     for(int i = 1; i < NPROC; i++) {
@@ -89,6 +93,16 @@ void yield() {
   }
 
   curproc->state = RUNNABLE;
+  cswitch(&curproc->context, &kproc.context);
+}
+
+void exit(int ret) {
+  if(!curproc) {
+    panic("bad exit");
+  }
+
+  memset(curproc, 0, sizeof *curproc);
+  curproc->state = UNUSED;
   cswitch(&curproc->context, &kproc.context);
 }
 

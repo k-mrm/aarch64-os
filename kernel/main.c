@@ -11,21 +11,21 @@
 void proc1() {
   u64 s = 0;
   for(;;) {
-    printk("proc1: %p\n", s++);
+    printk("proc1: %p %d\n", s++, getpid());
   }
 }
 
 void proc2() {
   u64 s = 0;
   for(;;) {
-    printk("proc2: %p\n", s++);
+    printk("proc2: %p %d\n", s++, getpid());
   }
 }
 
 void proc3() {
   u64 s = 0;
   for(;;) {
-    printk("proc3: %p\n", s++);
+    printk("proc3: %p %d\n", s++, getpid());
   }
 }
 
@@ -33,7 +33,7 @@ int main(void) {
   console_init();
   gicv2_init();
   trap_init();
-  timer_init(1000);
+  timer_init(200);
   proc_init();
 
   printk("mono os for aarch64\n");
@@ -46,7 +46,6 @@ int main(void) {
 
   newproc(proc1);
   newproc(proc2);
-  newproc(proc3);
 
   schedule();
 }
