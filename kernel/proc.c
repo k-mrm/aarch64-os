@@ -58,7 +58,7 @@ found:
 
   p->kstack = kstack;
   p->context.lr = (u64)forkret;
-  p->context.sp = (u64)sp;    //== p->tf
+  p->context.sp = (u64)sp;    // == p->tf
 
   p->state = RUNNABLE;
 

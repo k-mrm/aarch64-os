@@ -82,7 +82,7 @@ vectortable:
 .balign 0x80
   b cur_sp_elx_sync
 .balign 0x80
-  b cur_sp_elx_irq
+  b lower_el_aarch64_irq
 .balign 0x80
   mov x0, 8
   b unknownint
@@ -118,10 +118,20 @@ cur_sp_elx_irq:
   savereg
 
   mov x0, sp
-  bl  irq_handler
+  bl  kirq_handler
 
 .global trapret
 trapret:
+  restorereg
+
+  eret
+
+lower_el_aarch64_irq:
+  savereg
+
+  mov x0, sp
+  bl  uirq_handler
+
   restorereg
 
   eret

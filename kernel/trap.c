@@ -33,7 +33,7 @@ void sync_handler(struct trapframe *tf) {
   switch(esr & 0x3f) {
     case 0b100101:
       panic("data abort");
-    case 0b010101:
+    case 0b010101:  // svc
       syscall(tf);
       break;
     case 0b100110:
@@ -46,8 +46,20 @@ void sync_handler(struct trapframe *tf) {
   }
 }
 
-void irq_handler(struct trapframe *tf) {
-  printk("irq handler: elr %p EL%d\n", tf->elr, cur_el());
+void kirq_handler(struct trapframe *tf) {
+  // printk("irq handler: elr %p EL%d\n", tf->elr, cur_el());
+
+  u32 iar = gic_iar();
+  u32 targetcpuid = iar >> 10;
+  u32 intid = iar & 0x3ff;
+
+  irqhandler[intid]();
+
+  gic_eoi(iar);
+}
+
+void uirq_handler(struct trapframe *tf) {
+  // printk("irq handler: elr %p EL%d\n", tf->elr, cur_el());
 
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
@@ -58,8 +70,6 @@ void irq_handler(struct trapframe *tf) {
   gic_eoi(iar);
 
   if(curproc && curproc->state == RUNNING && intid == TIMER_IRQ) {
-    // curproc->state = RUNNABLE;
-    // cswitch(&curproc->context, &kproc->context);
     yield();
   }
 }
