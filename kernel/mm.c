@@ -4,7 +4,7 @@
 static __attribute__((aligned(4096))) u64 l1_pgt[512];
 static __attribute__((aligned(4096))) u64 l2_pgt[1024];
 
-extern u64 *ktext_end;
+extern char *ktext_end;
 
 void kpgt_init() {
   page_map();

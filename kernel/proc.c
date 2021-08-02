@@ -4,6 +4,7 @@
 #include "proc.h"
 #include "trap.h"
 #include "string.h"
+#include "kalloc.h"
 
 #define PAGESIZE 4096
 
@@ -12,12 +13,6 @@ struct proc proctable[NPROC];
 
 struct proc *curproc = NULL;
 struct proc kproc;
-
-#define MEMBASE 0x44000000llu
-void *allocpage() {
-  static int i = 0;
-  return (void *)(MEMBASE + (i++) * PAGESIZE);
-}
 
 void trapret(void);
 

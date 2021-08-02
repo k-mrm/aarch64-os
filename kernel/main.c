@@ -29,6 +29,8 @@ void proc3() {
   }
 }
 
+char *main_kstack[4096]; // main use this stack
+
 int main(void) {
   console_init();
   gicv2_init();
