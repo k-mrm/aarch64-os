@@ -1,5 +1,6 @@
-#include "mm.h"
 #include "mono.h"
+#include "aarch64.h"
+#include "mm.h"
 
 static __attribute__((aligned(4096))) u64 l1_pgt[512];
 static __attribute__((aligned(4096))) u64 l2_pgt[1024];
@@ -7,7 +8,7 @@ static __attribute__((aligned(4096))) u64 l2_pgt[1024];
 extern char *ktext_end;
 
 void kpgt_init() {
-  page_map();
+  ;
 }
 
 void upgt_init() {
@@ -27,5 +28,5 @@ void set_kpgt(u64 *k) {
 }
 
 void set_upgt(u64 *u) {
-  set_ttbr0_el0((u64)u);
+  set_ttbr0_el1((u64)u);
 }

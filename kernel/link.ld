@@ -23,7 +23,7 @@ SECTIONS {
     __bss_end = .;
 
     . = ALIGN(4096);
-    PROVIDE(kend = .);
+    kend = .;
 }
 
 __bss_size = (__bss_end - __bss_start) >> 3;

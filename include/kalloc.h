@@ -3,4 +3,6 @@
 
 void *allocpage(void);
 
+#define PAGESIZE  4096
+
 #endif

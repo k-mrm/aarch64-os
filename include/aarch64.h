@@ -119,8 +119,8 @@ static inline u64 cntfrq_el0() {
   return f;
 }
 
-static inline void set_ttbr0_el0(u64 t) {
-  asm volatile("msr ttbr0_el0, %0" : : "r"(t));
+static inline void set_ttbr0_el1(u64 t) {
+  asm volatile("msr ttbr0_el1, %0" : : "r"(t));
 }
 
 static inline void set_ttbr1_el1(u64 t) {

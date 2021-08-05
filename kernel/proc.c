@@ -6,8 +6,6 @@
 #include "string.h"
 #include "kalloc.h"
 
-#define PAGESIZE 4096
-
 struct proc proctable[NPROC];
 /* proctable[0] == kernel proc */
 
