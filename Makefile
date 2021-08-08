@@ -42,10 +42,10 @@ kernel8.img: $(OBJS) kernel/link.ld
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img
-	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -nographic -kernel kernel8.elf
+	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128 -nographic -kernel kernel8.elf
 
 gdb: kernel8.img
-	$(QEMU) -S -gdb tcp::1234 -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -nographic -kernel kernel8.elf
+	$(QEMU) -S -gdb tcp::1234 -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128 -nographic -kernel kernel8.elf
 
 dts:
 	$(QEMU) -S -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC),dumpdtb=virt.dtb -smp $(NCPU) -nographic
