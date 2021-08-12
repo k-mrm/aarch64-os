@@ -7,6 +7,7 @@
 #include "driver/gicv2.h"
 #include "driver/timer.h"
 #include "log.h"
+#include "kalloc.h"
 
 /* test */
 void proc1() {
@@ -37,6 +38,7 @@ int main(void) {
   gicv2_init();
   trap_init();
   timer_init(200);
+  kalloc_init();
   proc_init();
 
   kinfo("mono os for aarch64\n");
@@ -46,6 +48,8 @@ int main(void) {
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
 
   enable_irq();
+  
+  kalloctest();
 
   /*
   newproc(proc1);
