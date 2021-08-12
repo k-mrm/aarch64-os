@@ -9,7 +9,7 @@
 
 extern char kend[];
 
-void *allocpage() {
+void *allocpage() { // too simple
   static int i = 0;
   return (void *)(kend + (i++) * PAGESIZE);
 }

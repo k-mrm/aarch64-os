@@ -4,7 +4,7 @@ SECTIONS {
     . = 0x40000000;
     .text : { KEEP(*(.text.boot)) *(.text) }
     . = ALIGN(4096);
-    PROVIDE(ktext_end = .);
+    ktext_end = .;
 
     .rodata : {
       *(.rodata)

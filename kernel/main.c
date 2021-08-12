@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "driver/gicv2.h"
 #include "driver/timer.h"
+#include "log.h"
 
 /* test */
 void proc1() {
@@ -38,16 +39,18 @@ int main(void) {
   timer_init(200);
   proc_init();
 
-  printk("mono os for aarch64\n");
-  printk("cpuid: %d\n", mpidr_el1() & 0xff);
-  printk("current EL: %d\n", cur_el());
-  printk("vbar_el1: %p\n", vbar_el1());
-  printk("cntfrq_el0: %d\n", cntfrq_el0());
+  kinfo("mono os for aarch64\n");
+  kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
+  kinfo("current EL: %d\n", cur_el());
+  kinfo("vbar_el1: %p\n", vbar_el1());
+  kinfo("cntfrq_el0: %d\n", cntfrq_el0());
 
   enable_irq();
 
+  /*
   newproc(proc1);
   newproc(proc2);
+  */
 
   schedule();
 }

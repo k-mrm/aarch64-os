@@ -17,4 +17,6 @@ typedef _Bool bool;
 #define true 1
 #define false 0
 
+#define REG(addr) (*(volatile u32 *)(u64)(addr))
+
 #endif

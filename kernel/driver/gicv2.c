@@ -3,6 +3,7 @@
 #include "printk.h"
 #include "trap.h"
 #include "driver/gicv2.h"
+#include "log.h"
 
 #define GICD_BASE (GICV2_BASE)
 #define GICC_BASE (GICV2_BASE + 0x10000)
@@ -83,7 +84,7 @@ void gicd_init() {
 }
 
 void gicv2_init() {
-  printk("gicv2 init base: %p\n", GICD_BASE);
+  kinfo("gicv2 init base: %p\n", GICD_BASE);
 
   gicc_init();
   gicd_init();
@@ -96,7 +97,7 @@ void gicv2_init() {
 
   gic_enable();
 
-  printk("gic enabled: %s\n", gic_enabled()? "true" : "false");
+  kinfo("gic enabled: %s\n", gic_enabled()? "true" : "false");
 }
 
 bool gic_enabled() {

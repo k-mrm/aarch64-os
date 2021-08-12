@@ -29,6 +29,10 @@ static inline void wfi() {
   asm volatile("wfi");
 }
 
+static inline void isb() {
+  asm volatile("isb");
+}
+
 static inline u64 elr_el1() {
   u64 elr;
   asm volatile("mrs %0, elr_el1" : "=r"(elr));
@@ -125,6 +129,10 @@ static inline void set_ttbr0_el1(u64 t) {
 
 static inline void set_ttbr1_el1(u64 t) {
   asm volatile("msr ttbr1_el1, %0" : : "r"(t));
+}
+
+static inline void set_tcr_el1(u64 t) {
+  asm volatile("msr tcr_el1, %0" : : "r"(t));
 }
 
 #endif

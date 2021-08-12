@@ -3,6 +3,7 @@
 #include "printk.h"
 #include "trap.h"
 #include "driver/timer.h"
+#include "log.h"
 
 /* aarch64 generic timer driver */
 
@@ -47,7 +48,7 @@ void timer_irq_handler() {
 }
 
 void timer_init(u64 interval_ms) {
-  printk("timer init\n");
+  kinfo("timer init\n");
 
   atimer.interval_ms = interval_ms;
 
@@ -57,5 +58,5 @@ void timer_init(u64 interval_ms) {
   reload_timer(interval_ms);
   enable_timer();
 
-  printk("timer enable: %s\n", timer_enabled()? "true" : "false");
+  kinfo("timer enable: %s\n", timer_enabled()? "true" : "false");
 }
