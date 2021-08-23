@@ -20,7 +20,19 @@
 #define TCR_TBI1(n)   (((n) & 0x1) << 38)
 
 static __attribute__((aligned(4096))) u64 l1_pgt[512];
-static __attribute__((aligned(4096))) u64 l2_pgt[1024];
+static __attribute__((aligned(4096))) u64 l2_pgt[512];
+static __attribute__((aligned(4096))) u64 l3_pgt[512];
+
+/*
+ *  39bit(=512GB) Virtual Address
+ *
+ *     63      38       29       20       11        0
+ *    +-------+--------+--------+--------+----------+
+ *    | TTBRn | level1 | level2 | level3 | page off |
+ *    +-------+--------+--------+--------+----------+
+ *
+ *
+ */
 
 extern char *ktext_end;
 
@@ -50,11 +62,27 @@ static void mmu_enable() {
   ;
 }
 
+u64 va2pa() {
+  ;
+}
+
+u64 *pagewalk(u64 *pgt, u64 va) {
+  ;
+}
+
 void mm_init() {
   kpgt_init();
   upgt_init();
 
-  u64 tcr = TCR_T0SZ(25) | TCR_IRGN0(1) | TCR_ORGN0(1) | TCR_SH0(3) | TCR_EPD1(1);
+  u64 tcr = TCR_T0SZ(25) |  /* 2^(64-25) = 512GB */
+            TCR_IRGN0(1) |
+            TCR_ORGN0(1) |
+            TCR_SH0(3) |
+            TCR_TG0(0) |    /* TTBR0 granule 4KB */
+            TCR_TG1(2) |    /* TTBR1 granule 4KB */
+            TCR_T1SZ(25) |  /* 512GB */
+            TCR_IPS(0) |    /* IPS = 4GB */
+            TCR_EPD1(1);
   set_tcr_el1(tcr);
 
   isb();

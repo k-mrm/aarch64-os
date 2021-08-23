@@ -49,12 +49,8 @@ int main(void) {
 
   enable_irq();
   
-  kalloctest();
-
-  /*
   newproc(proc1);
   newproc(proc2);
-  */
 
   schedule();
 }

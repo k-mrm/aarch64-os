@@ -11,10 +11,6 @@
 
 extern char kend[];
 
-void *allocpage() {
-  return 0;
-}
-
 struct header {
   struct header *next;
 };
@@ -23,7 +19,7 @@ struct header *freelist = NULL;
 
 void *kalloc() {
   struct header *new = freelist;
-  if(!new)
+  if(!new)  /* no memory or uninitialized */
     return NULL;
 
   freelist = new->next;
@@ -36,6 +32,11 @@ void *kalloc() {
 void kfree(void *pa) {
   if(!pa)
     return;
+  printk("%p\n", pa);
+
+  if((u64)pa % PAGESIZE != 0) {
+    panic("a");
+  }
 
   struct header *p = (struct header *)pa;
   p->next = freelist;

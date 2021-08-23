@@ -35,14 +35,14 @@ found:
   p->pid = pid++;
   memset(&p->context, 0, sizeof(p->context));
 
-  char *kstack = allocpage();
+  char *kstack = kalloc();
 
   char *sp = kstack + PAGESIZE;
   sp -= sizeof(struct trapframe);
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(struct trapframe));
 
-  char *ustack = allocpage();
+  char *ustack = kalloc();
   char *usp = ustack + PAGESIZE;
 
   p->tf->elr = (u64)fn; // `eret` jump to elr(== fn)
@@ -103,12 +103,13 @@ void curproc_dump() {
   ;
 }
 
+/*
 static void init_firstproc() {
   struct proc *first = &proctable[1];
   first->pid = 1;
   memset(&first->context, 0, sizeof(first->context));
 
-  char *kstack = allocpage();
+  char *kstack = kalloc();
 
   char *sp = kstack + PAGESIZE;
   sp -= sizeof(struct trapframe);
@@ -124,6 +125,7 @@ static void init_firstproc() {
 
   first->state = RUNNABLE;
 }
+*/
 
 void proc_init() {
   memset(&kproc, 0, sizeof(kproc));
