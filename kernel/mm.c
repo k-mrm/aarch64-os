@@ -26,13 +26,28 @@ static __attribute__((aligned(4096))) u64 l3_pgt[512];
 /*
  *  39bit(=512GB) Virtual Address
  *
- *     63      38       29       20       11        0
+ *     63   39       30       21       12           0
  *    +-------+--------+--------+--------+----------+
  *    | TTBRn | level1 | level2 | level3 | page off |
  *    +-------+--------+--------+--------+----------+
  *
  *
  */
+
+#define PIDX(level, va) (((va) >> (39 - (level) * 9)) & 0x1ff)
+#define OFFSET(va)  ((va) & 0xfff)
+
+#define PTE_PA(pte) ((pte) & 0xfffffffff000)
+
+/* lower attribute */
+#define PTE_INDX(idx) (((idx) & 7) << 2)
+#define PTE_NS  (1 << 5)
+#define PTE_AP(ap)  (((ap) & 3) << 6)
+#define PTE_SH(sh)  (((sh) & 3) << 8)
+#define PTE_AF  (1 << 10)
+/* upper attribute */
+#define PTE_PXN (1 << 53)
+#define PTE_UXN (1 << 54)
 
 extern char *ktext_end;
 
@@ -45,17 +60,40 @@ void set_upgt(u64 *u) {
 }
 
 void kpgt_init() {
-  ;
-  set_kpgt(0);
+  u64 *kpgt = kalloc();
+
+  set_kpgt(kpgt);
 }
 
 void upgt_init() {
-  ;
-  set_upgt(0);
+  u64 *upgt = kalloc();
+
+  set_upgt(upgt);
+}
+
+u64 *pagewalk(u64 *pgt, u64 va) {
+  for(int level = 1; level < 3; level++) {
+    u64 *pte = pgt[PIDX(level, va)];
+    if(*pte & 1 == 0) {
+      pgt = kalloc();
+      *pte = PTE_PA(pgt) | 3;
+    }
+    else {
+      pgt = PTE_PA(*pte);
+    }
+  }
+
+  return pgt[PIDX(3, va)];
 }
 
 void page_map(u64 *pgt, u64 va, u64 pa, u64 size, int perm) {
-  ;
+  if(pa % PAGESIZE != 0)
+    panic("invalid pa");
+
+  for(u64 p = 0; p < size; p += PAGESIZE, pa += size) {
+    u64 *pte = pagewalk(pgt, va);
+    *pte = PTE_PA(pa) | 3;
+  }
 }
 
 static void mmu_enable() {
@@ -63,10 +101,6 @@ static void mmu_enable() {
 }
 
 u64 va2pa() {
-  ;
-}
-
-u64 *pagewalk(u64 *pgt, u64 va) {
   ;
 }
 
