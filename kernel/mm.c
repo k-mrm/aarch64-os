@@ -1,6 +1,7 @@
 #include "mono.h"
 #include "aarch64.h"
 #include "mm.h"
+#include "kalloc.h"
 
 #define TCR_T0SZ(n)   ((n) & 0x3f)
 #define TCR_IRGN0(n)  (((n) & 0x3) << 8)
@@ -37,7 +38,7 @@ static __attribute__((aligned(4096))) u64 l3_pgt[512];
 #define PIDX(level, va) (((va) >> (39 - (level) * 9)) & 0x1ff)
 #define OFFSET(va)  ((va) & 0xfff)
 
-#define PTE_PA(pte) ((pte) & 0xfffffffff000)
+#define PTE_PA(pte) ((u64)(pte) & 0xfffffffff000)
 
 /* lower attribute */
 #define PTE_INDX(idx) (((idx) & 7) << 2)
@@ -86,13 +87,15 @@ u64 *pagewalk(u64 *pgt, u64 va) {
   return pgt[PIDX(3, va)];
 }
 
-void page_map(u64 *pgt, u64 va, u64 pa, u64 size, int perm) {
-  if(pa % PAGESIZE != 0)
+void page_map(u64 *pgt, u64 va, u64 pa, u64 size, u64 perm) {
+  if(pa % PAGESIZE != 0 || size % PAGESIZE != 0)
     panic("invalid pa");
 
-  for(u64 p = 0; p < size; p += PAGESIZE, pa += size) {
+  for(u64 p = 0; p < size; p += PAGESIZE, va += size, pa += size) {
     u64 *pte = pagewalk(pgt, va);
-    *pte = PTE_PA(pa) | 3;
+    if(*pte & PTE_AF)
+      panic("this entry has been used");
+    *pte = PTE_PA(pa) | perm | 3;
   }
 }
 
