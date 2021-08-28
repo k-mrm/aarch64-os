@@ -40,7 +40,7 @@ found:
   char *sp = kstack + PAGESIZE;
   sp -= sizeof(struct trapframe);
   p->tf = (struct trapframe *)sp;
-  memset(p->tf, 0, sizeof(struct trapframe));
+  memset(p->tf, 0, sizeof(*p->tf));
 
   char *ustack = kalloc();
   char *usp = ustack + PAGESIZE;
@@ -81,20 +81,18 @@ void schedule() {
 }
 
 void yield() {
-  if(!curproc) {
+  if(!curproc)
     panic("bad yield");
-  }
 
   curproc->state = RUNNABLE;
   cswitch(&curproc->context, &kproc.context);
 }
 
 void exit(int ret) {
-  if(!curproc) {
+  if(!curproc)
     panic("bad exit");
-  }
 
-  memset(curproc, 0, sizeof *curproc);
+  memset(curproc, 0, sizeof(*curproc));
   curproc->state = UNUSED;
   cswitch(&curproc->context, &kproc.context);
 }

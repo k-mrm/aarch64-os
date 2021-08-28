@@ -2,23 +2,24 @@
 #include "aarch64.h"
 #include "mm.h"
 #include "kalloc.h"
+#include "printk.h"
 
-#define TCR_T0SZ(n)   ((n) & 0x3f)
-#define TCR_IRGN0(n)  (((n) & 0x3) << 8)
-#define TCR_ORGN0(n)  (((n) & 0x3) << 10)
-#define TCR_SH0(n)    (((n) & 0x3) << 12)
-#define TCR_TG0(n)    (((n) & 0x1) << 14)
-#define TCR_T1SZ(n)   (((n) & 0x3f) << 16)
-#define TCR_A1(n)     (((n) & 0x1) << 22)
-#define TCR_EPD1(n)   (((n) & 0x1) << 23)
-#define TCR_IRGN1(n)  (((n) & 0x3) << 24)
-#define TCR_ORGN1(n)  (((n) & 0x3) << 26)
-#define TCR_SH1(n)    (((n) & 0x3) << 28)
-#define TCR_TG1(n)    (((n) & 0x1) << 30)
-#define TCR_IPS(n)    (((n) & 0x7) << 32)
-#define TCR_AS(n)     (((n) & 0x1) << 36)
-#define TCR_TBI0(n)   (((n) & 0x1) << 37)
-#define TCR_TBI1(n)   (((n) & 0x1) << 38)
+#define TCR_T0SZ(n)   ((u64)(n) & 0x3f)
+#define TCR_IRGN0(n)  (((u64)(n) & 0x3) << 8)
+#define TCR_ORGN0(n)  (((u64)(n) & 0x3) << 10)
+#define TCR_SH0(n)    (((u64)(n) & 0x3) << 12)
+#define TCR_TG0(n)    (((u64)(n) & 0x1) << 14)
+#define TCR_T1SZ(n)   (((u64)(n) & 0x3f) << 16)
+#define TCR_A1(n)     (((u64)(n) & 0x1) << 22)
+#define TCR_EPD1(n)   (((u64)(n) & 0x1) << 23)
+#define TCR_IRGN1(n)  (((u64)(n) & 0x3) << 24)
+#define TCR_ORGN1(n)  (((u64)(n) & 0x3) << 26)
+#define TCR_SH1(n)    (((u64)(n) & 0x3) << 28)
+#define TCR_TG1(n)    (((u64)(n) & 0x1) << 30)
+#define TCR_IPS(n)    (((u64)(n) & 0x7) << 32)
+#define TCR_AS(n)     (((u64)(n) & 0x1) << 36)
+#define TCR_TBI0(n)   (((u64)(n) & 0x1) << 37)
+#define TCR_TBI1(n)   (((u64)(n) & 0x1) << 38)
 
 static __attribute__((aligned(4096))) u64 l1_pgt[512];
 static __attribute__((aligned(4096))) u64 l2_pgt[512];
@@ -72,22 +73,21 @@ void upgt_init() {
   set_upgt(upgt);
 }
 
-u64 *pagewalk(u64 *pgt, u64 va) {
+static u64 *pagewalk(u64 *pgt, u64 va) {
   for(int level = 1; level < 3; level++) {
-    u64 *pte = pgt[PIDX(level, va)];
-    if(*pte & 1 == 0) {
+    u64 *pte = (u64 *)pgt[PIDX(level, va)];
+    if((*pte & 1) == 0) {
       pgt = kalloc();
       *pte = PTE_PA(pgt) | 3;
-    }
-    else {
-      pgt = PTE_PA(*pte);
+    } else {
+      pgt = (u64 *)PTE_PA(*pte);
     }
   }
 
-  return pgt[PIDX(3, va)];
+  return (u64 *)pgt[PIDX(3, va)];
 }
 
-void page_map(u64 *pgt, u64 va, u64 pa, u64 size, u64 perm) {
+static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 perm) {
   if(pa % PAGESIZE != 0 || size % PAGESIZE != 0)
     panic("invalid pa");
 
@@ -99,12 +99,12 @@ void page_map(u64 *pgt, u64 va, u64 pa, u64 size, u64 perm) {
   }
 }
 
-static void mmu_enable() {
+static void enable_mmu() {
   ;
 }
 
 u64 va2pa() {
-  ;
+  return 0;
 }
 
 void mm_init() {
@@ -124,5 +124,5 @@ void mm_init() {
 
   isb();
 
-  mmu_enable();
+  enable_mmu();
 }

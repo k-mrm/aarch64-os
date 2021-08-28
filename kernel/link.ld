@@ -1,7 +1,8 @@
 ENTRY(_start)
 
 SECTIONS {
-    . = 0x40000000;
+    /* . = 0x40000000; */
+    . = 0xffffff8000000000;
     .text : { KEEP(*(.text.boot)) *(.text) }
     . = ALIGN(4096);
     ktext_end = .;

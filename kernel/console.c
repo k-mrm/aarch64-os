@@ -44,8 +44,7 @@ static void csscroll(struct console *cs) {
 static void csnewline(struct console *cs) {
   if(cs->cur_y == cs->h) {
     csscroll(cs);
-  }
-  else {
+  } else {
     cs->cur_x = cs->initx;
     cs->cur_y += cs->lineh;
   }

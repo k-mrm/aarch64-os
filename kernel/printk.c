@@ -13,17 +13,16 @@ static void printiu32(i32 num, int base, bool sign) {
   if(sign && num < 0) {
     unum = (u32)(-(num + 1)) + 1;
     neg = true;
-  }
-  else {
+  } else {
     unum = (u32)num;
   }
 
   do {
     *--cur = "0123456789abcdef"[unum % base];
   } while(unum /= base);
-  if(neg) {
+
+  if(neg)
     *--cur = '-';
-  }
 
   csputs(&cons1, cur);
 }
@@ -38,17 +37,16 @@ static void printiu64(i64 num, int base, bool sign) {
   if(sign && num < 0) {
     unum = (u64)(-(num + 1)) + 1;
     neg = true;
-  }
-  else {
+  } else {
     unum = (u64)num;
   }
 
   do {
     *--cur = "0123456789abcdef"[unum % base];
   } while(unum /= base);
-  if(neg) {
+
+  if(neg)
     *--cur = '-';
-  }
 
   csputs(&cons1, cur);
 }
@@ -87,8 +85,7 @@ int printk(const char *fmt, ...) {
           csputc(&cons1, c);
           break;
       }
-    }
-    else {
+    } else {
       csputc(&cons1, c);
     }
   }
