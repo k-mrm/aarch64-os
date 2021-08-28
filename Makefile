@@ -37,8 +37,10 @@ SDPATH = /media/k-mrm/09D0-F0A8
 %.o: %.S
 	$(GCC) $(CCFLAGS) -c $< -o $@
 
-kernel8.img: $(OBJS) kernel/link.ld
+kernel8.elf: $(OBJS) kernel/link.ld
 	$(LD) $(LDFLAGS) $(OBJS) -T kernel/link.ld -o kernel8.elf
+
+kernel8.img: kernel8.elf
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img

@@ -87,7 +87,7 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
   return (u64 *)pgt[PIDX(3, va)];
 }
 
-static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 perm) {
+static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
   if(pa % PAGESIZE != 0 || size % PAGESIZE != 0)
     panic("invalid pa");
 
@@ -95,7 +95,7 @@ static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 perm) {
     u64 *pte = pagewalk(pgt, va);
     if(*pte & PTE_AF)
       panic("this entry has been used");
-    *pte = PTE_PA(pa) | perm | 3;
+    *pte = PTE_PA(pa) | attr | 3;
   }
 }
 
