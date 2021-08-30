@@ -126,8 +126,7 @@ void mm_init() {
             TCR_TG0(0) |    /* TTBR0 granule 4KB */
             TCR_TG1(2) |    /* TTBR1 granule 4KB */
             TCR_T1SZ(25) |  /* 512GB */
-            TCR_IPS(0) |    /* IPS = 4GB */
-            TCR_EPD1(1);
+            TCR_IPS(0);    /* IPS = 4GB */
   set_tcr_el1(tcr);
 
   isb();
