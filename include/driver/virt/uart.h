@@ -4,7 +4,7 @@
 #include "mono.h"
 #include "memmap.h"
 
-#define UARTBASE 0x09000000
+#define PUARTBASE 0x09000000
 
 void uart_init(void);
 void uart_putc(char c);

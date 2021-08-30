@@ -3,7 +3,7 @@
 
 #include "driver/virt/gicv2.h"
 
-#define GICV2_BASE  VIRT_GICV2_BASE
+#define PGICV2_BASE  VIRT_GICV2_BASE
 
 void gicv2_init(void);
 void gic_eoi(u32 iar);

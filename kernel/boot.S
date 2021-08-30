@@ -1,3 +1,10 @@
+/* attr index */
+#define AI_DEVICE_nGnRnE_IDX  0x0
+#define AI_NORMAL_NC_IDX      0x1
+
+#define AI_DEVICE_nGnRnE  0x0
+#define AI_NORMAL_NC      0x44
+
 .section ".text.boot"
 
 .global _start
@@ -25,9 +32,27 @@ swtch_el1:
   eret
   */
 
+.align 12
+pgtable:
+  .zero 4096 
+
 kernel_start:
   ldr x0, =vectortable
   msr vbar_el1, x0
+
+  /* setup mmu */
+  ldr x0, =pgtable
+  msr ttbr0_el1, x0
+
+  ldr x0, =((AI_DEVICE_nGnRnE << (8 * AI_DEVICE_nGnRnE_IDX)) | (AI_NORMAL_NC << (8 * AI_NORMAL_NC_IDX)))
+  msr mair_el1, x0
+
+  isb
+
+  /* enable paging */
+  mrs x0, sctlr_el1
+  orr x0, x0, #1
+  msr sctlr_el1, x0
 
   adrp x1, main_kstack
   add x1, x1, #4096

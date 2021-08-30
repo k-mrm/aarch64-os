@@ -20,7 +20,7 @@ SECTIONS {
 
     . = ALIGN(4096);
     __bss_start = .;
-    .bss : AT(ADDR(.data) - 0xffffff8000000000) {
+    .bss : AT(ADDR(.bss) - 0xffffff8000000000) {
       *(.bss .bss.*)
     }
     __bss_end = .;

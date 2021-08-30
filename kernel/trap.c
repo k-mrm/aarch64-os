@@ -69,9 +69,8 @@ void uirq_handler(struct trapframe *tf) {
 
   gic_eoi(iar);
 
-  if(curproc && curproc->state == RUNNING && intid == TIMER_IRQ) {
+  if(curproc && curproc->state == RUNNING && intid == TIMER_IRQ)
     yield();
-  }
 }
 
 void unknownint(int arg) {
