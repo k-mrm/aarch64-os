@@ -42,7 +42,8 @@ static __attribute__((aligned(4096))) u64 l3_pgt[512];
 #define PTE_PA(pte) ((u64)(pte) & 0xfffffffff000)
 
 /* lower attribute */
-#define PTE_VALID 3
+#define PTE_VALID 1
+#define PTE_TABLE 2
 #define PTE_INDX(idx) (((idx) & 7) << 2)
 #define PTE_NS  (1 << 5)
 #define PTE_AP(ap)  (((ap) & 3) << 6)
@@ -86,7 +87,7 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
     u64 *pte = (u64 *)pgt[PIDX(level, va)];
     if((*pte & 1) == 0) {
       pgt = kalloc();
-      *pte = PTE_PA(pgt) | PTE_VALID;
+      *pte = PTE_PA(pgt) | PTE_TABLE | PTE_VALID;
     } else {
       pgt = (u64 *)PTE_PA(*pte);
     }
@@ -103,7 +104,7 @@ static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
     u64 *pte = pagewalk(pgt, va);
     if(*pte & PTE_AF)
       panic("this entry has been used");
-    *pte = PTE_PA(pa) | attr | PTE_VALID;
+    *pte = PTE_PA(pa) | attr | PTE_TABLE | PTE_VALID;
   }
 }
 

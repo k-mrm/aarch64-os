@@ -26,6 +26,10 @@ SECTIONS {
     __bss_end = .;
 
     . = ALIGN(4096);
+    . += 4096;
+    __kstack = .;
+
+    . = ALIGN(4096);
     kend = .;
 }
 
