@@ -27,9 +27,6 @@ swtch_el1:
   */
 
 kernel_start:
-  adrp x0, vectortable
-  msr vbar_el1, x0
-
   /* setup mmu */
   /* map 0x40000000 - PA(kend) to 0x40000000 - PA(kend) (identity mapping) */
   /* setup l2upgt */
@@ -161,6 +158,9 @@ l2pgt_loop1:
   isb
 
   /* setup stack and kernel main */
+  ldr x0, =vectortable
+  msr vbar_el1, x0
+
   ldr x1, =__kstack
   mov sp, x1
 
