@@ -31,9 +31,9 @@ void proc3() {
   }
 }
 
-char *main_kstack[4096]; // main use this stack
-
 int main(void) {
+  kinfo("kernel main @%p\n", main);
+
   console_init();
   gicv2_init();
   trap_init();
@@ -41,7 +41,6 @@ int main(void) {
   kalloc_init();
   proc_init();
 
-  kinfo("mono os for aarch64\n");
   kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
   kinfo("current EL: %d\n", cur_el());
   kinfo("vbar_el1: %p\n", vbar_el1());

@@ -26,7 +26,7 @@ void new_irq(int intid, handler_t handler) {
 void syscall(struct trapframe *tf);
 
 void sync_handler(struct trapframe *tf) {
-  // printk("elr: %p far: %p\n", elr_el1(), far_el1());
+  printk("elr: %p far: %p\n", elr_el1(), far_el1());
 
   u64 esr = esr_el1();
   esr >>= 26;
