@@ -4,62 +4,6 @@
 #include "kalloc.h"
 #include "printk.h"
 
-#define TCR_T0SZ(n)   ((u64)(n) & 0x3f)
-#define TCR_IRGN0(n)  (((u64)(n) & 0x3) << 8)
-#define TCR_ORGN0(n)  (((u64)(n) & 0x3) << 10)
-#define TCR_SH0(n)    (((u64)(n) & 0x3) << 12)
-#define TCR_TG0(n)    (((u64)(n) & 0x1) << 14)
-#define TCR_T1SZ(n)   (((u64)(n) & 0x3f) << 16)
-#define TCR_A1(n)     (((u64)(n) & 0x1) << 22)
-#define TCR_EPD1(n)   (((u64)(n) & 0x1) << 23)
-#define TCR_IRGN1(n)  (((u64)(n) & 0x3) << 24)
-#define TCR_ORGN1(n)  (((u64)(n) & 0x3) << 26)
-#define TCR_SH1(n)    (((u64)(n) & 0x3) << 28)
-#define TCR_TG1(n)    (((u64)(n) & 0x1) << 30)
-#define TCR_IPS(n)    (((u64)(n) & 0x7) << 32)
-#define TCR_AS(n)     (((u64)(n) & 0x1) << 36)
-#define TCR_TBI0(n)   (((u64)(n) & 0x1) << 37)
-#define TCR_TBI1(n)   (((u64)(n) & 0x1) << 38)
-
-static __attribute__((aligned(4096))) u64 l1_pgt[512];
-static __attribute__((aligned(4096))) u64 l2_pgt[512];
-static __attribute__((aligned(4096))) u64 l3_pgt[512];
-
-/*
- *  39bit(=512GB) Virtual Address
- *
- *     63   39 38    30 29    21 20    12 11       0
- *    +-------+--------+--------+--------+----------+
- *    | TTBRn | level1 | level2 | level3 | page off |
- *    +-------+--------+--------+--------+----------+
- *
- *
- */
-
-#define PIDX(level, va) (((va) >> (39 - (level) * 9)) & 0x1ff)
-#define OFFSET(va)  ((va) & 0xfff)
-
-#define PTE_PA(pte) ((u64)(pte) & 0xfffffffff000)
-
-/* lower attribute */
-#define PTE_VALID 1
-#define PTE_TABLE 2
-#define PTE_INDX(idx) (((idx) & 7) << 2)
-#define PTE_NS  (1 << 5)
-#define PTE_AP(ap)  (((ap) & 3) << 6)
-#define PTE_SH(sh)  (((sh) & 3) << 8)
-#define PTE_AF  (1 << 10)
-/* upper attribute */
-#define PTE_PXN (1 << 53)
-#define PTE_UXN (1 << 54)
-
-/* attr index */
-#define AI_DEVICE_nGnRnE_IDX  0x0
-#define AI_NORMAL_NC_IDX      0x1
-
-#define AI_DEVICE_nGnRnE  0x0
-#define AI_NORMAL_NC      0x44
-
 extern char *ktext_end;
 
 void set_kpgt(u64 *k) {

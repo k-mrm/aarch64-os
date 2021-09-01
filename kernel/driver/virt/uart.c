@@ -1,3 +1,4 @@
+#include "memmap.h"
 #include "driver/virt/uart.h"
 
 #define UART_DR (UARTBASE + 0x00)

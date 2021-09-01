@@ -1,6 +1,8 @@
 #ifndef MONO_KERNEL_H
 #define MONO_KERNEL_H
 
+#ifndef __ASSEMBLER__
+
 typedef unsigned long u64;
 typedef long i64;
 typedef unsigned int u32;
@@ -18,5 +20,7 @@ typedef _Bool bool;
 #define false 0
 
 #define REG(addr) (*(volatile u32 *)(u64)(addr))
+
+#endif
 
 #endif

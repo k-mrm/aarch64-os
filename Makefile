@@ -44,7 +44,7 @@ kernel8.img: kernel8.elf
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img
-	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128 -nographic -kernel kernel8.elf
+	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -d mmu -D ./qemu.log -smp $(NCPU) -m 128 -nographic -kernel kernel8.elf
 
 gdb: kernel8.img
 	$(QEMU) -S -gdb tcp::1234 -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128 -nographic -kernel kernel8.elf
