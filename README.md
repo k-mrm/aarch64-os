@@ -6,7 +6,7 @@ a simple OS for aarch64(qemu virt board)
 - aarch64-linux-gnu-toolchain
 - qemu-system-aarch64
 
-## Build
+## Build & Run
 
 ```
 $ make qemu
