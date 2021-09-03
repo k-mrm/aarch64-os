@@ -32,13 +32,15 @@ void proc3() {
 }
 
 int main(void) {
-  kinfo("kernel main @%p\n", main);
-
   console_init();
+  kinfo("booting...\n");
+  kinfo("kernel main @%p\n", main);
   gicv2_init();
   trap_init();
   timer_init(200);
-  kalloc_init();
+  kalloc_init1();
+  pgt_init();
+  kalloc_init2();
   proc_init();
 
   kinfo("cpuid: %d\n", mpidr_el1() & 0xff);

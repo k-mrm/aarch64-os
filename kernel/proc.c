@@ -5,6 +5,7 @@
 #include "trap.h"
 #include "string.h"
 #include "kalloc.h"
+#include "mm.h"
 
 struct proc proctable[NPROC];
 /* proctable[0] == kernel proc */

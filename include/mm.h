@@ -46,6 +46,8 @@
 #define PTE_PXN (1 << 53)
 #define PTE_UXN (1 << 54)
 
+#define PAGESIZE  4096
+
 /* attr index */
 #define AI_DEVICE_nGnRnE_IDX  0x0
 #define AI_NORMAL_NC_IDX      0x1

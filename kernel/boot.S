@@ -68,13 +68,13 @@ l2upgt_loop:
   /*  setup l2pgt  */
   ldr x0, =V2P(l2kpgt0)
   ldr x1, =V2P(l2kpgt1)
+
   /*
    *  0x8000000 - 0x3fffffff
    *
    *  Peripheral
    *  Device memory
    */
-
   mov x2, #0x8000000  /* start pa */
   mov x3, #0x3fffffff /* end pa */
   mov x4, #VA_START
@@ -194,6 +194,7 @@ hang:
 .section ".data"
 
 .align 12
+.global l1kpgt
 l1kpgt:
   .zero 4096 
 .align 12

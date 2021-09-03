@@ -84,8 +84,6 @@ void gicd_init() {
 }
 
 void gicv2_init() {
-  kinfo("gicv2 init base: %p\n", GICD_BASE);
-
   gicc_init();
   gicd_init();
 

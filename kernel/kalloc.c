@@ -1,5 +1,6 @@
 #include "mono.h"
 #include "memmap.h"
+#include "mm.h"
 #include "aarch64.h"
 #include "kalloc.h"
 #include "printk.h"
@@ -45,8 +46,16 @@ void kfree(void *pa) {
   memset((char *)pa, 0, PAGESIZE);
 }
 
-void kalloc_init() {
-  for(char *p = kend; p + PAGESIZE <= (char *)PHYMEM_END; p += PAGESIZE) {
+void kalloc_init1() {
+  for(char *p = kend; p + PAGESIZE <= (char *)KERNSECEND; p += PAGESIZE) {
+    struct header *ph = (struct header *)p;
+    ph->next = freelist;
+    freelist = ph;
+  }
+}
+
+void kalloc_init2() {
+  for(char *p = (char *)KERNSECEND; p + PAGESIZE <= (char *)PHYMEMEND; p += PAGESIZE) {
     struct header *ph = (struct header *)p;
     ph->next = freelist;
     freelist = ph;
