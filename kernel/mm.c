@@ -25,7 +25,8 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
 
 static u64 *kpagewalk(u64 *pgt, u64 va) {
   for(int level = 1; level < 3; level++) {
-    u64 *pte = (u64 *)pgt[PIDX(level, va)];
+    u64 *pte = &pgt[PIDX(level, va)];
+    kinfo("pte: %p %p\n", pte, *pte);
     if((*pte & PTE_VALID) && (*pte & PTE_TABLE)) {
       pgt = (u64 *)PTE_PA(*pte);
     } else {
@@ -34,7 +35,7 @@ static u64 *kpagewalk(u64 *pgt, u64 va) {
     }
   }
 
-  return (u64 *)pgt[PIDX(3, va)];
+  return &pgt[PIDX(3, va)];
 }
 
 static void kpagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
@@ -66,18 +67,20 @@ u64 va2pa() {
 }
 
 void kpgt_init() {
-  kinfo("kpgt %p\n", l1kpgt);
+  kinfo("kpgt %p\n", V2P((u64)l1kpgt));
   /* remap kernel */
-  kpagemap(l1kpgt, KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_INDX(AI_NORMAL_NC_IDX));
+  kpagemap(V2P((u64)l1kpgt), KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_INDX(AI_NORMAL_NC_IDX));
 
   /* map kend ~ PHYMEMEND */
-  kpagemap(l1kpgt, (u64)kend, V2P((u64)kend), PHYMEMEND - (u64)kend, PTE_INDX(AI_NORMAL_NC_IDX));
+  kpagemap(V2P((u64)l1kpgt), (u64)kend, V2P((u64)kend), PHYMEMEND - (u64)kend, PTE_INDX(AI_NORMAL_NC_IDX));
 
   kinfo("a\n");
 }
 
 void pgt_init() {
   kpgt_init();
+
+  isb();
 
   set_ttbr0_el1(0);
 }
