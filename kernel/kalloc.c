@@ -57,17 +57,7 @@ void kalloc_init1() {
 void kalloc_init2() {
   for(char *p = (char *)KERNSECEND; p + PAGESIZE <= (char *)PHYMEMEND; p += PAGESIZE) {
     struct header *ph = (struct header *)p;
-    printk("a %p\n", p);
     ph->next = freelist;
     freelist = ph;
   }
-}
-
-void kalloctest() {
-  char *p1 = kalloc();
-  char *p2 = kalloc();
-  char *p3 = kalloc();
-  kfree(p1);
-  char *p4 = kalloc();
-  printk("%d\n", *p1);
 }

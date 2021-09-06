@@ -46,7 +46,7 @@ static void kpagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
     u64 *pte = kpagewalk(pgt, va);
     if(*pte & PTE_AF)
       panic("this entry has been used");
-    *pte = PTE_PA(pa) | attr | PTE_TABLE | PTE_VALID;
+    *pte = PTE_PA(pa) | PTE_AF | attr | PTE_TABLE | PTE_VALID;
   }
 }
 
