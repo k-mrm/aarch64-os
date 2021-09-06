@@ -35,8 +35,9 @@
 #define PTE_PA(pte) ((u64)(pte) & 0xfffffffff000)
 
 /* lower attribute */
-#define PTE_VALID 1
-#define PTE_TABLE 2
+#define PTE_VALID   1   /* level 0,1,2 descriptor */
+#define PTE_TABLE   2   /* level 0,1,2 descriptor */
+#define PTE_V   3       /* level 3 descriptor */
 #define PTE_INDX(idx) (((idx) & 7) << 2)
 #define PTE_NS  (1 << 5)
 #define PTE_AP(ap)  (((ap) & 3) << 6)
