@@ -11,7 +11,7 @@ extern char kend[];
 
 static u64 *pagewalk(u64 *pgt, u64 va) {
   for(int level = 1; level < 3; level++) {
-    u64 *pte = (u64 *)pgt[PIDX(level, va)];
+    u64 *pte = &pgt[PIDX(level, va)];
     if((*pte & 1) == 0) {
       pgt = kalloc();
       *pte = PTE_PA(pgt) | PTE_TABLE | PTE_VALID;
@@ -20,18 +20,17 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
     }
   }
 
-  return (u64 *)pgt[PIDX(3, va)];
+  return &pgt[PIDX(3, va)];
 }
 
 static u64 *kpagewalk(u64 *pgt, u64 va) {
   for(int level = 1; level < 3; level++) {
     u64 *pte = &pgt[PIDX(level, va)];
-    kinfo("pte: %p %p\n", pte, *pte);
     if((*pte & PTE_VALID) && (*pte & PTE_TABLE)) {
       pgt = (u64 *)PTE_PA(*pte);
     } else {
       pgt = kalloc();
-      *pte = PTE_PA(pgt) | PTE_TABLE | PTE_VALID;
+      *pte = PTE_PA(V2P(pgt)) | PTE_TABLE | PTE_VALID;
     }
   }
 
@@ -41,6 +40,7 @@ static u64 *kpagewalk(u64 *pgt, u64 va) {
 static void kpagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
   if(pa % PAGESIZE != 0 || size % PAGESIZE != 0)
     panic("invalid pa");
+  printk("va %p\n", va);
 
   for(u64 p = 0; p < size; p += PAGESIZE, va += PAGESIZE, pa += PAGESIZE) {
     u64 *pte = kpagewalk(pgt, va);
@@ -67,14 +67,12 @@ u64 va2pa() {
 }
 
 void kpgt_init() {
-  kinfo("kpgt %p\n", V2P((u64)l1kpgt));
+  kinfo("kpgt %p\n", V2P(l1kpgt));
   /* remap kernel */
-  kpagemap(V2P((u64)l1kpgt), KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_INDX(AI_NORMAL_NC_IDX));
+  kpagemap(l1kpgt, KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_INDX(AI_NORMAL_NC_IDX));
 
   /* map kend ~ PHYMEMEND */
-  kpagemap(V2P((u64)l1kpgt), (u64)kend, V2P((u64)kend), PHYMEMEND - (u64)kend, PTE_INDX(AI_NORMAL_NC_IDX));
-
-  kinfo("a\n");
+  kpagemap(l1kpgt, (u64)kend, V2P(kend), PHYMEMEND - (u64)kend, PTE_INDX(AI_NORMAL_NC_IDX));
 }
 
 void pgt_init() {

@@ -36,7 +36,7 @@ void kfree(void *pa) {
   printk("%p\n", pa);
 
   if((u64)pa % PAGESIZE != 0) {
-    panic("a");
+    panic("bad pa");
   }
 
   struct header *p = (struct header *)pa;
@@ -57,6 +57,7 @@ void kalloc_init1() {
 void kalloc_init2() {
   for(char *p = (char *)KERNSECEND; p + PAGESIZE <= (char *)PHYMEMEND; p += PAGESIZE) {
     struct header *ph = (struct header *)p;
+    printk("a %p\n", p);
     ph->next = freelist;
     freelist = ph;
   }
