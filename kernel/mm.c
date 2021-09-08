@@ -9,20 +9,6 @@
 extern u64 l1kpgt[];
 extern char kend[];
 
-static u64 *pagewalk(u64 *pgt, u64 va) {
-  for(int level = 1; level < 3; level++) {
-    u64 *pte = &pgt[PIDX(level, va)];
-    if((*pte & 1) == 0) {
-      pgt = kalloc();
-      *pte = PTE_PA(pgt) | PTE_TABLE | PTE_VALID;
-    } else {
-      pgt = (u64 *)PTE_PA(*pte);
-    }
-  }
-
-  return &pgt[PIDX(3, va)];
-}
-
 static u64 *kpagewalk(u64 *pgt, u64 va) {
   for(int level = 1; level < 3; level++) {
     u64 *pte = &pgt[PIDX(level, va)];
@@ -50,6 +36,20 @@ static void kpagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
   }
 }
 
+static u64 *pagewalk(u64 *pgt, u64 va) {
+  for(int level = 1; level < 3; level++) {
+    u64 *pte = &pgt[PIDX(level, va)];
+    if((*pte & 1) == 0) {
+      pgt = kalloc();
+      *pte = PTE_PA(pgt) | PTE_TABLE | PTE_VALID;
+    } else {
+      pgt = (u64 *)PTE_PA(*pte);
+    }
+  }
+
+  return &pgt[PIDX(3, va)];
+}
+
 static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
   if(pa % PAGESIZE != 0 || size % PAGESIZE != 0)
     panic("invalid pa");
@@ -67,7 +67,6 @@ u64 va2pa() {
 }
 
 void kpgt_init() {
-  kinfo("kpgt %p\n", V2P(l1kpgt));
   /* remap kernel */
   kpagemap(l1kpgt, KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_INDX(AI_NORMAL_NC_IDX));
 

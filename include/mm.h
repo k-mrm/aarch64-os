@@ -35,19 +35,20 @@
 #define PTE_PA(pte) ((u64)(pte) & 0xfffffffff000)
 
 /* lower attribute */
-#define PTE_VALID   1   /* level 0,1,2 descriptor */
-#define PTE_TABLE   2   /* level 0,1,2 descriptor */
-#define PTE_V   3       /* level 3 descriptor */
+#define PTE_VALID 1   /* level 0,1,2 descriptor */
+#define PTE_TABLE 2   /* level 0,1,2 descriptor */
+#define PTE_V 3       /* level 3 descriptor */
 #define PTE_INDX(idx) (((idx) & 7) << 2)
 #define PTE_NS  (1 << 5)
 #define PTE_AP(ap)  (((ap) & 3) << 6)
+#define PTE_U   PTE_AP(1)
 #define PTE_SH(sh)  (((sh) & 3) << 8)
 #define PTE_AF  (1 << 10)
 /* upper attribute */
 #define PTE_PXN (1 << 53)
 #define PTE_UXN (1 << 54)
 
-#define PAGESIZE  4096
+#define PAGESIZE  4096    /* 4KB */
 
 /* attr index */
 #define AI_DEVICE_nGnRnE_IDX  0x0
