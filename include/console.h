@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_CONSOLE_H
 #define AARCH64_OS_CONSOLE_H
 
-#include "mono.h"
+#include "kernel.h"
 #include "font.h"
 
 #define USE_UART

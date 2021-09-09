@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_FONT_H
 #define AARCH64_OS_FONT_H
 
-#include "mono.h"
+#include "kernel.h"
 
 struct font {
   char (*data)[8];

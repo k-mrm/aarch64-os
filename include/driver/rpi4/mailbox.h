@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_MAILBOX_H
 #define AARCH64_OS_MAILBOX_H
 
-#include "mono.h"
+#include "kernel.h"
 #include "memmap.h"
 
 #define MBOXBASE  (PERIPHERAL_BASE + 0xb880)

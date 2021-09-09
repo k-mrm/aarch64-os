@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_AARCH64_H
 #define AARCH64_OS_AARCH64_H
 
-#include "mono.h"
+#include "kernel.h"
 
 static inline int cur_el() {
   int el;

@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_PROC_H
 #define AARCH64_OS_PROC_H
 
-#include "mono.h"
+#include "kernel.h"
 
 typedef int pid_t;
 

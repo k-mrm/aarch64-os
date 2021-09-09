@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_FRAMEBUFFER_H
 #define AARCH64_OS_FRAMEBUFFER_H
 
-#include "mono.h"
+#include "kernel.h"
 #include "font.h"
 
 struct framebuffer {

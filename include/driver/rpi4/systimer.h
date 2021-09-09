@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_SYSTIMER_H
 #define AARCH64_OS_SYSTIMER_H
 
-#include "mono.h"
+#include "kernel.h"
 #include "memmap.h"
 
 #define SYSTIMER_BASE (PERIPHERAL_BASE + 0x3000)

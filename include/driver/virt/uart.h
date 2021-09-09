@@ -5,7 +5,7 @@
 
 #ifndef __ASSEMBLER__
 
-#include "mono.h"
+#include "kernel.h"
 
 void uart_init(void);
 void uart_putc(char c);

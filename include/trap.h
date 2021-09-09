@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_TRAP_H
 #define AARCH64_OS_TRAP_H
 
-#include "mono.h"
+#include "kernel.h"
 
 #define TIMER_IRQ   27
 
