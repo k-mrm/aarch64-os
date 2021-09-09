@@ -1,5 +1,5 @@
-#ifndef MONO_GPIO_H
-#define MONO_GPIO_H
+#ifndef AARCH64_OS_GPIO_H
+#define AARCH64_OS_GPIO_H
 
 #include "memmap.h"
 

@@ -1,5 +1,5 @@
-#ifndef MONO_DRIVER_TIMER_H
-#define MONO_DRIVER_TIMER_H
+#ifndef AARCH64_OS_DRIVER_TIMER_H
+#define AARCH64_OS_DRIVER_TIMER_H
 
 #include "mono.h"
 

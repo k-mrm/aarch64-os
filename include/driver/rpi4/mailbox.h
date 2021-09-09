@@ -1,5 +1,5 @@
-#ifndef MONO_MAILBOX_H
-#define MONO_MAILBOX_H
+#ifndef AARCH64_OS_MAILBOX_H
+#define AARCH64_OS_MAILBOX_H
 
 #include "mono.h"
 #include "memmap.h"

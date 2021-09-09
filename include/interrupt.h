@@ -1,5 +1,5 @@
-#ifndef MONO_INTERRUPT_H
-#define MONO_INTERRUPT_H
+#ifndef AARCH64_OS_INTERRUPT_H
+#define AARCH64_OS_INTERRUPT_H
 
 void intr_init(void);
 

@@ -1,5 +1,7 @@
-#ifndef MONO_PROC_H
-#define MONO_PROC_H
+#ifndef AARCH64_OS_PROC_H
+#define AARCH64_OS_PROC_H
+
+#include "mono.h"
 
 typedef int pid_t;
 
@@ -45,6 +47,7 @@ struct proc {
   struct context context;
   struct trapframe *tf;
   char *kstack;
+  u64 *pgt;
   char name[16];
 };
 

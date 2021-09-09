@@ -1,5 +1,5 @@
-#ifndef MONO_LIB_STRING_H
-#define MONO_LIB_STRING_H
+#ifndef AARCH64_OS_LIB_STRING_H
+#define AARCH64_OS_LIB_STRING_H
 
 #include "mono.h"
 

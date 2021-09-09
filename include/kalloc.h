@@ -1,5 +1,5 @@
-#ifndef MONO_KALLOC_H
-#define MONO_KALLOC_H
+#ifndef AARCH64_OS_KALLOC_H
+#define AARCH64_OS_KALLOC_H
 
 void *kalloc(void);
 void kfree(void *pa);

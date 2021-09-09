@@ -37,8 +37,8 @@ SDPATH = /media/k-mrm/09D0-F0A8
 %.o: %.S
 	$(GCC) $(CCFLAGS) -c $< -o $@
 
-kernel8.elf: $(OBJS) kernel/link.ld
-	$(LD) $(LDFLAGS) $(OBJS) -T kernel/link.ld -o kernel8.elf
+kernel8.elf: $(OBJS) kernel/kernel.ld
+	$(LD) $(LDFLAGS) $(OBJS) -T kernel/kernel.ld -o kernel8.elf
 
 kernel8.img: kernel8.elf
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
@@ -52,11 +52,12 @@ gdb: kernel8.img
 dts:
 	$(QEMU) -S -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC),dumpdtb=virt.dtb -smp $(NCPU) -nographic
 	dtc -I dtb -O dts -o virt.dts virt.dtb
+	rm virt.dtb
 
 raspi: kernel8.img
 	cp kernel8.img $(SDPATH)
 
-.PHONY: clean
-
 clean:
 	$(RM) $(OBJS) kernel8.elf kernel8.img
+
+.PHONY: qemu gdb clean dts raspi

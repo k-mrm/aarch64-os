@@ -1,5 +1,5 @@
-#ifndef MONO_LIB_PRINTK_H
-#define MONO_LIB_PRINTK_H
+#ifndef AARCH64_OS_LIB_PRINTK_H
+#define AARCH64_OS_LIB_PRINTK_H
 
 int printk(const char *fmt, ...);
 void panic(const char *s) __attribute__((noreturn));

@@ -1,5 +1,5 @@
-#ifndef MONO_TRAP_H
-#define MONO_TRAP_H
+#ifndef AARCH64_OS_TRAP_H
+#define AARCH64_OS_TRAP_H
 
 #include "mono.h"
 

@@ -1,5 +1,5 @@
-#ifndef MONO_KERNEL_H
-#define MONO_KERNEL_H
+#ifndef AARCH64_OS_KERNEL_H
+#define AARCH64_OS_KERNEL_H
 
 #ifndef __ASSEMBLER__
 

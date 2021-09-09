@@ -1,5 +1,5 @@
-#ifndef MONO_FONT_H
-#define MONO_FONT_H
+#ifndef AARCH64_OS_FONT_H
+#define AARCH64_OS_FONT_H
 
 #include "mono.h"
 

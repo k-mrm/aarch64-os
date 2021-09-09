@@ -1,5 +1,5 @@
-#ifndef MONO_FRAMEBUFFER_H
-#define MONO_FRAMEBUFFER_H
+#ifndef AARCH64_OS_FRAMEBUFFER_H
+#define AARCH64_OS_FRAMEBUFFER_H
 
 #include "mono.h"
 #include "font.h"

@@ -1,5 +1,5 @@
-#ifndef MONO_MEMMAP_H
-#define MONO_MEMMAP_H
+#ifndef AARCH64_OS_MEMMAP_H
+#define AARCH64_OS_MEMMAP_H
 
 #include "driver/gicv2.h"
 #include "driver/uart.h"
@@ -24,6 +24,10 @@
 
 #define PKERNSECEND 0x40200000
 #define KERNSECEND  (PKERNSECEND + VA_START)
+
+#define USEREND     0x7fffffffff
+
+#define USTACKTOP   (USEREND + 1)
 
 #define GICV2_BASE  P2V(PGICV2_BASE)
 #define UARTBASE    P2V(PUARTBASE)

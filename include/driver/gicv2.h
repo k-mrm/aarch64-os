@@ -1,5 +1,5 @@
-#ifndef MONO_DRIVER_GICV2_H
-#define MONO_DRIVER_GICV2_H
+#ifndef AARCH64_OS_DRIVER_GICV2_H
+#define AARCH64_OS_DRIVER_GICV2_H
 
 #include "driver/virt/gicv2.h"
 

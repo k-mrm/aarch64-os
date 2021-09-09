@@ -62,16 +62,28 @@ static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
   }
 }
 
+void alloc_userspace(u64 *pgt, void (*fn)(void)) {
+  char *ustack = kalloc();
+  pagemap(pgt, USTACKTOP - PAGESIZE, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
+}
+
+void load_userspace(u64 *pgt) {
+  if(!pgt)
+    panic("no pagetable");
+
+  set_ttbr0_el1(pgt);
+}
+
 u64 va2pa() {
   return 0;
 }
 
 void kpgt_init() {
   /* remap kernel */
-  kpagemap(l1kpgt, KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_INDX(AI_NORMAL_NC_IDX));
+  kpagemap(l1kpgt, KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_NORMAL);
 
   /* map kend ~ PHYMEMEND */
-  kpagemap(l1kpgt, (u64)kend, V2P(kend), PHYMEMEND - (u64)kend, PTE_INDX(AI_NORMAL_NC_IDX));
+  kpagemap(l1kpgt, (u64)kend, V2P(kend), PHYMEMEND - (u64)kend, PTE_NORMAL);
 }
 
 void pgt_init() {

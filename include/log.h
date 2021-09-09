@@ -1,5 +1,5 @@
-#ifndef MONO_LOG_H
-#define MONO_LOG_H
+#ifndef AARCH64_OS_LOG_H
+#define AARCH64_OS_LOG_H
 
 #include "printk.h"
 

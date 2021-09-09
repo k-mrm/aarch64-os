@@ -1,5 +1,5 @@
-#ifndef MONO_MM_H
-#define MONO_MM_H
+#ifndef AARCH64_OS_MM_H
+#define AARCH64_OS_MM_H
 
 #define TCR_T0SZ(n)   ((n) & 0x3f)
 #define TCR_IRGN0(n)  (((n) & 0x3) << 8)
@@ -39,6 +39,8 @@
 #define PTE_TABLE 2   /* level 0,1,2 descriptor */
 #define PTE_V 3       /* level 3 descriptor */
 #define PTE_INDX(idx) (((idx) & 7) << 2)
+#define PTE_NORMAL  PTE_INDX(AI_NORMAL_NC_IDX)
+#define PTE_DEVICE  PTE_INDX(AI_DEVICE_nGnRnE_IDX)
 #define PTE_NS  (1 << 5)
 #define PTE_AP(ap)  (((ap) & 3) << 6)
 #define PTE_U   PTE_AP(1)

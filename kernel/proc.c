@@ -6,6 +6,7 @@
 #include "string.h"
 #include "kalloc.h"
 #include "mm.h"
+#include "memmap.h"
 #include "log.h"
 
 struct proc proctable[NPROC];
@@ -44,12 +45,12 @@ found:
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(*p->tf));
 
-  char *ustack = kalloc();
-  char *usp = ustack + PAGESIZE;
+  p->pgt = kalloc();  /* new pagetable */
+  alloc_userspace(p->pgt, fn);
 
-  p->tf->elr = (u64)fn; // `eret` jump to elr(== fn)
+  p->tf->elr = (u64)0; // `eret` jump to elr
   p->tf->spsr = 0x0;    // switch EL1 to EL0
-  p->tf->sp = (u64)usp; // sp_el0
+  p->tf->sp = (u64)USTACKTOP; // sp_el0
 
   p->kstack = kstack;
   p->context.lr = (u64)forkret;
@@ -74,6 +75,8 @@ void schedule() {
         p->state = RUNNING;
         curproc = p;
 
+        load_userspace(p->pgt);
+        
         cswitch(&kproc.context, &p->context);
 
         curproc = NULL;

@@ -1,5 +1,5 @@
-#ifndef MONO_GICV2_H
-#define MONO_GICV2_H
+#ifndef AARCH64_OS_GICV2_H
+#define AARCH64_OS_GICV2_H
 
 #define GICV2_BASE  0xff841000
 

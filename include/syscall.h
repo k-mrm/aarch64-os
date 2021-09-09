@@ -1,5 +1,5 @@
-#ifndef MONO_SYSCALL_H
-#define MONO_SYSCALL_H
+#ifndef AARCH64_OS_SYSCALL_H
+#define AARCH64_OS_SYSCALL_H
 
 #define NSYSCALL  1
 

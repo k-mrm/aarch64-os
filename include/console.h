@@ -1,5 +1,5 @@
-#ifndef MONO_CONSOLE_H
-#define MONO_CONSOLE_H
+#ifndef AARCH64_OS_CONSOLE_H
+#define AARCH64_OS_CONSOLE_H
 
 #include "mono.h"
 #include "font.h"

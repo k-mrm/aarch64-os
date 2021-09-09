@@ -1,5 +1,5 @@
-#ifndef MONO_SYSTIMER_H
-#define MONO_SYSTIMER_H
+#ifndef AARCH64_OS_SYSTIMER_H
+#define AARCH64_OS_SYSTIMER_H
 
 #include "mono.h"
 #include "memmap.h"

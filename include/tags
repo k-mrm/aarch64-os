@@ -1,0 +1,281 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AI_DEVICE_nGnRnE	mm.h	59;"	d
+AI_DEVICE_nGnRnE_IDX	mm.h	56;"	d
+AI_NORMAL_NC	mm.h	60;"	d
+AI_NORMAL_NC_IDX	mm.h	57;"	d
+ALT0	driver/rpi4/gpio.h	/^  ALT0 = 0b100,$/;"	e	enum:pinmode
+ALT1	driver/rpi4/gpio.h	/^  ALT1 = 0b101,$/;"	e	enum:pinmode
+ALT2	driver/rpi4/gpio.h	/^  ALT2 = 0b110,$/;"	e	enum:pinmode
+ALT3	driver/rpi4/gpio.h	/^  ALT3 = 0b111,$/;"	e	enum:pinmode
+ALT4	driver/rpi4/gpio.h	/^  ALT4 = 0b011,$/;"	e	enum:pinmode
+ALT5	driver/rpi4/gpio.h	/^  ALT5 = 0b010,$/;"	e	enum:pinmode
+GICC_AEOIR	driver/rpi4/gicv2.h	23;"	d
+GICC_AIAR	driver/rpi4/gicv2.h	22;"	d
+GICC_BASE	driver/rpi4/gicv2.h	7;"	d
+GICC_CTLR	driver/rpi4/gicv2.h	17;"	d
+GICC_EOIR	driver/rpi4/gicv2.h	20;"	d
+GICC_HPPIR	driver/rpi4/gicv2.h	21;"	d
+GICC_IAR	driver/rpi4/gicv2.h	19;"	d
+GICC_PMR	driver/rpi4/gicv2.h	18;"	d
+GICD_BASE	driver/rpi4/gicv2.h	6;"	d
+GICD_CTLR	driver/rpi4/gicv2.h	11;"	d
+GICD_IPRIORITYR	driver/rpi4/gicv2.h	14;"	d
+GICD_ISENABLER	driver/rpi4/gicv2.h	13;"	d
+GICD_ITARGETSR	driver/rpi4/gicv2.h	15;"	d
+GICD_TYPER	driver/rpi4/gicv2.h	12;"	d
+GICH_BASE	driver/rpi4/gicv2.h	8;"	d
+GICV2_BASE	driver/rpi4/gicv2.h	4;"	d
+GICV2_BASE	memmap.h	32;"	d
+GICV_BASE	driver/rpi4/gicv2.h	9;"	d
+GPCLR	driver/rpi4/gpio.h	10;"	d
+GPFSEL	driver/rpi4/gpio.h	8;"	d
+GPIOBASE	driver/rpi4/gpio.h	6;"	d
+GPSET	driver/rpi4/gpio.h	9;"	d
+INPUT	driver/rpi4/gpio.h	/^  INPUT = 0b000,$/;"	e	enum:pinmode
+KERNBASE	memmap.h	22;"	d
+KERNSECEND	memmap.h	26;"	d
+MBOX0_CFG	driver/rpi4/mailbox.h	13;"	d
+MBOX0_PEEK	driver/rpi4/mailbox.h	10;"	d
+MBOX0_READ	driver/rpi4/mailbox.h	9;"	d
+MBOX0_SENDER	driver/rpi4/mailbox.h	11;"	d
+MBOX0_STATUS	driver/rpi4/mailbox.h	12;"	d
+MBOX0_WRITE	driver/rpi4/mailbox.h	14;"	d
+MBOXBASE	driver/rpi4/mailbox.h	7;"	d
+MBOX_EMPTY	driver/rpi4/mailbox.h	16;"	d
+MBOX_FULL	driver/rpi4/mailbox.h	17;"	d
+MBOX_SUCCESS	driver/rpi4/mailbox.h	19;"	d
+MONO_AARCH64_H	aarch64.h	2;"	d
+MONO_CONSOLE_H	console.h	2;"	d
+MONO_CONTEXT_H	context.h	2;"	d
+MONO_DRIVER_GICV2_H	driver/gicv2.h	2;"	d
+MONO_DRIVER_TIMER_H	driver/timer.h	2;"	d
+MONO_DRIVER_UART_H	driver/uart.h	2;"	d
+MONO_DRIVER_VIRT_GICV2_H	driver/virt/gicv2.h	2;"	d
+MONO_DRIVER_VIRT_UART_H	driver/virt/uart.h	2;"	d
+MONO_FONT_H	font.h	2;"	d
+MONO_FRAMEBUFFER_H	driver/rpi4/framebuffer.h	2;"	d
+MONO_GICV2_H	driver/rpi4/gicv2.h	2;"	d
+MONO_GPIO_H	driver/rpi4/gpio.h	2;"	d
+MONO_INTERRUPT_H	interrupt.h	2;"	d
+MONO_KALLOC_H	kalloc.h	2;"	d
+MONO_KERNEL_H	mono.h	2;"	d
+MONO_LIB_PRINTK_H	printk.h	2;"	d
+MONO_LIB_STRING_H	lib/string.h	2;"	d
+MONO_LOG_H	log.h	2;"	d
+MONO_MAILBOX_H	driver/rpi4/mailbox.h	2;"	d
+MONO_MEMMAP_H	memmap.h	2;"	d
+MONO_MM_H	mm.h	2;"	d
+MONO_PROC_H	proc.h	2;"	d
+MONO_SYSCALL_H	syscall.h	2;"	d
+MONO_SYSTIMER_H	driver/rpi4/systimer.h	2;"	d
+MONO_TRAP_H	trap.h	2;"	d
+NPROC	proc.h	54;"	d
+NSYSCALL	syscall.h	4;"	d
+NULL	mono.h	15;"	d
+OFFSET	mm.h	33;"	d
+OUTPUT	driver/rpi4/gpio.h	/^  OUTPUT = 0b001,$/;"	e	enum:pinmode
+P2V	memmap.h	12;"	d
+P2V	memmap.h	17;"	d
+PAGESIZE	mm.h	53;"	d
+PGICV2_BASE	driver/gicv2.h	6;"	d
+PHYMEMEND	memmap.h	23;"	d
+PIDX	mm.h	32;"	d
+PKERNBASE	memmap.h	21;"	d
+PKERNSECEND	memmap.h	25;"	d
+PROP_END	driver/rpi4/mailbox.h	/^  PROP_END = 0,$/;"	e	enum:mbox_proptag
+PROP_FB_ALLOC_BUFFER	driver/rpi4/mailbox.h	/^  PROP_FB_ALLOC_BUFFER = 0x40001,$/;"	e	enum:mbox_proptag
+PROP_FB_GET_PITCH	driver/rpi4/mailbox.h	/^  PROP_FB_GET_PITCH = 0x40008,$/;"	e	enum:mbox_proptag
+PROP_FB_SET_DEPTH	driver/rpi4/mailbox.h	/^  PROP_FB_SET_DEPTH = 0x48005,$/;"	e	enum:mbox_proptag
+PROP_FB_SET_PHY_WH	driver/rpi4/mailbox.h	/^  PROP_FB_SET_PHY_WH = 0x48003,$/;"	e	enum:mbox_proptag
+PROP_FB_SET_VIRT_WH	driver/rpi4/mailbox.h	/^  PROP_FB_SET_VIRT_WH = 0x48004,$/;"	e	enum:mbox_proptag
+PTE_AF	mm.h	48;"	d
+PTE_AP	mm.h	45;"	d
+PTE_DEVICE	mm.h	43;"	d
+PTE_INDX	mm.h	41;"	d
+PTE_NORMAL	mm.h	42;"	d
+PTE_NS	mm.h	44;"	d
+PTE_PA	mm.h	35;"	d
+PTE_PXN	mm.h	50;"	d
+PTE_SH	mm.h	47;"	d
+PTE_TABLE	mm.h	39;"	d
+PTE_U	mm.h	46;"	d
+PTE_UXN	mm.h	51;"	d
+PTE_V	mm.h	40;"	d
+PTE_VALID	mm.h	38;"	d
+PUARTBASE	driver/virt/uart.h	4;"	d
+PULLDOWN	driver/rpi4/gpio.h	/^  PULLDOWN = 2,$/;"	e	enum:pullmode
+PULLUP	driver/rpi4/gpio.h	/^  PULLUP = 1,$/;"	e	enum:pullmode
+REG	mono.h	22;"	d
+RUNNABLE	proc.h	/^  RUNNABLE,$/;"	e	enum:procstate
+RUNNING	proc.h	/^  RUNNING,$/;"	e	enum:procstate
+SLEEPING	proc.h	/^  SLEEPING,$/;"	e	enum:procstate
+SYSTIMER_BASE	driver/rpi4/systimer.h	7;"	d
+SYSTIMER_C	driver/rpi4/systimer.h	12;"	d
+SYSTIMER_CHI	driver/rpi4/systimer.h	11;"	d
+SYSTIMER_CLO	driver/rpi4/systimer.h	10;"	d
+SYSTIMER_CS	driver/rpi4/systimer.h	9;"	d
+SYS_GETPID	syscall.h	6;"	d
+TCR_A1	mm.h	10;"	d
+TCR_AS	mm.h	17;"	d
+TCR_EPD1	mm.h	11;"	d
+TCR_IPS	mm.h	16;"	d
+TCR_IRGN0	mm.h	5;"	d
+TCR_IRGN1	mm.h	12;"	d
+TCR_ORGN0	mm.h	6;"	d
+TCR_ORGN1	mm.h	13;"	d
+TCR_SH0	mm.h	7;"	d
+TCR_SH1	mm.h	14;"	d
+TCR_T0SZ	mm.h	4;"	d
+TCR_T1SZ	mm.h	9;"	d
+TCR_TBI0	mm.h	18;"	d
+TCR_TBI1	mm.h	19;"	d
+TCR_TG0	mm.h	8;"	d
+TCR_TG1	mm.h	15;"	d
+TIMER_IRQ	trap.h	6;"	d
+UARTBASE	memmap.h	33;"	d
+UNUSED	proc.h	/^  UNUSED,$/;"	e	enum:procstate
+USEREND	memmap.h	28;"	d
+USE_UART	console.h	7;"	d
+USTACKTOP	memmap.h	30;"	d
+V2P	memmap.h	11;"	d
+V2P	memmap.h	16;"	d
+VA_START	memmap.h	7;"	d
+VIRT_GICV2_BASE	driver/virt/gicv2.h	6;"	d
+bool	mono.h	/^typedef _Bool bool;$/;"	t
+buf	driver/rpi4/framebuffer.h	/^  u16 *buf;$/;"	m	struct:framebuffer
+cntfrq_el0	aarch64.h	/^static inline u64 cntfrq_el0() {$/;"	f
+cntv_ctl_el0	aarch64.h	/^static inline u64 cntv_ctl_el0() {$/;"	f
+cntv_cval_el0	aarch64.h	/^static inline u64 cntv_cval_el0() {$/;"	f
+cntv_tval_el0	aarch64.h	/^static inline u64 cntv_tval_el0() {$/;"	f
+cntvct_el0	aarch64.h	/^static inline u64 cntvct_el0() {$/;"	f
+console	console.h	/^struct console {$/;"	s
+context	context.h	/^struct context {$/;"	s
+context	proc.h	/^  struct context context;$/;"	m	struct:proc	typeref:struct:proc::context
+context	proc.h	/^struct context {$/;"	s
+cur_el	aarch64.h	/^static inline int cur_el() {$/;"	f
+daif	aarch64.h	/^static inline u64 daif() {$/;"	f
+data	font.h	/^  char (*data)[8];$/;"	m	struct:font
+depth	driver/rpi4/framebuffer.h	/^  u32 depth;$/;"	m	struct:framebuffer
+disable_irq	aarch64.h	/^static inline void disable_irq() {$/;"	f
+elr	trap.h	/^  u64 elr;$/;"	m	struct:trapframe
+elr_el1	aarch64.h	/^static inline u64 elr_el1() {$/;"	f
+enable_irq	aarch64.h	/^static inline void enable_irq() {$/;"	f
+esr_el1	aarch64.h	/^static inline u64 esr_el1() {$/;"	f
+false	mono.h	20;"	d
+far_el1	aarch64.h	/^static inline u64 far_el1() {$/;"	f
+font	font.h	/^struct font {$/;"	s
+framebuffer	driver/rpi4/framebuffer.h	/^struct framebuffer {$/;"	s
+h	driver/rpi4/framebuffer.h	/^  u32 h;$/;"	m	struct:framebuffer
+h	font.h	/^  u8 h;$/;"	m	struct:font
+handler_t	trap.h	/^typedef void (*handler_t)(void);$/;"	t
+i16	mono.h	/^typedef signed short i16;$/;"	t
+i32	mono.h	/^typedef signed int i32;$/;"	t
+i64	mono.h	/^typedef long i64;$/;"	t
+i8	mono.h	/^typedef signed char i8;$/;"	t
+id	driver/rpi4/systimer.h	/^  int id;$/;"	m	struct:systimer
+interval	driver/rpi4/systimer.h	/^  u32 interval;$/;"	m	struct:systimer
+isb	aarch64.h	/^static inline void isb() {$/;"	f
+kinfo	log.h	6;"	d
+kstack	proc.h	/^  char *kstack;$/;"	m	struct:proc
+lr	proc.h	/^  u64 lr;  \/* x30 *\/$/;"	m	struct:context
+mbox_proptag	driver/rpi4/mailbox.h	/^enum mbox_proptag {$/;"	g
+mpidr_el1	aarch64.h	/^static inline u64 mpidr_el1() {$/;"	f
+name	proc.h	/^  char name[16];$/;"	m	struct:proc
+nbuf	driver/rpi4/framebuffer.h	/^  u32 nbuf;$/;"	m	struct:framebuffer
+off_x	driver/rpi4/framebuffer.h	/^  u32 off_x;$/;"	m	struct:framebuffer
+off_y	driver/rpi4/framebuffer.h	/^  u32 off_y;$/;"	m	struct:framebuffer
+pgt	proc.h	/^  u64 *pgt;$/;"	m	struct:proc
+phy_h	driver/rpi4/framebuffer.h	/^  u32 phy_h;$/;"	m	struct:framebuffer
+phy_w	driver/rpi4/framebuffer.h	/^  u32 phy_w;$/;"	m	struct:framebuffer
+pid	proc.h	/^  pid_t pid;$/;"	m	struct:proc
+pid_t	proc.h	/^typedef int pid_t;$/;"	t
+pinmode	driver/rpi4/gpio.h	/^enum pinmode {$/;"	g
+pitch	driver/rpi4/framebuffer.h	/^  u32 pitch;$/;"	m	struct:framebuffer
+proc	proc.h	/^struct proc {$/;"	s
+procstate	proc.h	/^enum procstate {$/;"	g
+pullmode	driver/rpi4/gpio.h	/^enum pullmode {$/;"	g
+set_cntv_ctl_el0	aarch64.h	/^static inline void set_cntv_ctl_el0(u64 c) {$/;"	f
+set_cntv_cval_el0	aarch64.h	/^static inline void set_cntv_cval_el0(u64 c) {$/;"	f
+set_cntv_tval_el0	aarch64.h	/^static inline void set_cntv_tval_el0(u64 t) {$/;"	f
+set_tcr_el1	aarch64.h	/^static inline void set_tcr_el1(u64 t) {$/;"	f
+set_ttbr0_el1	aarch64.h	/^static inline void set_ttbr0_el1(u64 t) {$/;"	f
+set_ttbr1_el1	aarch64.h	/^static inline void set_ttbr1_el1(u64 t) {$/;"	f
+set_vbar_el1	aarch64.h	/^static inline void set_vbar_el1(u64 *v) {$/;"	f
+sp	proc.h	/^  u64 sp;$/;"	m	struct:context
+sp	trap.h	/^  u64 sp;$/;"	m	struct:trapframe
+spsr	trap.h	/^  u64 spsr;$/;"	m	struct:trapframe
+spsr_el1	aarch64.h	/^static inline u64 spsr_el1() {$/;"	f
+state	proc.h	/^  enum procstate state;$/;"	m	struct:proc	typeref:enum:proc::procstate
+systimer	driver/rpi4/systimer.h	/^struct systimer {$/;"	s
+tf	proc.h	/^  struct trapframe *tf;$/;"	m	struct:proc	typeref:struct:proc::trapframe
+trapframe	trap.h	/^struct trapframe {$/;"	s
+true	mono.h	19;"	d
+u16	mono.h	/^typedef unsigned short u16;$/;"	t
+u32	mono.h	/^typedef unsigned int u32;$/;"	t
+u64	mono.h	/^typedef unsigned long u64;$/;"	t
+u8	mono.h	/^typedef unsigned char u8;$/;"	t
+uartid	console.h	/^  int uartid;$/;"	m	struct:console
+vbar_el1	aarch64.h	/^static inline u64 *vbar_el1() {$/;"	f
+w	driver/rpi4/framebuffer.h	/^  u32 w;$/;"	m	struct:framebuffer
+w	font.h	/^  u8 w;$/;"	m	struct:font
+wfe	aarch64.h	/^static inline void wfe() {$/;"	f
+wfi	aarch64.h	/^static inline void wfi() {$/;"	f
+x0	proc.h	/^  u64 x0;$/;"	m	struct:context
+x0	trap.h	/^  u64 x0;$/;"	m	struct:trapframe
+x1	proc.h	/^  u64 x1;$/;"	m	struct:context
+x1	trap.h	/^  u64 x1;$/;"	m	struct:trapframe
+x10	trap.h	/^  u64 x10;$/;"	m	struct:trapframe
+x11	trap.h	/^  u64 x11;$/;"	m	struct:trapframe
+x12	trap.h	/^  u64 x12;$/;"	m	struct:trapframe
+x13	trap.h	/^  u64 x13;$/;"	m	struct:trapframe
+x14	trap.h	/^  u64 x14;$/;"	m	struct:trapframe
+x15	trap.h	/^  u64 x15;$/;"	m	struct:trapframe
+x16	proc.h	/^  u64 x16;$/;"	m	struct:context
+x16	trap.h	/^  u64 x16;$/;"	m	struct:trapframe
+x17	proc.h	/^  u64 x17;$/;"	m	struct:context
+x17	trap.h	/^  u64 x17;$/;"	m	struct:trapframe
+x18	proc.h	/^  u64 x18;$/;"	m	struct:context
+x18	trap.h	/^  u64 x18;$/;"	m	struct:trapframe
+x19	proc.h	/^  u64 x19;$/;"	m	struct:context
+x19	trap.h	/^  u64 x19;$/;"	m	struct:trapframe
+x2	proc.h	/^  u64 x2;$/;"	m	struct:context
+x2	trap.h	/^  u64 x2;$/;"	m	struct:trapframe
+x20	proc.h	/^  u64 x20;$/;"	m	struct:context
+x20	trap.h	/^  u64 x20;$/;"	m	struct:trapframe
+x21	proc.h	/^  u64 x21;$/;"	m	struct:context
+x21	trap.h	/^  u64 x21;$/;"	m	struct:trapframe
+x22	proc.h	/^  u64 x22;$/;"	m	struct:context
+x22	trap.h	/^  u64 x22;$/;"	m	struct:trapframe
+x23	proc.h	/^  u64 x23;$/;"	m	struct:context
+x23	trap.h	/^  u64 x23;$/;"	m	struct:trapframe
+x24	proc.h	/^  u64 x24;$/;"	m	struct:context
+x24	trap.h	/^  u64 x24;$/;"	m	struct:trapframe
+x25	proc.h	/^  u64 x25;$/;"	m	struct:context
+x25	trap.h	/^  u64 x25;$/;"	m	struct:trapframe
+x26	proc.h	/^  u64 x26;$/;"	m	struct:context
+x26	trap.h	/^  u64 x26;$/;"	m	struct:trapframe
+x27	proc.h	/^  u64 x27;$/;"	m	struct:context
+x27	trap.h	/^  u64 x27;$/;"	m	struct:trapframe
+x28	proc.h	/^  u64 x28;$/;"	m	struct:context
+x28	trap.h	/^  u64 x28;$/;"	m	struct:trapframe
+x29	proc.h	/^  u64 x29;$/;"	m	struct:context
+x29	trap.h	/^  u64 x29;$/;"	m	struct:trapframe
+x3	proc.h	/^  u64 x3;$/;"	m	struct:context
+x3	trap.h	/^  u64 x3;$/;"	m	struct:trapframe
+x30	trap.h	/^  u64 x30;  \/* lr *\/$/;"	m	struct:trapframe
+x4	proc.h	/^  u64 x4;$/;"	m	struct:context
+x4	trap.h	/^  u64 x4;$/;"	m	struct:trapframe
+x5	proc.h	/^  u64 x5;$/;"	m	struct:context
+x5	trap.h	/^  u64 x5;$/;"	m	struct:trapframe
+x6	proc.h	/^  u64 x6;$/;"	m	struct:context
+x6	trap.h	/^  u64 x6;$/;"	m	struct:trapframe
+x7	proc.h	/^  u64 x7;$/;"	m	struct:context
+x7	trap.h	/^  u64 x7;$/;"	m	struct:trapframe
+x8	proc.h	/^  u64 x8;$/;"	m	struct:context
+x8	trap.h	/^  u64 x8;$/;"	m	struct:trapframe
+x9	trap.h	/^  u64 x9;$/;"	m	struct:trapframe
