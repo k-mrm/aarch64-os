@@ -13,5 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: install
+      run: |
+          sudo apt install gcc-aarch64-linux-gnu
     - name: make
       run: make kernel8.elf
