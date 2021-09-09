@@ -1,4 +1,4 @@
-#include "mono.h"
+#include "kernel.h"
 #include "aarch64.h"
 #include "mm.h"
 #include "memmap.h"
@@ -26,7 +26,6 @@ static u64 *kpagewalk(u64 *pgt, u64 va) {
 static void kpagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
   if(pa % PAGESIZE != 0 || size % PAGESIZE != 0)
     panic("invalid pa");
-  printk("va %p\n", va);
 
   for(u64 p = 0; p < size; p += PAGESIZE, va += PAGESIZE, pa += PAGESIZE) {
     u64 *pte = kpagewalk(pgt, va);

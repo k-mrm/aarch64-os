@@ -40,7 +40,7 @@ struct trapframe {
   u64 elr;
   u64 spsr;
   u64 sp;
-};
+} __attribute__((packed));
 
 typedef void (*handler_t)(void);
 

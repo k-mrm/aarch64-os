@@ -1,6 +1,6 @@
 #include "trap.h"
 #include "aarch64.h"
-#include "mono.h"
+#include "kernel.h"
 #include "memmap.h"
 #include "printk.h"
 #include "proc.h"
