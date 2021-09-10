@@ -1,13 +1,13 @@
 PREFIX = aarch64-linux-gnu-
-GCC = $(PREFIX)gcc
+CC = $(PREFIX)gcc
 LD = $(PREFIX)ld
 OBJCOPY = $(PREFIX)objcopy
 
 CPU = cortex-a72
 
-CCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -DUSE_ARMVIRT -mcpu=$(CPU)
-CCFLAGS += -I ./include/
-CCFLAGS += -I ./include/lib/
+CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -DUSE_ARMVIRT -mcpu=$(CPU)
+CFLAGS += -I ./include/
+CFLAGS += -I ./include/lib/
 LDFLAGS = -nostdlib -nostartfiles
 
 QEMU = qemu-system-aarch64
@@ -32,10 +32,10 @@ OBJS = $(KOBJS)	$(LIBS) $(VIRTDRV)
 
 SDPATH = /media/k-mrm/09D0-F0A8
 %.o: %.c
-	$(GCC) $(CCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.S
-	$(GCC) $(CCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 kernel8.elf: $(OBJS) kernel/kernel.ld
 	$(LD) $(LDFLAGS) $(OBJS) -T kernel/kernel.ld -o kernel8.elf
