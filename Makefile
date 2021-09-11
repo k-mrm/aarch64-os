@@ -15,6 +15,10 @@ MACHINE = virt
 MACHINE_GIC = gic-version=2
 NCPU = 1
 
+QEMUOPTS = -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
+#QEMUOPTS += -device virtio-blk-device
+QEMUOPTS += -nographic -kernel kernel8.elf
+
 KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/console.o kernel/trap.o kernel/font.o \
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o	\
@@ -44,10 +48,10 @@ kernel8.img: kernel8.elf
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 qemu: kernel8.img
-	$(QEMU) -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -d mmu -D ./qemu.log -smp $(NCPU) -m 128 -nographic -kernel kernel8.elf
+	$(QEMU) $(QEMUOPTS)
 
 gdb: kernel8.img
-	$(QEMU) -S -gdb tcp::1234 -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128 -nographic -kernel kernel8.elf
+	$(QEMU) -S -gdb tcp::1234 $(QEMUOPTS)
 
 dts:
 	$(QEMU) -S -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC),dumpdtb=virt.dtb -smp $(NCPU) -nographic

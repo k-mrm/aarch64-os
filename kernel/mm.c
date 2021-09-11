@@ -67,7 +67,7 @@ void alloc_userspace(u64 *pgt, void (*fn)(void)) {
 }
 
 void load_userspace(u64 *pgt) {
-  if(!pgt)
+  if(pgt == NULL)
     panic("no pagetable");
 
   set_ttbr0_el1(pgt);

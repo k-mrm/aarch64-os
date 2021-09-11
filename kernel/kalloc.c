@@ -31,7 +31,7 @@ void *kalloc() {
 }
 
 void kfree(void *pa) {
-  if(!pa)
+  if(pa == NULL)
     return;
   printk("%p\n", pa);
 
