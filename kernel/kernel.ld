@@ -3,27 +3,39 @@ ENTRY(_start)
 SECTIONS {
     /* . = 0x40000000; */
     . = 0xffffff8040000000;
-    .text : AT(ADDR(.text) - 0xffffff8000000000) {
-      KEEP(*(.text.boot)) *(.text)
+
+    .text.boot : AT(ADDR(.text.boot) - 0xffffff8000000000) {
+      KEEP(*(.text.boot))
     }
+
     . = ALIGN(4096);
+    __usr_begin = .;
+    .text.usr : { usr/* (.text .text.*) }
+    .rodata.usr : { usr/* (.rodata) }
+    .data.usr : { usr/* (.data) }
+    .bss.usr : { usr/* (.bss .bss.*) }
+    __usr_end = .;
+
+    . = ALIGN(4096);
+    .text : AT(ADDR(.text) - 0xffffff8000000000) {
+      *(.text)
+    }
     ktext_end = .;
 
     .rodata : AT(ADDR(.rodata) - 0xffffff8000000000) {
       *(.rodata)
     }
 
-    . = ALIGN(4096);
     .data : AT(ADDR(.data) - 0xffffff8000000000) {
       *(.data)
     }
 
     . = ALIGN(4096);
-    __bss_start = .;
     .bss : AT(ADDR(.bss) - 0xffffff8000000000) {
+      __bss_start = .;
       *(.bss .bss.*)
+      __bss_end = .;
     }
-    __bss_end = .;
 
     . = ALIGN(4096);
     . += 4096;

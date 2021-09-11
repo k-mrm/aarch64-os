@@ -47,8 +47,8 @@
 #define PTE_SH(sh)  (((sh) & 3) << 8)
 #define PTE_AF  (1 << 10)
 /* upper attribute */
-#define PTE_PXN (1 << 53)
-#define PTE_UXN (1 << 54)
+#define PTE_PXN (1UL << 53)
+#define PTE_UXN (1UL << 54)
 
 #define PAGESIZE  4096    /* 4KB */
 

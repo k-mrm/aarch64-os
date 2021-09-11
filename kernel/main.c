@@ -9,28 +9,6 @@
 #include "log.h"
 #include "kalloc.h"
 
-/* test */
-void proc1() {
-  u64 s = 0;
-  for(;;) {
-    printk("proc1: %p %d\n", s++, getpid());
-  }
-}
-
-void proc2() {
-  u64 s = 0;
-  for(;;) {
-    printk("proc2: %p %d\n", s++, getpid());
-  }
-}
-
-void proc3() {
-  u64 s = 0;
-  for(;;) {
-    printk("proc3: %p %d\n", s++, getpid());
-  }
-}
-
 int main(void) {
   console_init();
   kinfo("booting...\n");
@@ -50,8 +28,5 @@ int main(void) {
 
   enable_irq();
   
-  newproc(proc1);
-  newproc(proc2);
-
   schedule();
 }

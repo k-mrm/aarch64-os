@@ -22,7 +22,9 @@ QEMUOPTS += -nographic -kernel kernel8.elf
 KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/console.o kernel/trap.o kernel/font.o \
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o	\
-			 kernel/cswitch.o kernel/syscall.o kernel/systable.o kernel/mm.o
+			 kernel/cswitch.o kernel/syscall.o kernel/mm.o
+
+UOBJS = usr/systable.o
 
 DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o
 
