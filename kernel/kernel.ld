@@ -11,8 +11,8 @@ SECTIONS {
     . = ALIGN(4096);
     __usr_begin = .;
     .text.usr : { usr/* (.text .text.*) }
-    .rodata.usr : { usr/* (.rodata) }
-    .data.usr : { usr/* (.data) }
+    .rodata.usr : { usr/* (.rodata .rodata.*) }
+    .data.usr : { usr/* (.data .data.*) }
     .bss.usr : { usr/* (.bss .bss.*) }
     . = ALIGN(4096);
     __usr_end = .;

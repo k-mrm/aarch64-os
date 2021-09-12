@@ -52,7 +52,6 @@ void load_userspace(u64 *pgt) {
   if(pgt == NULL)
     panic("no pagetable");
 
-  printk("pgttttt %p %p\n", pgt, V2P(pgt));
   set_ttbr0_el1(V2P(pgt));
 }
 

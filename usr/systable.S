@@ -9,3 +9,4 @@
 .endm
 
 SYSCALL getpid, SYS_GETPID
+SYSCALL write, SYS_WRITE

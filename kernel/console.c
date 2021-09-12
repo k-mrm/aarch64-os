@@ -66,3 +66,8 @@ void csputs(struct console *cs, char *s) {
   }
 }
 #endif
+
+int _write(char *s) {
+  csputs(&cons1, s);
+  return 0;
+}

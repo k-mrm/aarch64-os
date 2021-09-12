@@ -4,7 +4,7 @@
 void proc1() {
   u64 s = 0;
   for(;;) {
-    printk("proc1: %p %d\n", s++, 1);
+    write("proc1\n");
   }
 }
 

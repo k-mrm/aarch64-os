@@ -64,7 +64,7 @@ found:
   return pid;
 }
 
-int sys_getpid(void) {
+int _getpid(void) {
   return curproc->pid;
 }
 
