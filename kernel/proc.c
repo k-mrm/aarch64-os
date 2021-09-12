@@ -46,9 +46,10 @@ found:
   memset(p->tf, 0, sizeof(*p->tf));
 
   p->pgt = kalloc();    /* new pagetable */
+  printk("pgt %p ", p->pgt);
   alloc_userspace(p->pgt, ubegin, size);
 
-  printk("newproc %p %p %p", ubegin, size, uentry);
+  printk("newproc %p %p %p\n", ubegin, size, uentry);
 
   p->tf->elr = uentry;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
@@ -74,10 +75,10 @@ void schedule() {
       struct proc *p = &proctable[i];
 
       if(p->state == RUNNABLE) {
-        p->state = RUNNING;
-        curproc = p;
-
         load_userspace(p->pgt);
+        p->state = RUNNING;
+
+        curproc = p;
         
         cswitch(&kproc.context, &p->context);
 
