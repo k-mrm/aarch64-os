@@ -68,7 +68,11 @@ int printk(const char *fmt, ...) {
           printiu32(__builtin_va_arg(ap, u32), 10, false);
           break;
         case 'x':
+          printiu64(__builtin_va_arg(ap, u64), 16, false);
+          break;
         case 'p':
+          csputc(&cons1, '0');
+          csputc(&cons1, 'x');
           printiu64(__builtin_va_arg(ap, u64), 16, false);
           break;
         case 'c':

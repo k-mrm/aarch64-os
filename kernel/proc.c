@@ -22,7 +22,7 @@ void forkret() {
 }
 
 /* FIXME: tmp */
-pid_t newproc(void (*fn)(void)) {
+pid_t newproc(u64 ubegin, u64 size, u64 uentry) {
   static pid_t pid = 1;
   struct proc *p;
 
@@ -45,16 +45,18 @@ found:
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(*p->tf));
 
-  p->pgt = kalloc();  /* new pagetable */
-  alloc_userspace(p->pgt, fn);
+  p->pgt = kalloc();    /* new pagetable */
+  alloc_userspace(p->pgt, ubegin, size);
 
-  p->tf->elr = (u64)0; // `eret` jump to elr
-  p->tf->spsr = 0x0;    // switch EL1 to EL0
-  p->tf->sp = (u64)USTACKTOP; // sp_el0
+  printk("newproc %p %p %p", ubegin, size, uentry);
+
+  p->tf->elr = uentry;  /* `eret` jump to elr */
+  p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
+  p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
 
   p->kstack = kstack;
   p->context.lr = (u64)forkret;
-  p->context.sp = (u64)sp;    // == p->tf
+  p->context.sp = (u64)sp;    /* == p->tf */
 
   p->state = RUNNABLE;
 

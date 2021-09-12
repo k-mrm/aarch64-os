@@ -7,6 +7,7 @@ int sys_getpid(void);
 
 syscall_t syscall_table[NSYSCALL] = {
   sys_getpid,
+  0,
 };
 
 void syscall(struct trapframe *tf) {

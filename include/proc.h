@@ -55,7 +55,7 @@ struct proc {
 
 void proc_init(void);
 void schedule(void);
-pid_t newproc(void (*fn)(void));
+pid_t newproc(u64 ubegin, u64 size, u64 uentry);
 
 void cswitch(struct context *old, struct context *new);
 

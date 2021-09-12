@@ -24,7 +24,7 @@ KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o	\
 			 kernel/cswitch.o kernel/syscall.o kernel/mm.o
 
-UOBJS = usr/systable.o
+UOBJS = usr/systable.o usr/test.o
 
 DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o
 
@@ -34,7 +34,7 @@ RPI4DRV = $(DRIVER)
 
 LIBS = lib/string.o
 
-OBJS = $(KOBJS)	$(LIBS) $(VIRTDRV)
+OBJS = $(KOBJS)	$(UOBJS) $(LIBS) $(VIRTDRV)
 
 SDPATH = /media/k-mrm/09D0-F0A8
 %.o: %.c

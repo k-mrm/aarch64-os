@@ -5,6 +5,7 @@
 #include "kalloc.h"
 #include "printk.h"
 #include "log.h"
+#include "string.h"
 
 extern u64 l1kpgt[];
 extern char kend[];
@@ -61,7 +62,16 @@ static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
   }
 }
 
-void alloc_userspace(u64 *pgt, void (*fn)(void)) {
+void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
+  /* map usr_begin ~ usr_end to 0 ~  */
+  for(u64 va = 0; va < size; va += PAGESIZE) {
+    char *upage = kalloc();
+    memcpy(upage, (char *)begin, PAGESIZE);
+    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
+  }
+
+
+  /* map usr stack */
   char *ustack = kalloc();
   pagemap(pgt, USTACKTOP - PAGESIZE, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
 }

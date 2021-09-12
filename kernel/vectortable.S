@@ -1,3 +1,5 @@
+.section ".text"
+
 .macro savereg
   sub sp, sp, #272
   stp x0, x1, [sp, #16 * 0]

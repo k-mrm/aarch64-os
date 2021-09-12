@@ -9,6 +9,10 @@
 #include "log.h"
 #include "kalloc.h"
 
+extern u64 __usr_begin;
+extern u64 __usr_end;
+extern u64 proc1;
+
 int main(void) {
   console_init();
   kinfo("booting...\n");
@@ -27,6 +31,11 @@ int main(void) {
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
 
   enable_irq();
+
+  u64 b = (u64)&__usr_begin;
+  u64 e = (u64)&__usr_end;
+  u64 p = (u64)&proc1;
+  newproc(b, e - b, p - b);
   
   schedule();
 }

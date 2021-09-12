@@ -59,4 +59,11 @@
 #define AI_DEVICE_nGnRnE  0x0
 #define AI_NORMAL_NC      0x44
 
+#ifndef __ASSEMBLER__
+
+void alloc_userspace(u64 *pgt, u64 begin, u64 size);
+void load_userspace(u64 *pgt);
+
+#endif
+
 #endif

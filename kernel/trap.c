@@ -39,7 +39,9 @@ void sync_handler(struct trapframe *tf) {
     case 0b100110:
       panic("sp alignment fault");
     case 0b100100:
-      panic("data abort with lower EL");
+      panic("data abort in EL0");
+    case 0b100000:
+      panic("instruction abort in EL0");
     default:
       printk("%d ", esr & 0x3f);
       panic("unknown");

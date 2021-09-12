@@ -1,4 +1,4 @@
-#include "aarch64-os.h"
+#include "kernel.h"
 
 /* test */
 void proc1() {

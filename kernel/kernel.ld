@@ -14,11 +14,11 @@ SECTIONS {
     .rodata.usr : { usr/* (.rodata) }
     .data.usr : { usr/* (.data) }
     .bss.usr : { usr/* (.bss .bss.*) }
+    . = ALIGN(4096);
     __usr_end = .;
 
-    . = ALIGN(4096);
     .text : AT(ADDR(.text) - 0xffffff8000000000) {
-      *(.text)
+      *(.text) *(.text.*)
     }
     ktext_end = .;
 
@@ -43,6 +43,10 @@ SECTIONS {
 
     . = ALIGN(4096);
     kend = .;
+
+    /DISCARD/ : {
+      *(.comment)
+    }
 }
 
 __bss_size = (__bss_end - __bss_start) >> 3;
