@@ -14,6 +14,7 @@ SECTIONS {
     .rodata.usr : { usr/* (.rodata .rodata.*) }
     .data.usr : { usr/* (.data .data.*) }
     .bss.usr : { usr/* (.bss .bss.*) }
+    .eh_frame.usr : { usr/* (.eh_frame) }
     . = ALIGN(4096);
     __usr_end = .;
 
@@ -23,11 +24,11 @@ SECTIONS {
     ktext_end = .;
 
     .rodata : AT(ADDR(.rodata) - 0xffffff8000000000) {
-      *(.rodata)
+      *(.rodata) *(.rodata.*)
     }
 
     .data : AT(ADDR(.data) - 0xffffff8000000000) {
-      *(.data)
+      *(.data) *(.data.*)
     }
 
     . = ALIGN(4096);

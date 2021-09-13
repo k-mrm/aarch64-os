@@ -7,7 +7,6 @@ CPU = cortex-a72
 
 CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -DUSE_ARMVIRT -mcpu=$(CPU)
 CFLAGS += -I ./include/
-CFLAGS += -I ./include/lib/
 LDFLAGS = -nostdlib -nostartfiles
 
 QEMU = qemu-system-aarch64
@@ -23,9 +22,9 @@ QEMUOPTS += -nographic -kernel kernel8.elf
 KOBJS = kernel/boot.o kernel/vectortable.o	\
 			 kernel/console.o kernel/trap.o kernel/font.o \
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o	\
-			 kernel/cswitch.o kernel/syscall.o kernel/mm.o
+			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o
 
-UOBJS = usr/systable.o usr/test.o
+UOBJS = usr/systable.o usr/test.o usr/ulib.o
 
 DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o
 
@@ -33,9 +32,7 @@ VIRTDRV = $(DRIVER) kernel/driver/virt/uart.o
 
 RPI4DRV = $(DRIVER)
 
-LIBS = lib/string.o
-
-OBJS = $(KOBJS)	$(UOBJS) $(LIBS) $(VIRTDRV)
+OBJS = $(KOBJS)	$(UOBJS) $(VIRTDRV)
 
 SDPATH = /media/k-mrm/09D0-F0A8
 %.o: %.c

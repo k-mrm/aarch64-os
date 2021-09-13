@@ -23,7 +23,8 @@ int sys_getpid(void) {
 
 int sys_write(void) {
   u64 str = sysarg(0);
-  return _write((char *)str);
+  u64 size = sysarg(1);
+  return _write((char *)str, size);
 }
 
 syscall_t syscall_table[] = {

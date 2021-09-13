@@ -32,6 +32,15 @@ void csputc(struct console *cs, char c) {
 void csputs(struct console *cs, char *s) {
   uart_puts(s);
 }
+
+int cswrite(struct console *cs, char *s, u64 size) {
+  u64 i;
+  for(i = 0; i < size; i++) {
+    uart_putc(*s++);
+  }
+
+  return i;
+}
 #else
 static void csscroll(struct console *cs) {
   memmove(cs->fb->buf, (char *)cs->fb->buf + cs->bpl, cs->fb->pitch * (cs->h - cs->lineh));
@@ -67,7 +76,6 @@ void csputs(struct console *cs, char *s) {
 }
 #endif
 
-int _write(char *s) {
-  csputs(&cons1, s);
-  return 0;
+int _write(char *s, u64 size) {
+  return cswrite(&cons1, s, size);
 }
