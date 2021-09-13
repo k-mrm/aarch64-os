@@ -16,8 +16,8 @@ MACHINE_GIC = gic-version=2
 NCPU = 1
 
 QEMUOPTS = -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
-QEMUOPTS += -drive file=fs.img,format=raw,id=fs
-QEMUOPTS += -device virtio-blk-device,drive=fs
+#QEMUOPTS += -drive file=fs.img,format=raw,id=fs
+#QEMUOPTS += -device virtio-blk-device,drive=fs
 QEMUOPTS += -nographic -kernel kernel8.elf
 
 KOBJS = kernel/boot.o kernel/vectortable.o	\
