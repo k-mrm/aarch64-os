@@ -58,7 +58,7 @@ l2upgt_loop:
   and x3, x3, #0x1ff  /* start va level1 index */ 
 
   mov x4, #(PTE_TABLE | PTE_VALID)  /* entry attr */
-  ldr x5, =V2P(l2upgt)
+  adrp x5, l2upgt
   orr x6, x4, x5    /* table entry */
 
   str x6, [x0, x3, lsl #3]    /* l1upgt[l1idx] = table entry */
@@ -66,8 +66,8 @@ l2upgt_loop:
   /* map 0xffffff8008000000 - VA(kend) to 0x8000000 - PA(kend)*/
 
   /*  setup l2pgt  */
-  ldr x0, =V2P(l2kpgt0)
-  ldr x1, =V2P(l2kpgt1)
+  adrp x0, l2kpgt0
+  adrp x1, l2kpgt1
 
   /*
    *  0x8000000 - 0x3fffffff
@@ -120,7 +120,7 @@ l2pgt_loop1:
   b.ls l2pgt_loop1  /* if start va idx <= end va idx */
 
   /* setup l1pgt */
-  ldr x0, =V2P(l1kpgt)
+  adrp x0, l1kpgt
 
   mov x1, #0x8000000    /* start pa */
   ldr x2, =V2P(kend)-1  /* end pa */
@@ -132,8 +132,8 @@ l2pgt_loop1:
   and x5, x5, #0x1ff  /* start va level1 index */ 
 
   mov x6, #(PTE_TABLE | PTE_VALID)  /* entry attr */
-  ldr x7, =V2P(l2kpgt0)
-  ldr x8, =V2P(l2kpgt1)
+  adrp x7, l2kpgt0
+  adrp x8, l2kpgt1
   orr x7, x7, x6    /* table entry */
   orr x8, x8, x6    /* table entry */
 
