@@ -26,8 +26,6 @@ void new_irq(int intid, handler_t handler) {
 void syscall(struct trapframe *tf);
 
 void sync_handler(struct trapframe *tf) {
-  printk("elr: %p far: %p\n", elr_el1(), far_el1());
-
   u64 esr = esr_el1();
   esr >>= 26;
   switch(esr & 0x3f) {
@@ -43,6 +41,7 @@ void sync_handler(struct trapframe *tf) {
     case 0b100000:
       panic("instruction abort in EL0");
     default:
+      printk("elr: %p far: %p\n", elr_el1(), far_el1());
       printk("%d ", esr & 0x3f);
       panic("unknown");
   }

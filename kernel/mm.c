@@ -35,6 +35,7 @@ static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
     *pte = PTE_PA(pa) | PTE_AF | attr | PTE_V;
   }
 }
+
 void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
   /* map usr_begin ~ usr_end to 0 ~  */
   for(u64 va = 0; va < size; va += PAGESIZE) {
@@ -53,10 +54,6 @@ void load_userspace(u64 *pgt) {
     panic("no pagetable");
 
   set_ttbr0_el1(V2P(pgt));
-}
-
-u64 va2pa() {
-  return 0;
 }
 
 void kpgt_init() {

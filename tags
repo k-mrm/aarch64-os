@@ -1,0 +1,458 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AARCH64_OS_AARCH64_H	include/aarch64.h	2;"	d
+AARCH64_OS_CONSOLE_H	include/console.h	2;"	d
+AARCH64_OS_CONTEXT_H	include/context.h	2;"	d
+AARCH64_OS_DRIVER_GICV2_H	include/driver/gicv2.h	2;"	d
+AARCH64_OS_DRIVER_TIMER_H	include/driver/timer.h	2;"	d
+AARCH64_OS_DRIVER_UART_H	include/driver/uart.h	2;"	d
+AARCH64_OS_DRIVER_VIRT_GICV2_H	include/driver/virt/gicv2.h	2;"	d
+AARCH64_OS_DRIVER_VIRT_UART_H	include/driver/virt/uart.h	2;"	d
+AARCH64_OS_FONT_H	include/font.h	2;"	d
+AARCH64_OS_FRAMEBUFFER_H	include/driver/rpi4/framebuffer.h	2;"	d
+AARCH64_OS_GICV2_H	include/driver/rpi4/gicv2.h	2;"	d
+AARCH64_OS_GPIO_H	include/driver/rpi4/gpio.h	2;"	d
+AARCH64_OS_INTERRUPT_H	include/interrupt.h	2;"	d
+AARCH64_OS_KALLOC_H	include/kalloc.h	2;"	d
+AARCH64_OS_KERNEL_H	include/kernel.h	2;"	d
+AARCH64_OS_LIB_PRINTK_H	include/printk.h	2;"	d
+AARCH64_OS_LIB_STRING_H	include/lib/string.h	2;"	d
+AARCH64_OS_LOG_H	include/log.h	2;"	d
+AARCH64_OS_MAILBOX_H	include/driver/rpi4/mailbox.h	2;"	d
+AARCH64_OS_MEMMAP_H	include/memmap.h	2;"	d
+AARCH64_OS_MM_H	include/mm.h	2;"	d
+AARCH64_OS_PROC_H	include/proc.h	2;"	d
+AARCH64_OS_SYSCALL_H	include/syscall.h	2;"	d
+AARCH64_OS_SYSTIMER_H	include/driver/rpi4/systimer.h	2;"	d
+AARCH64_OS_TRAP_H	include/trap.h	2;"	d
+AI_DEVICE_nGnRnE	include/mm.h	59;"	d
+AI_DEVICE_nGnRnE_IDX	include/mm.h	56;"	d
+AI_NORMAL_NC	include/mm.h	60;"	d
+AI_NORMAL_NC_IDX	include/mm.h	57;"	d
+ALT0	include/driver/rpi4/gpio.h	/^  ALT0 = 0b100,$/;"	e	enum:pinmode
+ALT1	include/driver/rpi4/gpio.h	/^  ALT1 = 0b101,$/;"	e	enum:pinmode
+ALT2	include/driver/rpi4/gpio.h	/^  ALT2 = 0b110,$/;"	e	enum:pinmode
+ALT3	include/driver/rpi4/gpio.h	/^  ALT3 = 0b111,$/;"	e	enum:pinmode
+ALT4	include/driver/rpi4/gpio.h	/^  ALT4 = 0b011,$/;"	e	enum:pinmode
+ALT5	include/driver/rpi4/gpio.h	/^  ALT5 = 0b010,$/;"	e	enum:pinmode
+CC	Makefile	/^CC = $(PREFIX)gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -DUSE_ARMVIRT -mcpu=$(CPU)$/;"	m
+CNTV_CTL_ENABLE	kernel/driver/timer.c	14;"	d	file:
+CNTV_CTL_IMASK	kernel/driver/timer.c	15;"	d	file:
+CNTV_CTL_ISTATUS	kernel/driver/timer.c	16;"	d	file:
+CPU	Makefile	/^CPU = cortex-a72$/;"	m
+DRIVER	Makefile	/^DRIVER = kernel\/driver\/gicv2.o kernel\/driver\/timer.o$/;"	m
+GICC_AEOIR	include/driver/rpi4/gicv2.h	23;"	d
+GICC_AEOIR	kernel/driver/gicv2.c	27;"	d	file:
+GICC_AIAR	include/driver/rpi4/gicv2.h	22;"	d
+GICC_AIAR	kernel/driver/gicv2.c	26;"	d	file:
+GICC_BASE	include/driver/rpi4/gicv2.h	7;"	d
+GICC_BASE	kernel/driver/gicv2.c	9;"	d	file:
+GICC_CTLR	include/driver/rpi4/gicv2.h	17;"	d
+GICC_CTLR	kernel/driver/gicv2.c	21;"	d	file:
+GICC_EOIR	include/driver/rpi4/gicv2.h	20;"	d
+GICC_EOIR	kernel/driver/gicv2.c	24;"	d	file:
+GICC_HPPIR	include/driver/rpi4/gicv2.h	21;"	d
+GICC_HPPIR	kernel/driver/gicv2.c	25;"	d	file:
+GICC_IAR	include/driver/rpi4/gicv2.h	19;"	d
+GICC_IAR	kernel/driver/gicv2.c	23;"	d	file:
+GICC_PMR	include/driver/rpi4/gicv2.h	18;"	d
+GICC_PMR	kernel/driver/gicv2.c	22;"	d	file:
+GICD_BASE	include/driver/rpi4/gicv2.h	6;"	d
+GICD_BASE	kernel/driver/gicv2.c	8;"	d	file:
+GICD_CFG_EDGE	kernel/driver/gicv2.c	/^  GICD_CFG_EDGE = 2,$/;"	e	enum:gicd_cfg	file:
+GICD_CFG_LEVEL	kernel/driver/gicv2.c	/^  GICD_CFG_LEVEL = 0,$/;"	e	enum:gicd_cfg	file:
+GICD_CTLR	include/driver/rpi4/gicv2.h	11;"	d
+GICD_CTLR	kernel/driver/gicv2.c	11;"	d	file:
+GICD_ICENABLER	kernel/driver/gicv2.c	14;"	d	file:
+GICD_ICFGR	kernel/driver/gicv2.c	19;"	d	file:
+GICD_ICPENDR	kernel/driver/gicv2.c	16;"	d	file:
+GICD_IPRIORITYR	include/driver/rpi4/gicv2.h	14;"	d
+GICD_IPRIORITYR	kernel/driver/gicv2.c	17;"	d	file:
+GICD_ISENABLER	include/driver/rpi4/gicv2.h	13;"	d
+GICD_ISENABLER	kernel/driver/gicv2.c	13;"	d	file:
+GICD_ISPENDR	kernel/driver/gicv2.c	15;"	d	file:
+GICD_ITARGETSR	include/driver/rpi4/gicv2.h	15;"	d
+GICD_ITARGETSR	kernel/driver/gicv2.c	18;"	d	file:
+GICD_TYPER	include/driver/rpi4/gicv2.h	12;"	d
+GICD_TYPER	kernel/driver/gicv2.c	12;"	d	file:
+GICH_BASE	include/driver/rpi4/gicv2.h	8;"	d
+GICV2_BASE	include/driver/rpi4/gicv2.h	4;"	d
+GICV2_BASE	include/memmap.h	32;"	d
+GICV_BASE	include/driver/rpi4/gicv2.h	9;"	d
+GPCLR	include/driver/rpi4/gpio.h	10;"	d
+GPFSEL	include/driver/rpi4/gpio.h	8;"	d
+GPIOBASE	include/driver/rpi4/gpio.h	6;"	d
+GPSET	include/driver/rpi4/gpio.h	9;"	d
+INPUT	include/driver/rpi4/gpio.h	/^  INPUT = 0b000,$/;"	e	enum:pinmode
+KERNBASE	include/memmap.h	22;"	d
+KERNSECEND	include/memmap.h	26;"	d
+KOBJS	Makefile	/^KOBJS = kernel\/boot.o kernel\/vectortable.o	\\$/;"	m
+LD	Makefile	/^LD = $(PREFIX)ld$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS = -nostdlib -nostartfiles$/;"	m
+LIBS	Makefile	/^LIBS = lib\/string.o$/;"	m
+MACHINE	Makefile	/^MACHINE = virt$/;"	m
+MACHINE_GIC	Makefile	/^MACHINE_GIC = gic-version=2$/;"	m
+MBOX0_CFG	include/driver/rpi4/mailbox.h	13;"	d
+MBOX0_PEEK	include/driver/rpi4/mailbox.h	10;"	d
+MBOX0_READ	include/driver/rpi4/mailbox.h	9;"	d
+MBOX0_SENDER	include/driver/rpi4/mailbox.h	11;"	d
+MBOX0_STATUS	include/driver/rpi4/mailbox.h	12;"	d
+MBOX0_WRITE	include/driver/rpi4/mailbox.h	14;"	d
+MBOXBASE	include/driver/rpi4/mailbox.h	7;"	d
+MBOX_EMPTY	include/driver/rpi4/mailbox.h	16;"	d
+MBOX_FULL	include/driver/rpi4/mailbox.h	17;"	d
+MBOX_SUCCESS	include/driver/rpi4/mailbox.h	19;"	d
+NCPU	Makefile	/^NCPU = 1$/;"	m
+NPROC	include/proc.h	54;"	d
+NSYSCALL	include/syscall.h	4;"	d
+NULL	include/kernel.h	15;"	d
+OBJCOPY	Makefile	/^OBJCOPY = $(PREFIX)objcopy$/;"	m
+OBJS	Makefile	/^OBJS = $(KOBJS)	$(UOBJS) $(LIBS) $(VIRTDRV)$/;"	m
+OFFSET	include/mm.h	33;"	d
+OUTPUT	include/driver/rpi4/gpio.h	/^  OUTPUT = 0b001,$/;"	e	enum:pinmode
+P2V	include/memmap.h	12;"	d
+P2V	include/memmap.h	17;"	d
+PAGESIZE	include/mm.h	53;"	d
+PGICV2_BASE	include/driver/gicv2.h	6;"	d
+PHYMEMEND	include/memmap.h	23;"	d
+PIDX	include/mm.h	32;"	d
+PKERNBASE	include/memmap.h	21;"	d
+PKERNSECEND	include/memmap.h	25;"	d
+PREFIX	Makefile	/^PREFIX = aarch64-linux-gnu-$/;"	m
+PROP_END	include/driver/rpi4/mailbox.h	/^  PROP_END = 0,$/;"	e	enum:mbox_proptag
+PROP_FB_ALLOC_BUFFER	include/driver/rpi4/mailbox.h	/^  PROP_FB_ALLOC_BUFFER = 0x40001,$/;"	e	enum:mbox_proptag
+PROP_FB_GET_PITCH	include/driver/rpi4/mailbox.h	/^  PROP_FB_GET_PITCH = 0x40008,$/;"	e	enum:mbox_proptag
+PROP_FB_SET_DEPTH	include/driver/rpi4/mailbox.h	/^  PROP_FB_SET_DEPTH = 0x48005,$/;"	e	enum:mbox_proptag
+PROP_FB_SET_PHY_WH	include/driver/rpi4/mailbox.h	/^  PROP_FB_SET_PHY_WH = 0x48003,$/;"	e	enum:mbox_proptag
+PROP_FB_SET_VIRT_WH	include/driver/rpi4/mailbox.h	/^  PROP_FB_SET_VIRT_WH = 0x48004,$/;"	e	enum:mbox_proptag
+PTE_AF	include/mm.h	48;"	d
+PTE_AP	include/mm.h	45;"	d
+PTE_DEVICE	include/mm.h	43;"	d
+PTE_INDX	include/mm.h	41;"	d
+PTE_NORMAL	include/mm.h	42;"	d
+PTE_NS	include/mm.h	44;"	d
+PTE_PA	include/mm.h	35;"	d
+PTE_PXN	include/mm.h	50;"	d
+PTE_SH	include/mm.h	47;"	d
+PTE_TABLE	include/mm.h	39;"	d
+PTE_U	include/mm.h	46;"	d
+PTE_UXN	include/mm.h	51;"	d
+PTE_V	include/mm.h	40;"	d
+PTE_VALID	include/mm.h	38;"	d
+PUARTBASE	include/driver/virt/uart.h	4;"	d
+PULLDOWN	include/driver/rpi4/gpio.h	/^  PULLDOWN = 2,$/;"	e	enum:pullmode
+PULLUP	include/driver/rpi4/gpio.h	/^  PULLUP = 1,$/;"	e	enum:pullmode
+QEMU	Makefile	/^QEMU = qemu-system-aarch64$/;"	m
+QEMUOPTS	Makefile	/^QEMUOPTS = -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128$/;"	m
+REG	include/kernel.h	22;"	d
+RPI4DRV	Makefile	/^RPI4DRV = $(DRIVER)$/;"	m
+RUNNABLE	include/proc.h	/^  RUNNABLE,$/;"	e	enum:procstate
+RUNNING	include/proc.h	/^  RUNNING,$/;"	e	enum:procstate
+SDPATH	Makefile	/^SDPATH = \/media\/k-mrm\/09D0-F0A8$/;"	m
+SLEEPING	include/proc.h	/^  SLEEPING,$/;"	e	enum:procstate
+SYSCALL	usr/systable.S	/^SYSCALL getpid, SYS_GETPID$/;"	l
+SYSCALL	usr/systable.S	/^SYSCALL write, SYS_WRITE$/;"	l
+SYSTIMER_BASE	include/driver/rpi4/systimer.h	7;"	d
+SYSTIMER_C	include/driver/rpi4/systimer.h	12;"	d
+SYSTIMER_CHI	include/driver/rpi4/systimer.h	11;"	d
+SYSTIMER_CLO	include/driver/rpi4/systimer.h	10;"	d
+SYSTIMER_CS	include/driver/rpi4/systimer.h	9;"	d
+SYS_GETPID	include/syscall.h	6;"	d
+SYS_WRITE	include/syscall.h	7;"	d
+TCR_A1	include/mm.h	10;"	d
+TCR_AS	include/mm.h	17;"	d
+TCR_EPD1	include/mm.h	11;"	d
+TCR_IPS	include/mm.h	16;"	d
+TCR_IRGN0	include/mm.h	5;"	d
+TCR_IRGN1	include/mm.h	12;"	d
+TCR_ORGN0	include/mm.h	6;"	d
+TCR_ORGN1	include/mm.h	13;"	d
+TCR_SH0	include/mm.h	7;"	d
+TCR_SH1	include/mm.h	14;"	d
+TCR_T0SZ	include/mm.h	4;"	d
+TCR_T1SZ	include/mm.h	9;"	d
+TCR_TBI0	include/mm.h	18;"	d
+TCR_TBI1	include/mm.h	19;"	d
+TCR_TG0	include/mm.h	8;"	d
+TCR_TG1	include/mm.h	15;"	d
+TIMER_IRQ	include/trap.h	6;"	d
+UARTBASE	include/memmap.h	33;"	d
+UART_CR	kernel/driver/virt/uart.c	9;"	d	file:
+UART_DR	kernel/driver/virt/uart.c	4;"	d	file:
+UART_FBRD	kernel/driver/virt/uart.c	7;"	d	file:
+UART_FR	kernel/driver/virt/uart.c	5;"	d	file:
+UART_IBRD	kernel/driver/virt/uart.c	6;"	d	file:
+UART_LCRH	kernel/driver/virt/uart.c	8;"	d	file:
+UNUSED	include/proc.h	/^  UNUSED,$/;"	e	enum:procstate
+UOBJS	Makefile	/^UOBJS = usr\/systable.o usr\/test.o$/;"	m
+USEREND	include/memmap.h	28;"	d
+USE_UART	include/console.h	7;"	d
+USTACKTOP	include/memmap.h	30;"	d
+V2P	include/memmap.h	11;"	d
+V2P	include/memmap.h	16;"	d
+VA_START	include/memmap.h	7;"	d
+VIRTDRV	Makefile	/^VIRTDRV = $(DRIVER) kernel\/driver\/virt\/uart.o$/;"	m
+VIRT_GICV2_BASE	include/driver/virt/gicv2.h	6;"	d
+_getpid	kernel/proc.c	/^int _getpid(void) {$/;"	f
+_start	kernel/boot.S	/^_start:$/;"	l
+_write	kernel/console.c	/^int _write(char *s) {$/;"	f
+alloc_userspace	kernel/mm.c	/^void alloc_userspace(u64 *pgt, u64 begin, u64 size) {$/;"	f
+atimer	kernel/driver/timer.c	/^} atimer;$/;"	v	typeref:struct:timer
+bool	include/kernel.h	/^typedef _Bool bool;$/;"	t
+buf	include/driver/rpi4/framebuffer.h	/^  u16 *buf;$/;"	m	struct:framebuffer
+cntfrq_el0	include/aarch64.h	/^static inline u64 cntfrq_el0() {$/;"	f
+cntv_ctl_el0	include/aarch64.h	/^static inline u64 cntv_ctl_el0() {$/;"	f
+cntv_cval_el0	include/aarch64.h	/^static inline u64 cntv_cval_el0() {$/;"	f
+cntv_tval_el0	include/aarch64.h	/^static inline u64 cntv_tval_el0() {$/;"	f
+cntvct_el0	include/aarch64.h	/^static inline u64 cntvct_el0() {$/;"	f
+cons1	kernel/console.c	/^struct console cons1;$/;"	v	typeref:struct:console
+console	include/console.h	/^struct console {$/;"	s
+console_init	kernel/console.c	/^void console_init() {$/;"	f
+context	include/context.h	/^struct context {$/;"	s
+context	include/proc.h	/^  struct context context;$/;"	m	struct:proc	typeref:struct:proc::context
+context	include/proc.h	/^struct context {$/;"	s
+csnewline	kernel/console.c	/^static void csnewline(struct console *cs) {$/;"	f	file:
+csputc	kernel/console.c	/^void csputc(struct console *cs, char c) {$/;"	f
+csputs	kernel/console.c	/^void csputs(struct console *cs, char *s) {$/;"	f
+csscroll	kernel/console.c	/^static void csscroll(struct console *cs) {$/;"	f	file:
+cswitch	kernel/cswitch.S	/^cswitch: \/* cswitch(struct context *old, struct context *new) *\/$/;"	l
+cur_el	include/aarch64.h	/^static inline int cur_el() {$/;"	f
+cur_sp_elx_irq	kernel/vectortable.S	/^cur_sp_elx_irq:$/;"	l
+cur_sp_elx_sync	kernel/vectortable.S	/^cur_sp_elx_sync:$/;"	l
+curproc	kernel/proc.c	/^struct proc *curproc = NULL;$/;"	v	typeref:struct:proc
+curproc_dump	kernel/proc.c	/^void curproc_dump() {$/;"	f
+daif	include/aarch64.h	/^static inline u64 daif() {$/;"	f
+data	include/font.h	/^  char (*data)[8];$/;"	m	struct:font
+default_font	kernel/font.c	/^struct font default_font;$/;"	v	typeref:struct:font
+default_handler	kernel/trap.c	/^static void default_handler() {$/;"	f	file:
+depth	include/driver/rpi4/framebuffer.h	/^  u32 depth;$/;"	m	struct:framebuffer
+disable_irq	include/aarch64.h	/^static inline void disable_irq() {$/;"	f
+disable_timer	kernel/driver/timer.c	/^static void disable_timer() {$/;"	f	file:
+disable_uart	kernel/driver/virt/uart.c	/^void disable_uart() {$/;"	f
+display_fb	kernel/driver/rpi4/framebuffer.c	/^struct framebuffer display_fb = {1920, 1080, 1440, 810, 0, 16, 0, 0, 0, 0};$/;"	v	typeref:struct:framebuffer
+drawchar	kernel/driver/rpi4/framebuffer.c	/^void drawchar(struct framebuffer *fb, struct font *font, u32 x, u32 y, char c) {$/;"	f
+drawpxl	kernel/driver/rpi4/framebuffer.c	/^void drawpxl(struct framebuffer *fb, u32 x, u32 y, u16 c) {$/;"	f
+elr	include/trap.h	/^  u64 elr;$/;"	m	struct:trapframe
+elr_el1	include/aarch64.h	/^static inline u64 elr_el1() {$/;"	f
+enable_irq	include/aarch64.h	/^static inline void enable_irq() {$/;"	f
+enable_timer	kernel/driver/timer.c	/^static void enable_timer() {$/;"	f	file:
+esr_el1	include/aarch64.h	/^static inline u64 esr_el1() {$/;"	f
+exit	kernel/proc.c	/^void exit(int ret) {$/;"	f
+false	include/kernel.h	20;"	d
+far_el1	include/aarch64.h	/^static inline u64 far_el1() {$/;"	f
+fb_init	kernel/driver/rpi4/framebuffer.c	/^void fb_init() {$/;"	f
+font	include/font.h	/^struct font {$/;"	s
+font_init	kernel/font.c	/^void font_init() {$/;"	f
+font_raw	kernel/font.c	/^static char font_raw[128][8] = {$/;"	v	file:
+forkret	kernel/proc.c	/^void forkret() {$/;"	f
+framebuffer	include/driver/rpi4/framebuffer.h	/^struct framebuffer {$/;"	s
+freelist	kernel/kalloc.c	/^struct header *freelist = NULL;$/;"	v	typeref:struct:header
+gic_clear_pending	kernel/driver/gicv2.c	/^void gic_clear_pending(u32 intid) {$/;"	f
+gic_config	kernel/driver/gicv2.c	/^void gic_config(u32 intid, enum gicd_cfg cfg) {$/;"	f
+gic_disable_int	kernel/driver/gicv2.c	/^void gic_disable_int(u32 intid) {$/;"	f
+gic_enable	kernel/driver/gicv2.c	/^void gic_enable() {$/;"	f
+gic_enable_int	kernel/driver/gicv2.c	/^void gic_enable_int(u32 intid) {$/;"	f
+gic_enabled	kernel/driver/gicv2.c	/^bool gic_enabled() {$/;"	f
+gic_eoi	kernel/driver/gicv2.c	/^void gic_eoi(u32 iar) {$/;"	f
+gic_iar	kernel/driver/gicv2.c	/^u32 gic_iar() {$/;"	f
+gic_is_pending	kernel/driver/gicv2.c	/^bool gic_is_pending(u32 intid) {$/;"	f
+gic_set_pending	kernel/driver/gicv2.c	/^void gic_set_pending(u32 intid) {$/;"	f
+gic_set_prio	kernel/driver/gicv2.c	/^void gic_set_prio(u32 intid, u32 prio) {$/;"	f
+gic_set_target	kernel/driver/gicv2.c	/^void gic_set_target(u32 intid, u32 cpuid) {$/;"	f
+gicc_init	kernel/driver/gicv2.c	/^void gicc_init() {$/;"	f
+gicd_cfg	kernel/driver/gicv2.c	/^enum gicd_cfg {$/;"	g	file:
+gicd_init	kernel/driver/gicv2.c	/^void gicd_init() {$/;"	f
+gicv2_init	kernel/driver/gicv2.c	/^void gicv2_init() {$/;"	f
+gpio_clr	kernel/driver/rpi4/gpio.c	/^void gpio_clr(int pin) {$/;"	f
+gpio_pull	kernel/driver/rpi4/gpio.c	/^void gpio_pull(int pin, enum pullmode m) {$/;"	f
+gpio_set	kernel/driver/rpi4/gpio.c	/^void gpio_set(int pin) {$/;"	f
+h	include/driver/rpi4/framebuffer.h	/^  u32 h;$/;"	m	struct:framebuffer
+h	include/font.h	/^  u8 h;$/;"	m	struct:font
+handler_t	include/trap.h	/^typedef void (*handler_t)(void);$/;"	t
+hang	kernel/boot.S	/^hang:$/;"	l
+header	kernel/kalloc.c	/^struct header {$/;"	s	file:
+i16	include/kernel.h	/^typedef signed short i16;$/;"	t
+i32	include/kernel.h	/^typedef signed int i32;$/;"	t
+i64	include/kernel.h	/^typedef long i64;$/;"	t
+i8	include/kernel.h	/^typedef signed char i8;$/;"	t
+id	include/driver/rpi4/systimer.h	/^  int id;$/;"	m	struct:systimer
+interval	include/driver/rpi4/systimer.h	/^  u32 interval;$/;"	m	struct:systimer
+interval_ms	kernel/driver/timer.c	/^  u64 interval_ms;$/;"	m	struct:timer	file:
+irqhandler	kernel/trap.c	/^handler_t irqhandler[256];$/;"	v
+isb	include/aarch64.h	/^static inline void isb() {$/;"	f
+kalloc	kernel/kalloc.c	/^void *kalloc() {$/;"	f
+kalloc_init1	kernel/kalloc.c	/^void kalloc_init1() {$/;"	f
+kalloc_init2	kernel/kalloc.c	/^void kalloc_init2() {$/;"	f
+kernel_start	kernel/boot.S	/^kernel_start:$/;"	l
+kfree	kernel/kalloc.c	/^void kfree(void *pa) {$/;"	f
+kinfo	include/log.h	6;"	d
+kirq_handler	kernel/trap.c	/^void kirq_handler(struct trapframe *tf) {$/;"	f
+kpgt_init	kernel/mm.c	/^void kpgt_init() {$/;"	f
+kproc	kernel/proc.c	/^struct proc kproc;$/;"	v	typeref:struct:proc
+kstack	include/proc.h	/^  char *kstack;$/;"	m	struct:proc
+l1kpgt	kernel/boot.S	/^l1kpgt:$/;"	l
+l1upgt	kernel/boot.S	/^l1upgt:$/;"	l
+l2kpgt0	kernel/boot.S	/^l2kpgt0:$/;"	l
+l2kpgt1	kernel/boot.S	/^l2kpgt1:$/;"	l
+l2pgt_loop0	kernel/boot.S	/^l2pgt_loop0:$/;"	l
+l2pgt_loop1	kernel/boot.S	/^l2pgt_loop1:$/;"	l
+l2upgt	kernel/boot.S	/^l2upgt:$/;"	l
+l2upgt_loop	kernel/boot.S	/^l2upgt_loop:$/;"	l
+load_userspace	kernel/mm.c	/^void load_userspace(u64 *pgt) {$/;"	f
+lower_el_aarch64_irq	kernel/vectortable.S	/^lower_el_aarch64_irq:$/;"	l
+lr	include/proc.h	/^  u64 lr;  \/* x30 *\/$/;"	m	struct:context
+main	kernel/main.c	/^int main(void) {$/;"	f
+mbox_msg	kernel/driver/rpi4/framebuffer.c	/^volatile u32 __attribute__((aligned(16))) mbox_msg[26];$/;"	v
+mbox_proptag	include/driver/rpi4/mailbox.h	/^enum mbox_proptag {$/;"	g
+mbox_read	kernel/driver/rpi4/mailbox.c	/^u32 mbox_read(int ch) {$/;"	f
+mbox_write	kernel/driver/rpi4/mailbox.c	/^void mbox_write(int ch, u32 data) {$/;"	f
+memcpy	lib/string.c	/^void *memcpy(void *dst, const void *src, u64 n) {$/;"	f
+memmove	lib/string.c	/^void *memmove(void *dst, const void *src, u64 n) {$/;"	f
+memset	lib/string.c	/^void *memset(void *dst, int c, u64 n) {$/;"	f
+mpidr_el1	include/aarch64.h	/^static inline u64 mpidr_el1() {$/;"	f
+name	include/proc.h	/^  char name[16];$/;"	m	struct:proc
+nbuf	include/driver/rpi4/framebuffer.h	/^  u32 nbuf;$/;"	m	struct:framebuffer
+new_irq	kernel/trap.c	/^void new_irq(int intid, handler_t handler) {$/;"	f
+newproc	kernel/proc.c	/^pid_t newproc(u64 ubegin, u64 size, u64 uentry) {$/;"	f
+next	kernel/kalloc.c	/^  struct header *next;$/;"	m	struct:header	typeref:struct:header::header	file:
+off_x	include/driver/rpi4/framebuffer.h	/^  u32 off_x;$/;"	m	struct:framebuffer
+off_y	include/driver/rpi4/framebuffer.h	/^  u32 off_y;$/;"	m	struct:framebuffer
+pagemap	kernel/mm.c	/^static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {$/;"	f	file:
+pagewalk	kernel/mm.c	/^static u64 *pagewalk(u64 *pgt, u64 va) {$/;"	f	file:
+panic	kernel/printk.c	/^void panic(const char *s) {$/;"	f
+pgt	include/proc.h	/^  u64 *pgt;$/;"	m	struct:proc
+pgt_init	kernel/mm.c	/^void pgt_init() {$/;"	f
+phy_h	include/driver/rpi4/framebuffer.h	/^  u32 phy_h;$/;"	m	struct:framebuffer
+phy_w	include/driver/rpi4/framebuffer.h	/^  u32 phy_w;$/;"	m	struct:framebuffer
+pid	include/proc.h	/^  pid_t pid;$/;"	m	struct:proc
+pid_t	include/proc.h	/^typedef int pid_t;$/;"	t
+pinmode	include/driver/rpi4/gpio.h	/^enum pinmode {$/;"	g
+pitch	include/driver/rpi4/framebuffer.h	/^  u32 pitch;$/;"	m	struct:framebuffer
+printiu32	kernel/printk.c	/^static void printiu32(i32 num, int base, bool sign) {$/;"	f	file:
+printiu64	kernel/printk.c	/^static void printiu64(i64 num, int base, bool sign) {$/;"	f	file:
+printk	kernel/printk.c	/^int printk(const char *fmt, ...) {$/;"	f
+proc	include/proc.h	/^struct proc {$/;"	s
+proc1	usr/test.c	/^void proc1() {$/;"	f
+proc2	usr/test.c	/^void proc2() {$/;"	f
+proc3	usr/test.c	/^void proc3() {$/;"	f
+proc_init	kernel/proc.c	/^void proc_init() {$/;"	f
+procstate	include/proc.h	/^enum procstate {$/;"	g
+proctable	kernel/proc.c	/^struct proc proctable[NPROC];$/;"	v	typeref:struct:proc
+pullmode	include/driver/rpi4/gpio.h	/^enum pullmode {$/;"	g
+reload_timer	kernel/driver/timer.c	/^static void reload_timer(u64 interval_ms) {$/;"	f	file:
+schedule	kernel/proc.c	/^void schedule() {$/;"	f
+set_cntv_ctl_el0	include/aarch64.h	/^static inline void set_cntv_ctl_el0(u64 c) {$/;"	f
+set_cntv_cval_el0	include/aarch64.h	/^static inline void set_cntv_cval_el0(u64 c) {$/;"	f
+set_cntv_tval_el0	include/aarch64.h	/^static inline void set_cntv_tval_el0(u64 t) {$/;"	f
+set_pinmode	kernel/driver/rpi4/gpio.c	/^void set_pinmode(int pin, enum pinmode mode) {$/;"	f
+set_tcr_el1	include/aarch64.h	/^static inline void set_tcr_el1(u64 t) {$/;"	f
+set_ttbr0_el1	include/aarch64.h	/^static inline void set_ttbr0_el1(u64 t) {$/;"	f
+set_ttbr1_el1	include/aarch64.h	/^static inline void set_ttbr1_el1(u64 t) {$/;"	f
+set_vbar_el1	include/aarch64.h	/^static inline void set_vbar_el1(u64 *v) {$/;"	f
+sleep	kernel/driver/rpi4/systimer.c	/^void sleep(u32 sec) {$/;"	f
+sp	include/proc.h	/^  u64 sp;$/;"	m	struct:context
+sp	include/trap.h	/^  u64 sp;$/;"	m	struct:trapframe
+spsr	include/trap.h	/^  u64 spsr;$/;"	m	struct:trapframe
+spsr_el1	include/aarch64.h	/^static inline u64 spsr_el1() {$/;"	f
+state	include/proc.h	/^  enum procstate state;$/;"	m	struct:proc	typeref:enum:proc::procstate
+sync_handler	kernel/trap.c	/^void sync_handler(struct trapframe *tf) {$/;"	f
+sys_getpid	kernel/syscall.c	/^int sys_getpid(void) {$/;"	f
+sys_write	kernel/syscall.c	/^int sys_write(void) {$/;"	f
+sysarg	kernel/syscall.c	/^u64 sysarg(int n) {$/;"	f
+syscall	kernel/syscall.c	/^void syscall(struct trapframe *tf) {$/;"	f
+syscall_t	kernel/syscall.c	/^typedef int (*syscall_t)(void);$/;"	t	file:
+syscall_table	kernel/syscall.c	/^syscall_t syscall_table[] = {$/;"	v
+systime	kernel/driver/rpi4/systimer.c	/^u64 systime() {$/;"	f
+systimer	include/driver/rpi4/systimer.h	/^struct systimer {$/;"	s
+systimer1_handle_irq	kernel/driver/rpi4/systimer.c	/^void systimer1_handle_irq(void) {$/;"	f
+systimer1_init	kernel/driver/rpi4/systimer.c	/^void systimer1_init(u32 interval) {$/;"	f
+tf	include/proc.h	/^  struct trapframe *tf;$/;"	m	struct:proc	typeref:struct:proc::trapframe
+timer	kernel/driver/timer.c	/^struct timer {$/;"	s	file:
+timer1	kernel/driver/rpi4/systimer.c	/^struct systimer timer1, timer3;$/;"	v	typeref:struct:systimer
+timer3	kernel/driver/rpi4/systimer.c	/^struct systimer timer1, timer3;$/;"	v	typeref:struct:
+timer_enabled	kernel/driver/timer.c	/^static bool timer_enabled() {$/;"	f	file:
+timer_init	kernel/driver/timer.c	/^void timer_init(u64 interval_ms) {$/;"	f
+timer_irq_handler	kernel/driver/timer.c	/^void timer_irq_handler() {$/;"	f
+trap_init	kernel/trap.c	/^void trap_init() {$/;"	f
+trapframe	include/trap.h	/^struct trapframe {$/;"	s
+trapret	kernel/vectortable.S	/^trapret:$/;"	l
+true	include/kernel.h	19;"	d
+ttbr1_el1	include/aarch64.h	/^static inline u64 ttbr1_el1() {$/;"	f
+u16	include/kernel.h	/^typedef unsigned short u16;$/;"	t
+u32	include/kernel.h	/^typedef unsigned int u32;$/;"	t
+u64	include/kernel.h	/^typedef unsigned long u64;$/;"	t
+u8	include/kernel.h	/^typedef unsigned char u8;$/;"	t
+uart_init	kernel/driver/virt/uart.c	/^void uart_init() {$/;"	f
+uart_putc	kernel/driver/virt/uart.c	/^void uart_putc(char c) {$/;"	f
+uart_puts	kernel/driver/virt/uart.c	/^void uart_puts(char *s) {$/;"	f
+uart_txff	kernel/driver/virt/uart.c	/^static bool uart_txff() {$/;"	f	file:
+uartid	include/console.h	/^  int uartid;$/;"	m	struct:console
+uirq_handler	kernel/trap.c	/^void uirq_handler(struct trapframe *tf) {$/;"	f
+unknownint	kernel/trap.c	/^void unknownint(int arg) {$/;"	f
+va2pa	kernel/mm.c	/^u64 va2pa() {$/;"	f
+vbar_el1	include/aarch64.h	/^static inline u64 *vbar_el1() {$/;"	f
+vectortable	kernel/vectortable.S	/^vectortable:$/;"	l
+w	include/driver/rpi4/framebuffer.h	/^  u32 w;$/;"	m	struct:framebuffer
+w	include/font.h	/^  u8 w;$/;"	m	struct:font
+wfe	include/aarch64.h	/^static inline void wfe() {$/;"	f
+wfi	include/aarch64.h	/^static inline void wfi() {$/;"	f
+x0	include/proc.h	/^  u64 x0;$/;"	m	struct:context
+x0	include/trap.h	/^  u64 x0;$/;"	m	struct:trapframe
+x1	include/proc.h	/^  u64 x1;$/;"	m	struct:context
+x1	include/trap.h	/^  u64 x1;$/;"	m	struct:trapframe
+x10	include/trap.h	/^  u64 x10;$/;"	m	struct:trapframe
+x11	include/trap.h	/^  u64 x11;$/;"	m	struct:trapframe
+x12	include/trap.h	/^  u64 x12;$/;"	m	struct:trapframe
+x13	include/trap.h	/^  u64 x13;$/;"	m	struct:trapframe
+x14	include/trap.h	/^  u64 x14;$/;"	m	struct:trapframe
+x15	include/trap.h	/^  u64 x15;$/;"	m	struct:trapframe
+x16	include/proc.h	/^  u64 x16;$/;"	m	struct:context
+x16	include/trap.h	/^  u64 x16;$/;"	m	struct:trapframe
+x17	include/proc.h	/^  u64 x17;$/;"	m	struct:context
+x17	include/trap.h	/^  u64 x17;$/;"	m	struct:trapframe
+x18	include/proc.h	/^  u64 x18;$/;"	m	struct:context
+x18	include/trap.h	/^  u64 x18;$/;"	m	struct:trapframe
+x19	include/proc.h	/^  u64 x19;$/;"	m	struct:context
+x19	include/trap.h	/^  u64 x19;$/;"	m	struct:trapframe
+x2	include/proc.h	/^  u64 x2;$/;"	m	struct:context
+x2	include/trap.h	/^  u64 x2;$/;"	m	struct:trapframe
+x20	include/proc.h	/^  u64 x20;$/;"	m	struct:context
+x20	include/trap.h	/^  u64 x20;$/;"	m	struct:trapframe
+x21	include/proc.h	/^  u64 x21;$/;"	m	struct:context
+x21	include/trap.h	/^  u64 x21;$/;"	m	struct:trapframe
+x22	include/proc.h	/^  u64 x22;$/;"	m	struct:context
+x22	include/trap.h	/^  u64 x22;$/;"	m	struct:trapframe
+x23	include/proc.h	/^  u64 x23;$/;"	m	struct:context
+x23	include/trap.h	/^  u64 x23;$/;"	m	struct:trapframe
+x24	include/proc.h	/^  u64 x24;$/;"	m	struct:context
+x24	include/trap.h	/^  u64 x24;$/;"	m	struct:trapframe
+x25	include/proc.h	/^  u64 x25;$/;"	m	struct:context
+x25	include/trap.h	/^  u64 x25;$/;"	m	struct:trapframe
+x26	include/proc.h	/^  u64 x26;$/;"	m	struct:context
+x26	include/trap.h	/^  u64 x26;$/;"	m	struct:trapframe
+x27	include/proc.h	/^  u64 x27;$/;"	m	struct:context
+x27	include/trap.h	/^  u64 x27;$/;"	m	struct:trapframe
+x28	include/proc.h	/^  u64 x28;$/;"	m	struct:context
+x28	include/trap.h	/^  u64 x28;$/;"	m	struct:trapframe
+x29	include/proc.h	/^  u64 x29;$/;"	m	struct:context
+x29	include/trap.h	/^  u64 x29;$/;"	m	struct:trapframe
+x3	include/proc.h	/^  u64 x3;$/;"	m	struct:context
+x3	include/trap.h	/^  u64 x3;$/;"	m	struct:trapframe
+x30	include/trap.h	/^  u64 x30;  \/* lr *\/$/;"	m	struct:trapframe
+x4	include/proc.h	/^  u64 x4;$/;"	m	struct:context
+x4	include/trap.h	/^  u64 x4;$/;"	m	struct:trapframe
+x5	include/proc.h	/^  u64 x5;$/;"	m	struct:context
+x5	include/trap.h	/^  u64 x5;$/;"	m	struct:trapframe
+x6	include/proc.h	/^  u64 x6;$/;"	m	struct:context
+x6	include/trap.h	/^  u64 x6;$/;"	m	struct:trapframe
+x7	include/proc.h	/^  u64 x7;$/;"	m	struct:context
+x7	include/trap.h	/^  u64 x7;$/;"	m	struct:trapframe
+x8	include/proc.h	/^  u64 x8;$/;"	m	struct:context
+x8	include/trap.h	/^  u64 x8;$/;"	m	struct:trapframe
+x9	include/trap.h	/^  u64 x9;$/;"	m	struct:trapframe
+yield	kernel/proc.c	/^void yield() {$/;"	f
