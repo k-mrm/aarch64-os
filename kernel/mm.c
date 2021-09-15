@@ -13,6 +13,7 @@ extern char kend[];
 static u64 *pagewalk(u64 *pgt, u64 va) {
   for(int level = 1; level < 3; level++) {
     u64 *pte = &pgt[PIDX(level, va)];
+
     if((*pte & PTE_VALID) && (*pte & PTE_TABLE)) {
       pgt = (u64 *)PTE_PA(*pte);
     } else {

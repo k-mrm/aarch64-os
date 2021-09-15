@@ -73,6 +73,21 @@ void gic_config(u32 intid, enum gicd_cfg cfg) {
   REG(GICD_ICFGR(intid / 16)) = icfgr | ((u32)cfg << (intid % 16 * 2));
 }
 
+void gic_setup_ppi(u32 intid, enum gicd_cfg cfg, int prio, int cpu) {
+  gic_config(intid, cfg);
+  gic_set_prio(intid, prio);
+  gic_set_target(intid, cpu);
+  gic_clear_pending(intid);
+  gic_enable_int(intid);
+}
+
+void gic_setup_spi(u32 intid, enum gicd_cfg cfg, int prio) {
+  gic_config(intid, cfg);
+  gic_set_prio(intid, prio);
+  gic_clear_pending(intid);
+  gic_enable_int(intid);
+}
+
 void gicc_init() {
   REG(GICC_CTLR) = 0;
 
@@ -87,11 +102,8 @@ void gicv2_init() {
   gicc_init();
   gicd_init();
 
-  gic_config(TIMER_IRQ, GICD_CFG_EDGE);
-  gic_set_prio(TIMER_IRQ, 0);
-  gic_set_target(TIMER_IRQ, 0);
-  gic_clear_pending(TIMER_IRQ);
-  gic_enable_int(TIMER_IRQ);
+  gic_setup_ppi(TIMER_IRQ, GICD_CFG_EDGE, 0, 0);
+  gic_setup_spi(UART_IRQ, GICD_CFG_LEVEL, 0);
 
   gic_enable();
 

@@ -1,5 +1,6 @@
 #include "memmap.h"
 #include "driver/virt/uart.h"
+#include "trap.h"
 
 #define UART_DR (UARTBASE + 0x00)
 #define UART_FR (UARTBASE + 0x18)
@@ -12,11 +13,8 @@ void disable_uart() {
   REG(UART_CR) = 0;
 }
 
-void uart_init() {
-  disable_uart();
-
-  REG(UART_LCRH) = 0x60;
-  REG(UART_CR) = 0x301;  /* RXE, TXE, UARTEN */
+void uartintr() {
+  ;
 }
 
 static bool uart_txff() {
@@ -35,4 +33,13 @@ void uart_puts(char *s) {
     REG(UART_DR) = c;
     s++;
   }
+}
+
+void uart_init() {
+  disable_uart();
+
+  new_irq(UART_IRQ, uartintr);
+
+  REG(UART_LCRH) = 0x60;
+  REG(UART_CR) = 0x301;  /* RXE, TXE, UARTEN */
 }
