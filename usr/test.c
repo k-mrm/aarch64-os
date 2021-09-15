@@ -4,8 +4,10 @@
 /* test */
 void proc1() {
   char *s = "proc1\n";
+  char a[64];
+  char b = a[114514];
   for(;;) {
-    write(s, strlen(s));
+    write(&b, 1);
   }
 }
 

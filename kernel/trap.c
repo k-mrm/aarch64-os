@@ -7,6 +7,8 @@
 #include "syscall.h"
 #include "driver/gicv2.h"
 
+void syscall(struct trapframe *tf);
+
 handler_t irqhandler[256];
 
 static void default_handler() {
@@ -23,23 +25,38 @@ void new_irq(int intid, handler_t handler) {
   irqhandler[intid] = handler;
 }
 
-void syscall(struct trapframe *tf);
+void handle_data_abort(int el, u64 esr) {
+  u64 dfsc = esr & 0x3f;
+
+  /* TODO */
+}
+
+void handle_inst_abort(int el, u64 esr) {
+  panic("instruction abort");
+}
+
+void exception_die(char *reason) {
+  ;
+}
 
 void sync_handler(struct trapframe *tf) {
   u64 esr = esr_el1();
-  esr >>= 26;
-  switch(esr & 0x3f) {
+  u64 ec = (esr >> 26) & 0x3f;
+  switch(ec) {
     case 0b100101:
-      panic("data abort");
+      handle_data_abort(1, esr);
+      return;
     case 0b010101:  // svc
       syscall(tf);
-      break;
+      return;
     case 0b100110:
       panic("sp alignment fault");
     case 0b100100:
-      panic("data abort in EL0");
+      handle_data_abort(0, esr);
+      return;
     case 0b100000:
-      panic("instruction abort in EL0");
+      handle_inst_abort(0, esr);
+      return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());
       printk("%d ", esr & 0x3f);
@@ -57,6 +74,9 @@ void kirq_handler(struct trapframe *tf) {
   irqhandler[intid]();
 
   gic_eoi(iar);
+
+  if(curproc && curproc->state == RUNNING && intid == TIMER_IRQ)
+    yield();
 }
 
 void uirq_handler(struct trapframe *tf) {

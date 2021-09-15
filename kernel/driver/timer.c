@@ -41,7 +41,7 @@ static void reload_timer(u64 interval_ms) {
   set_cntv_tval_el0(interval_clk);
 }
 
-void timer_irq_handler() {
+void timerintr() {
   disable_timer();
   reload_timer(atimer.interval_ms);
   enable_timer();
@@ -52,7 +52,7 @@ void timer_init(u64 interval_ms) {
 
   atimer.interval_ms = interval_ms;
 
-  new_irq(TIMER_IRQ, timer_irq_handler);
+  new_irq(TIMER_IRQ, timerintr);
 
   disable_timer();
   reload_timer(interval_ms);
