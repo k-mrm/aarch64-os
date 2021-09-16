@@ -79,6 +79,7 @@ void schedule() {
         load_userspace(p->pgt);
         p->state = RUNNING;
         kinfo("enter proc %d\n", p->pid);
+        kinfo("sp %p elr %p\n", p->tf->sp, p->tf->elr);
 
         curproc = p;
         
@@ -100,7 +101,8 @@ void yield() {
   cswitch(&p->context, &kproc.context);
 }
 
-void exit(int ret) {
+void _exit(int ret) {
+  printk("exit\n");
   struct proc *p = curproc;
 
   if(!p)

@@ -17,6 +17,7 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
     if((*pte & PTE_VALID) && (*pte & PTE_TABLE)) {
       pgt = (u64 *)P2V(PTE_PA(*pte));
     } else {
+      printk("va walk alloc %p pte %p\n", va, pte);
       pgt = kalloc();
       *pte = PTE_PA(V2P(pgt)) | PTE_TABLE | PTE_VALID;
     }
@@ -39,13 +40,14 @@ static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {
 
 static void pageunmap(u64 *pgt, u64 va, u64 size) {
   for(u64 p = 0; p < size; p += PAGESIZE, va += PAGESIZE) {
-    kinfo("pageunmap");
+    kinfo("pageunmap %p\n", va);
     u64 *pte = pagewalk(pgt, va);
     if(*pte == 0)
       panic("bad unmap");
 
     u64 pa = PTE_PA(*pte);
-    kfree((void *)P2V(pa));
+    /* FIXME */
+    // kfree((void *)P2V(pa));
 
     *pte = 0;
   }
@@ -56,8 +58,8 @@ void free_table(u64 *pgt) {
     u64 *pte = &pgt[i];
 
     if((*pte & PTE_VALID) && (*pte & PTE_TABLE) && !(*pte & PTE_AF)) {
-      u64 *childpgt = PTE_PA(*pte);
-      free_table(P2V(childpgt));
+      u64 *childpgt = (u64 *)PTE_PA(*pte);
+      free_table((u64 *)P2V(childpgt));
       *pte = 0;
     }
   }
@@ -71,6 +73,7 @@ void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
   /* map usr_begin ~ usr_end to 0 ~  */
   for(u64 va = 0; va < size; va += PAGESIZE) {
     char *upage = kalloc();
+    kinfo("alloc upage %p\n", upage);
     memcpy(upage, (char *)begin, PAGESIZE);
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }

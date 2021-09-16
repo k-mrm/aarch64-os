@@ -27,29 +27,28 @@ void new_irq(int intid, handler_t handler) {
   irqhandler[intid] = handler;
 }
 
+/* from EL0 */
+void fault_die(char *reason) {
+  printk("%s\n", reason);
+  _exit(1);
+}
+
 void handle_data_abort(int el, u64 esr) {
   u64 dfsc = esr & 0x3f;
 
-
   /* TODO */
 
+  printk("far %p\n", far_el1());
   if(el == 0) {
     fault_die("data abort EL0");
   }
   else {
-    printk("far %p\n", far_el1());
     panic("data abort EL1");
   }
 }
 
 void handle_inst_abort(int el, u64 esr) {
   panic("instruction abort");
-}
-
-/* from EL0 */
-void fault_die(char *reason) {
-  printk("%s\n", reason);
-  exit(1);
 }
 
 void sync_handler(struct trapframe *tf) {

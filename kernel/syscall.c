@@ -27,9 +27,15 @@ int sys_write(void) {
   return _write((char *)str, size);
 }
 
+int sys_exit(void) {
+  int ret = sysarg(0);
+  return _exit(ret);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
+  sys_exit,
 };
 
 void syscall(struct trapframe *tf) {

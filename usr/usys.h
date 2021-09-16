@@ -5,5 +5,6 @@
 
 int getpid();
 int write(char *s, u64 size);
+int exit(int ret);
 
 #endif

@@ -34,7 +34,6 @@ void *kalloc() {
 void kfree(void *va) {
   if(va == NULL)
     return;
-  kinfo("kfree %p\n", va);
   if((u64)va % PAGESIZE != 0)
     panic("bad va");
 
