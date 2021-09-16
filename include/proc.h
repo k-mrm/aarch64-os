@@ -44,6 +44,7 @@ enum procstate {
 struct proc {
   enum procstate state;
   pid_t pid;
+  u64 size;
   struct context context;
   struct trapframe *tf;
   char *kstack;

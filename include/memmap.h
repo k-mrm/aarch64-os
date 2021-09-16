@@ -27,7 +27,8 @@
 
 #define USEREND     0x7fffffffff
 
-#define USTACKTOP   (USEREND + 1)
+#define USTACKTOP   0x7ffffff000
+#define USTACKBOTTOM  (USTACKTOP - PAGESIZE)
 
 #define GICV2_BASE  P2V(PGICV2_BASE)
 #define UARTBASE    P2V(PUARTBASE)

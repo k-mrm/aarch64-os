@@ -9,14 +9,16 @@
 
 void syscall(struct trapframe *tf);
 
-handler_t irqhandler[256];
+#define NIRQ  256
+
+handler_t irqhandler[NIRQ];
 
 static void default_handler() {
   panic("unknown irq");
 }
 
 void trap_init() {
-  for(int i = 0; i < 256; i++) {
+  for(int i = 0; i < NIRQ; i++) {
     irqhandler[i] = default_handler;
   }
 }
@@ -28,25 +30,38 @@ void new_irq(int intid, handler_t handler) {
 void handle_data_abort(int el, u64 esr) {
   u64 dfsc = esr & 0x3f;
 
+
   /* TODO */
+
+  if(el == 0) {
+    fault_die("data abort EL0");
+  }
+  else {
+    printk("far %p\n", far_el1());
+    panic("data abort EL1");
+  }
 }
 
 void handle_inst_abort(int el, u64 esr) {
   panic("instruction abort");
 }
 
-void exception_die(char *reason) {
-  ;
+/* from EL0 */
+void fault_die(char *reason) {
+  printk("%s\n", reason);
+  exit(1);
 }
 
 void sync_handler(struct trapframe *tf) {
+  printk("sync handler: elr %p\n", tf->elr);
+
   u64 esr = esr_el1();
   u64 ec = (esr >> 26) & 0x3f;
   switch(ec) {
     case 0b100101:
       handle_data_abort(1, esr);
       return;
-    case 0b010101:  // svc
+    case 0b010101:  /* svc */
       syscall(tf);
       return;
     case 0b100110:

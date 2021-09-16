@@ -46,10 +46,11 @@ found:
   memset(p->tf, 0, sizeof(*p->tf));
 
   p->pgt = kalloc();    /* new pagetable */
-  printk("pgt %p ", p->pgt);
+  kinfo("pgt %p ", p->pgt);
+  p->size = size;
   alloc_userspace(p->pgt, ubegin, size);
 
-  printk("newproc %p %p %p\n", ubegin, size, uentry);
+  kinfo("newproc %p %p %p\n", ubegin, size, uentry);
 
   p->tf->elr = uentry;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
@@ -77,6 +78,7 @@ void schedule() {
       if(p->state == RUNNABLE) {
         load_userspace(p->pgt);
         p->state = RUNNING;
+        kinfo("enter proc %d\n", p->pid);
 
         curproc = p;
         
@@ -89,20 +91,28 @@ void schedule() {
 }
 
 void yield() {
-  if(!curproc)
+  struct proc *p = curproc;
+
+  if(!p)
     panic("bad yield");
 
-  curproc->state = RUNNABLE;
-  cswitch(&curproc->context, &kproc.context);
+  p->state = RUNNABLE;
+  cswitch(&p->context, &kproc.context);
 }
 
 void exit(int ret) {
-  if(!curproc)
+  struct proc *p = curproc;
+
+  if(!p)
     panic("bad exit");
 
-  memset(curproc, 0, sizeof(*curproc));
-  curproc->state = UNUSED;
-  cswitch(&curproc->context, &kproc.context);
+  kfree(p->kstack);
+  free_userspace(p->pgt, p->size);
+
+  memset(p, 0, sizeof(*p));
+
+  p->state = UNUSED;
+  cswitch(&p->context, &kproc.context);
 }
 
 void curproc_dump() {

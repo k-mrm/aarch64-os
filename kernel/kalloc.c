@@ -5,6 +5,7 @@
 #include "kalloc.h"
 #include "printk.h"
 #include "string.h"
+#include "log.h"
 
 /*
  *  physical memory allocator
@@ -30,20 +31,18 @@ void *kalloc() {
   return (void *)new;
 }
 
-void kfree(void *pa) {
-  if(pa == NULL)
+void kfree(void *va) {
+  if(va == NULL)
     return;
-  printk("%p\n", pa);
+  kinfo("kfree %p\n", va);
+  if((u64)va % PAGESIZE != 0)
+    panic("bad va");
 
-  if((u64)pa % PAGESIZE != 0) {
-    panic("bad pa");
-  }
-
-  struct header *p = (struct header *)pa;
+  struct header *p = (struct header *)va;
   p->next = freelist;
   freelist = p;
 
-  memset((char *)pa, 0, PAGESIZE);
+  memset((char *)va, 0, PAGESIZE);
 }
 
 void kalloc_init1() {
