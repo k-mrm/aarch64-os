@@ -102,7 +102,7 @@ void yield() {
 }
 
 void _exit(int ret) {
-  printk("exit\n");
+  kinfo("exit\n");
   struct proc *p = curproc;
 
   if(!p)

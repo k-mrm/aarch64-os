@@ -1,6 +1,7 @@
 #include "trap.h"
 #include "proc.h"
 #include "syscall.h"
+#include "printk.h"
 
 typedef int (*syscall_t)(void);
 
@@ -12,6 +13,8 @@ u64 sysarg(int n) {
       return curproc->tf->x1;
     case 2:
       return curproc->tf->x2;
+    case 3:
+      return curproc->tf->x3;
   }
 
   return 0;

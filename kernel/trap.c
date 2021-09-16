@@ -6,8 +6,10 @@
 #include "proc.h"
 #include "syscall.h"
 #include "driver/gicv2.h"
+#include "log.h"
 
 void syscall(struct trapframe *tf);
+void dump_tf(struct trapframe *tf);
 
 #define NIRQ  256
 
@@ -38,13 +40,11 @@ void handle_data_abort(int el, u64 esr) {
 
   /* TODO */
 
-  printk("far %p\n", far_el1());
-  if(el == 0) {
+  kinfo("far %p\n", far_el1());
+  if(el == 0)
     fault_die("data abort EL0");
-  }
-  else {
+  else
     panic("data abort EL1");
-  }
 }
 
 void handle_inst_abort(int el, u64 esr) {
@@ -52,7 +52,7 @@ void handle_inst_abort(int el, u64 esr) {
 }
 
 void sync_handler(struct trapframe *tf) {
-  printk("sync handler: elr %p\n", tf->elr);
+  kinfo("sync handler: elr %p\n", tf->elr);
 
   u64 esr = esr_el1();
   u64 ec = (esr >> 26) & 0x3f;
@@ -73,7 +73,8 @@ void sync_handler(struct trapframe *tf) {
       return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());
-      printk("%d ", esr & 0x3f);
+      printk("ec %d\n", esr & 0x3f);
+      dump_tf(tf);
       panic("unknown");
   }
 }
@@ -111,4 +112,18 @@ void uirq_handler(struct trapframe *tf) {
 void unknownint(int arg) {
   printk("elr: %p arg: %d\n", elr_el1(), arg);
   panic("unknown interrupt");
+}
+
+void dump_tf(struct trapframe *tf) {
+  printk("trapframe dump:\n");
+  printk("x0 %p x1 %p x2 %p x3 %p\n", tf->x0, tf->x1, tf->x2, tf->x3);
+  printk("x4 %p x5 %p x6 %p x7 %p\n", tf->x4, tf->x5, tf->x6, tf->x7);
+  printk("x8 %p x9 %p x10 %p x11 %p\n", tf->x8, tf->x9, tf->x10, tf->x11);
+  printk("x12 %p x13 %p x14 %p x15 %p\n", tf->x12, tf->x13, tf->x14, tf->x15);
+  printk("x16 %p x17 %p x18 %p x19 %p\n", tf->x16, tf->x17, tf->x18, tf->x19);
+  printk("x16 %p x17 %p x18 %p x19 %p\n", tf->x16, tf->x17, tf->x18, tf->x19);
+  printk("x20 %p x21 %p x22 %p x23 %p\n", tf->x20, tf->x21, tf->x22, tf->x23);
+  printk("x24 %p x25 %p x26 %p x27 %p\n", tf->x24, tf->x25, tf->x26, tf->x27);
+  printk("x28 %p x29 %p x30 %p elr %p\n", tf->x28, tf->x29, tf->x30, tf->elr);
+  printk("spsr %p sp %p\n", tf->spsr, tf->sp);
 }

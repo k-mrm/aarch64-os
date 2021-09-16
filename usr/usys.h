@@ -3,7 +3,7 @@
 
 #include "ulib.h"
 
-int getpid();
+int getpid(void);
 int write(char *s, u64 size);
 int exit(int ret);
 
