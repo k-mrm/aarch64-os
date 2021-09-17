@@ -41,7 +41,7 @@ void kfree(void *va) {
   p->next = freelist;
   freelist = p;
 
-  memset((char *)va, 0, PAGESIZE);
+  // memset((char *)va, 0, PAGESIZE);
 }
 
 void kalloc_init1() {

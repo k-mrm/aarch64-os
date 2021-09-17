@@ -78,14 +78,14 @@ void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
 
   /* map usr stack */
   char *ustack = kalloc();
-  pagemap(pgt, USTACKTOP - PAGESIZE, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
+  pagemap(pgt, USTACKBOTTOM, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
 }
 
 void free_userspace(u64 *pgt, u64 size) {
   kinfo("free pgt %p %d\n", pgt, size);
-  // pageunmap(pgt, 0, size);
+  pageunmap(pgt, 0, size);
 
-  pageunmap(pgt, USTACKTOP - PAGESIZE, PAGESIZE);
+  pageunmap(pgt, USTACKBOTTOM, PAGESIZE);
 
   free_table(pgt);
 }
