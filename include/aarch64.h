@@ -33,6 +33,21 @@ static inline void isb() {
   asm volatile("isb");
 }
 
+static inline void dsb_ish() {
+  asm volatile("dsb ish");
+}
+
+static inline void tlbi_vmalle1is() {
+  asm volatile("tlbi vmalle1is");
+}
+
+static inline void flush_tlb() {
+  dsb_ish();
+  tlbi_vmalle1is();
+  dsb_ish();
+  isb();
+}
+
 static inline u64 elr_el1() {
   u64 elr;
   asm volatile("mrs %0, elr_el1" : "=r"(elr));
@@ -123,8 +138,15 @@ static inline u64 cntfrq_el0() {
   return f;
 }
 
+static inline u64 ttbr0_el1() {
+  u64 t;
+  asm volatile("mrs %0, ttbr0_el1" : "=r"(t));
+  return t;
+}
+
 static inline void set_ttbr0_el1(u64 t) {
   asm volatile("msr ttbr0_el1, %0" : : "r"(t));
+  flush_tlb();
 }
 
 static inline u64 ttbr1_el1() {

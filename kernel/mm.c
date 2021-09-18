@@ -25,10 +25,16 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
   return &pgt[PIDX(3, va)];
 }
 
-static u64 va2pa(u64 va) {
+u64 va2pa(u64 va) {
   kinfo("va2pa %p", va);
   u64 kpgtpa = ttbr1_el1();
   u64 *pte = pagewalk((u64 *)P2V(kpgtpa), va);
+
+  return PTE_PA(*pte) + OFFSET(va);
+}
+
+u64 uva2pa(u64 *pgt, u64 va) {
+  u64 *pte = pagewalk(pgt, va);
 
   return PTE_PA(*pte) + OFFSET(va);
 }
@@ -52,8 +58,7 @@ static void pageunmap(u64 *pgt, u64 va, u64 size) {
       panic("bad unmap");
 
     u64 pa = PTE_PA(*pte);
-    kinfo("pageunmap pgt: %p va: %p pa: %p\n", pgt, va, va2pa(P2V(pa)));
-    kinfo("free %p\n", P2V(pa));
+
     kfree((void *)P2V(pa));
 
     *pte = 0;
@@ -82,7 +87,7 @@ void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
     char *upage = kalloc();
     kinfo("map va %p to page %p\n", va, V2P(upage));
     memcpy(upage, (char *)begin, PAGESIZE);
-    kinfo("upage pa %p begin pa %p\n", va2pa(upage), va2pa((char*)begin));
+    kinfo("upage pa %p\n", va2pa(upage));
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
 

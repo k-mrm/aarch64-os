@@ -37,26 +37,9 @@ void kfree(void *va) {
   if((u64)va % PAGESIZE != 0)
     panic("bad va");
 
-  /*
-  if(va == 0xffffff8047ffd000) {
-    volatile char *a = (volatile char *)0xffffff8047ff5000;
-    for(int i = 0; i < PAGESIZE; i++)
-      printk("%p ", a[i]);
-  }
-  */
-
-  memset(va, 0, PAGESIZE); /* bug on! */
+  memset(va, 1, PAGESIZE);
 
   struct header *p = (struct header *)va;
-
-  /*
-  if(va == 0xffffff8047ffd000) {
-    volatile char *a = (volatile char *)0xffffff8047ff5000;
-    for(int i = 0; i < PAGESIZE; i++)
-      printk("%p ", a[i]);
-  }
-  */
-
   p->next = freelist;
   freelist = p;
 }

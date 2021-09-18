@@ -92,6 +92,8 @@ void schedule() {
 }
 
 void yield() {
+  kinfo("yield\n");
+
   struct proc *p = curproc;
 
   if(!p)
@@ -109,8 +111,8 @@ void _exit(int ret) {
     panic("bad exit");
 
   free_userspace(p->pgt, p->size);
-  // kfree(p->kstack);
-  kinfo("pstack free\n");
+  // kfree(p->kstack); /* BUG ON */
+  kinfo("p->kstack free\n");
 
   memset(p, 0, sizeof(*p));
 
