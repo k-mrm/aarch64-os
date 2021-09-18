@@ -48,6 +48,7 @@ void handle_data_abort(int el, u64 esr) {
 }
 
 void handle_inst_abort(int el, u64 esr) {
+  printk("elr: %p far: %p\n", elr_el1(), far_el1());
   panic("instruction abort");
 }
 
@@ -71,16 +72,19 @@ void sync_handler(struct trapframe *tf) {
     case 0b100000:
       handle_inst_abort(0, esr);
       return;
+    case 0b100001:
+      handle_inst_abort(1, esr);
+      return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());
-      printk("ec %d\n", esr & 0x3f);
+      printk("ec %d\n", ec);
       dump_tf(tf);
       panic("unknown");
   }
 }
 
 void kirq_handler(struct trapframe *tf) {
-  // printk("irq handler: elr %p EL%d\n", tf->elr, cur_el());
+  // kinfo("irq handler: elr %p EL%d\n", tf->elr, cur_el());
 
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
@@ -95,7 +99,7 @@ void kirq_handler(struct trapframe *tf) {
 }
 
 void uirq_handler(struct trapframe *tf) {
-  // printk("irq handler: elr %p EL%d\n", tf->elr, cur_el());
+  // kinfo("irq handler: elr %p EL%d\n", tf->elr, cur_el());
 
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;

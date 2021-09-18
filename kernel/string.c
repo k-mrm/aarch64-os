@@ -26,8 +26,8 @@ void *memmove(void *dst, const void *src, u64 n) {
 void *memset(void *dst, int c, u64 n) {
   char *d = dst;
 
-  while(n-- > 0)
-    *d++ = c;
+  for(u64 i = 0; i < n; i++)
+    d[i] = c;
 
   return dst;
 }

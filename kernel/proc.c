@@ -38,9 +38,8 @@ found:
   p->pid = pid++;
   memset(&p->context, 0, sizeof(p->context));
 
-  char *kstack = kalloc();
-
-  char *sp = kstack + PAGESIZE;
+  p->kstack = kalloc();
+  char *sp = p->kstack + PAGESIZE;
   sp -= sizeof(struct trapframe);
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(*p->tf));
@@ -50,13 +49,12 @@ found:
   p->size = size;
   alloc_userspace(p->pgt, ubegin, size);
 
-  kinfo("newproc %p %p %p\n", ubegin, size, uentry);
+  kinfo("newproc %p %p %p %p\n", ubegin, size, uentry, p->kstack);
 
   p->tf->elr = uentry;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
   p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
 
-  p->kstack = kstack;
   p->context.lr = (u64)forkret;
   p->context.sp = (u64)sp;    /* == p->tf */
 
@@ -85,6 +83,8 @@ void schedule() {
         
         cswitch(&kproc.context, &p->context);
 
+        forget_userspace();
+
         curproc = NULL;
       }
     }
@@ -108,8 +108,9 @@ void _exit(int ret) {
   if(!p)
     panic("bad exit");
 
-  kfree(p->kstack);
   free_userspace(p->pgt, p->size);
+  // kfree(p->kstack);
+  kinfo("pstack free\n");
 
   memset(p, 0, sizeof(*p));
 

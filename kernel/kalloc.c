@@ -37,25 +37,38 @@ void kfree(void *va) {
   if((u64)va % PAGESIZE != 0)
     panic("bad va");
 
+  /*
+  if(va == 0xffffff8047ffd000) {
+    volatile char *a = (volatile char *)0xffffff8047ff5000;
+    for(int i = 0; i < PAGESIZE; i++)
+      printk("%p ", a[i]);
+  }
+  */
+
+  memset(va, 0, PAGESIZE); /* bug on! */
+
   struct header *p = (struct header *)va;
+
+  /*
+  if(va == 0xffffff8047ffd000) {
+    volatile char *a = (volatile char *)0xffffff8047ff5000;
+    for(int i = 0; i < PAGESIZE; i++)
+      printk("%p ", a[i]);
+  }
+  */
+
   p->next = freelist;
   freelist = p;
-
-  // memset((char *)va, 0, PAGESIZE);
 }
 
 void kalloc_init1() {
   for(char *p = kend; p + PAGESIZE <= (char *)KERNSECEND; p += PAGESIZE) {
-    struct header *ph = (struct header *)p;
-    ph->next = freelist;
-    freelist = ph;
+    kfree(p);
   }
 }
 
 void kalloc_init2() {
   for(char *p = (char *)KERNSECEND; p + PAGESIZE <= (char *)PHYMEMEND; p += PAGESIZE) {
-    struct header *ph = (struct header *)p;
-    ph->next = freelist;
-    freelist = ph;
+    kfree(p);
   }
 }

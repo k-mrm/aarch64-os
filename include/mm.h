@@ -63,6 +63,8 @@
 
 void alloc_userspace(u64 *pgt, u64 begin, u64 size);
 void load_userspace(u64 *pgt);
+void free_userspace(u64 *pgt, u64 size);
+void forget_userspace(void);
 
 #endif
 
