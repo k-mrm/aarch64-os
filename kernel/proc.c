@@ -118,6 +118,8 @@ int _fork() {
   
   new->tf->x0 = 0;
 
+  new->state = RUNNABLE;
+
   return new->pid;
 }
 

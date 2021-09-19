@@ -17,5 +17,12 @@ void proc2() {
 void init() {
   char *s = "init\n";
   write(s, strlen(s));
+
+  int pid = fork();
+  if(pid == 0) {
+    write("child\n", 6);
+  } else {
+    write("parent\n", 7);
+  }
   exit(0);
 }
