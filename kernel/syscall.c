@@ -35,10 +35,15 @@ int sys_exit(void) {
   return _exit(ret);
 }
 
+int sys_fork(void) {
+  return _fork();
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
   sys_exit,
+  sys_fork,
 };
 
 void syscall(struct trapframe *tf) {

@@ -107,8 +107,18 @@ void yield() {
   cswitch(&p->context, &kproc.context);
 }
 
-int fork() {
-  ;
+int _fork() {
+  struct proc *p = curproc;
+  struct proc *new = newproc();
+
+  cp_userspace(new->pgt, p->pgt);
+  map_ustack(new->pgt);
+  new->size = p->size;
+  *new->tf = *p->tf;
+  
+  new->tf->x0 = 0;
+
+  return new->pid;
 }
 
 void _exit(int ret) {

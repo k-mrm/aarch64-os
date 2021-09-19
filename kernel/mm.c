@@ -98,6 +98,17 @@ void map_ustack(u64 *pgt) {
   pagemap(pgt, USTACKBOTTOM, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
 }
 
+void cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
+  for(u64 va = 0; va < size; va += PAGESIZE) {
+    u64 *pte = pagewalk(oldpgt, va);
+    u64 pa = PTE_PA(*pte);
+    char *page = kalloc();
+    memcpy(page, (char *)P2V(pa), PAGESIZE);
+    
+    pagemap(newpgt, va, V2P(page), PAGESIZE, PTE_NORMAL | PTE_U);
+  }
+}
+
 void free_userspace(u64 *pgt, u64 size) {
   kinfo("free userspace pgt %p size %d\n", pgt, size);
   pageunmap(pgt, 0, size);

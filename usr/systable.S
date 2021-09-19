@@ -1,5 +1,4 @@
-#include "syscall.h"
-
+#include "syscall.h" 
 .macro SYSCALL name, id
 .global \name
 \name:
@@ -11,3 +10,4 @@
 SYSCALL getpid, SYS_GETPID
 SYSCALL write, SYS_WRITE
 SYSCALL exit, SYS_EXIT
+SYSCALL fork, SYS_FORK
