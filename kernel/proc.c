@@ -21,8 +21,7 @@ void forkret() {
   trapret();
 }
 
-/* FIXME: tmp */
-pid_t newproc(u64 ubegin, u64 size, u64 uentry) {
+struct proc *newproc() {
   static pid_t pid = 1;
   struct proc *p;
 
@@ -32,9 +31,10 @@ pid_t newproc(u64 ubegin, u64 size, u64 uentry) {
       goto found;
   }
 
-  return -1;
+  return NULL;
 
 found:
+  p->state = CREATED;
   p->pid = pid++;
   memset(&p->context, 0, sizeof(p->context));
 
@@ -44,23 +44,27 @@ found:
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(*p->tf));
 
-  p->pgt = kalloc();    /* new pagetable */
-  kinfo("pgt %p ", p->pgt);
-  p->size = size;
-  alloc_userspace(p->pgt, ubegin, size);
-
-  kinfo("newproc %p %p %p %p\n", ubegin, size, uentry, p->kstack);
-
-  p->tf->elr = uentry;  /* `eret` jump to elr */
-  p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
-  p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
+  p->pgt = kalloc();
 
   p->context.lr = (u64)forkret;
   p->context.sp = (u64)sp;    /* == p->tf */
 
-  p->state = RUNNABLE;
+  return p;
+}
 
-  return pid;
+void userproc_init(u64 ubegin, u64 size, u64 entry) {
+  struct proc *p = newproc();
+
+  init_userspace(p->pgt, ubegin, size);
+  p->size = size;
+
+  map_ustack(p->pgt);
+
+  p->tf->elr = entry;  /* `eret` jump to elr */
+  p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
+  p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
+
+  p->state = RUNNABLE;
 }
 
 int _getpid(void) {
@@ -103,6 +107,10 @@ void yield() {
   cswitch(&p->context, &kproc.context);
 }
 
+int fork() {
+  ;
+}
+
 void _exit(int ret) {
   kinfo("exit\n");
   struct proc *p = curproc;
@@ -112,7 +120,6 @@ void _exit(int ret) {
 
   free_userspace(p->pgt, p->size);
   // kfree(p->kstack); /* BUG ON */
-  kinfo("p->kstack free\n");
 
   memset(p, 0, sizeof(*p));
 

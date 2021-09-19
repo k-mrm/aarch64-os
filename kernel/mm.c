@@ -78,7 +78,8 @@ void free_table(u64 *pgt) {
   kfree(pgt);
 }
 
-void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
+
+void init_userspace(u64 *pgt, u64 begin, u64 size) {
   if(size % PAGESIZE)
     panic("invalid size");
 
@@ -90,8 +91,9 @@ void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
     kinfo("upage pa %p\n", va2pa(upage));
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
+}
 
-  /* map usr stack */
+void map_ustack(u64 *pgt) {
   char *ustack = kalloc();
   pagemap(pgt, USTACKBOTTOM, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
 }

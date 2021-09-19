@@ -11,8 +11,7 @@
 
 extern u64 __usr_begin;
 extern u64 __usr_end;
-extern u64 proc1;
-extern u64 proc2;
+extern u64 init;
 
 int main(void) {
   console_init();
@@ -36,10 +35,8 @@ int main(void) {
 
   u64 b = (u64)&__usr_begin;
   u64 e = (u64)&__usr_end;
-  u64 p1 = (u64)&proc1;
-  u64 p2 = (u64)&proc2;
-  newproc(b, e - b, p1 - b);
-  newproc(b, e - b, p2 - b);
+  u64 s = (u64)&init;
+  userproc_init(b, e - b, s - b);
   
   schedule();
 }

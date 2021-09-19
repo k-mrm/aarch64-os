@@ -13,3 +13,9 @@ void proc2() {
   write(s, strlen(s));
   exit(0);
 }
+
+void init() {
+  char *s = "init\n";
+  write(s, strlen(s));
+  exit(0);
+}
