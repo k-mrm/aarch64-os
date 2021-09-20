@@ -40,14 +40,17 @@ enum procstate {
   RUNNING,
   RUNNABLE,
   SLEEPING,
+  ZOMBIE,
 };
 
 struct proc {
   enum procstate state;
+  int ret;
   pid_t pid;
   u64 size;
   struct context context;
   struct trapframe *tf;
+  struct proc *parent;
   char *kstack;
   u64 *pgt;
   char name[16];

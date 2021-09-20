@@ -21,7 +21,9 @@ void init() {
   int pid = fork();
   if(pid == 0) {
     write("child\n", 6);
+    exit(0);
   } else {
+    wait(NULL);
     write("parent\n", 7);
   }
   exit(0);

@@ -39,11 +39,17 @@ int sys_fork(void) {
   return _fork();
 }
 
+int sys_wait(void) {
+  u64 addr = sysarg(0);
+  return _wait((int *)addr);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
   sys_exit,
   sys_fork,
+  sys_wait,
 };
 
 void syscall(struct trapframe *tf) {

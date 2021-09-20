@@ -52,6 +52,12 @@ found:
   return p;
 }
 
+void free_proc(struct proc *p) {
+  kfree(p->kstack);
+  memset(p, 0, sizeof(*p));
+  p->state = UNUSED;
+}
+
 void userproc_init(u64 ubegin, u64 size, u64 entry) {
   struct proc *p = newproc();
 
@@ -110,17 +116,46 @@ void yield() {
 int _fork() {
   struct proc *p = curproc;
   struct proc *new = newproc();
+  if(new == NULL)
+    goto err;
 
   cp_userspace(new->pgt, p->pgt);
   map_ustack(new->pgt);
   new->size = p->size;
+
   *new->tf = *p->tf;
-  
+
   new->tf->x0 = 0;
 
+  new->parent = p;
   new->state = RUNNABLE;
 
   return new->pid;
+
+err:
+  return -1;
+}
+
+int _wait(int *status) {
+  struct proc *p = curproc;
+
+  for(;;) {
+    for(int i = 1; i < NPROC; i++) {
+      struct proc *cp = &proctable[i];
+      if(cp->parent != p)
+        continue;
+
+      if(cp->state == ZOMBIE) {
+        int pid = cp->pid;
+        if(status != NULL)
+          *status = cp->ret;
+
+        free_proc(cp);
+
+        return pid;
+      }
+    }
+  }
 }
 
 void _exit(int ret) {
@@ -133,9 +168,9 @@ void _exit(int ret) {
   free_userspace(p->pgt, p->size);
   // kfree(p->kstack); /* BUG ON */
 
-  memset(p, 0, sizeof(*p));
+  p->ret = ret;
+  p->state = ZOMBIE;
 
-  p->state = UNUSED;
   cswitch(&p->context, &kproc.context);
 }
 
