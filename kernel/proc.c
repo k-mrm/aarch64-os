@@ -185,7 +185,6 @@ void _exit(int ret) {
     panic("bad exit");
 
   free_userspace(p->pgt, p->size);
-  // kfree(p->kstack); /* BUG ON */
 
   p->ret = ret;
   p->state = ZOMBIE;

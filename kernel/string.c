@@ -12,8 +12,7 @@ void *memmove(void *dst, const void *src, u64 n) {
   if(s > d) {
     while(n-- > 0)
       *d++ = *s++;
-  }
-  else {
+  } else {
     d += n;
     s += n;
     while(n-- > 0)
