@@ -155,6 +155,25 @@ int _wait(int *status) {
         return pid;
       }
     }
+
+    sleep(p);
+  }
+}
+
+void sleep(struct proc *p) {
+  kinfo("sleeep\n");
+  p->state = SLEEPING;
+  
+  cswitch(&p->context, &kproc.context);
+}
+
+void wakeup(struct proc *proc) {
+  kinfo("wakeup\n");
+
+  for(int i = 1; i < NPROC; i++) {
+    struct proc *p = &proctable[i];
+    if(p->state == SLEEPING && p == proc)
+      p->state = RUNNABLE;
   }
 }
 
@@ -170,6 +189,8 @@ void _exit(int ret) {
 
   p->ret = ret;
   p->state = ZOMBIE;
+
+  wakeup(p->parent);
 
   cswitch(&p->context, &kproc.context);
 }
