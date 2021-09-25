@@ -25,12 +25,17 @@ void console_init() {
 }
 
 #ifdef USE_UART
+
 void csputc(struct console *cs, char c) {
   uart_putc(c);
 }
 
 void csputs(struct console *cs, char *s) {
   uart_puts(s);
+}
+
+char csgetc() {
+  return uart_getc();
 }
 
 int cswrite(struct console *cs, char *s, u64 size) {
@@ -41,7 +46,9 @@ int cswrite(struct console *cs, char *s, u64 size) {
 
   return i;
 }
+
 #else
+
 static void csscroll(struct console *cs) {
   memmove(cs->fb->buf, (char *)cs->fb->buf + cs->bpl, cs->fb->pitch * (cs->h - cs->lineh));
   memset((char *)cs->fb->buf + cs->fb->pitch * (cs->h - cs->lineh), 0, cs->bpl);
@@ -74,6 +81,7 @@ void csputs(struct console *cs, char *s) {
     csputc(cs, *s++);
   }
 }
+
 #endif
 
 int _write(char *s, u64 size) {

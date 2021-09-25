@@ -17,13 +17,22 @@ void uartintr() {
   ;
 }
 
-static bool uart_txff() {
+static inline bool uart_txff() {
   return REG(UART_FR) & (1 << 5);
+}
+
+static inline bool uart_rxfe() {
+  return REG(UART_FR) & (1 << 4);
 }
 
 void uart_putc(char c) {
   while(uart_txff()) {}
   REG(UART_DR) = c;
+}
+
+char uart_getc() {
+  while(uart_rxfe()) {}
+  return REG(UART_DR);
 }
 
 void uart_puts(char *s) {

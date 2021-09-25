@@ -32,6 +32,7 @@ int main(void) {
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
 
   enable_irq();
+  csgetc();
 
   u64 b = (u64)&__usr_begin;
   u64 e = (u64)&__usr_end;
