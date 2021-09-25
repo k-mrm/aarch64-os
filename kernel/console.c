@@ -34,7 +34,7 @@ void csputs(struct console *cs, char *s) {
   uart_puts(s);
 }
 
-char csgetc() {
+char csgetc(struct console *cs) {
   return uart_getc();
 }
 
@@ -42,6 +42,23 @@ int cswrite(struct console *cs, char *s, u64 size) {
   u64 i;
   for(i = 0; i < size; i++) {
     uart_putc(*s++);
+  }
+
+  return i;
+}
+
+int csread(struct console *cs, char *buf, u64 size) {
+  u64 i;
+  for(i = 0; i < size; i++, buf++) {
+    char c = csgetc(cs);
+    if(c == '\r')
+      c = '\n';
+
+    *buf = c;
+    csputc(cs, c);
+
+    if(c == '\n')
+      break;
   }
 
   return i;
@@ -86,4 +103,8 @@ void csputs(struct console *cs, char *s) {
 
 int _write(char *s, u64 size) {
   return cswrite(&cons1, s, size);
+}
+
+int _read(char *buf, u64 size) {
+  return csread(&cons1, buf, size);
 }

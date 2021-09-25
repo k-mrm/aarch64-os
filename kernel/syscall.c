@@ -30,6 +30,12 @@ int sys_write(void) {
   return _write((char *)str, size);
 }
 
+int sys_read(void) {
+  u64 buf = sysarg(0);
+  u64 size = sysarg(1);
+  return _read((char *)buf, size);
+}
+
 int sys_exit(void) {
   int ret = sysarg(0);
   return _exit(ret);
@@ -47,6 +53,7 @@ int sys_wait(void) {
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
+  sys_read,
   sys_exit,
   sys_fork,
   sys_wait,
