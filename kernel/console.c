@@ -27,7 +27,13 @@ void console_init() {
 #ifdef USE_UART
 
 void csputc(struct console *cs, char c) {
-  uart_putc(c);
+  if(c == 127) {  /* 127 == BACKSPACE */  
+    uart_putc('\b');
+    uart_putc(' ');
+    uart_putc('\b');
+  } else {
+    uart_putc(c);
+  }
 }
 
 void csputs(struct console *cs, char *s) {

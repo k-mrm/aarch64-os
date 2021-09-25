@@ -31,12 +31,6 @@ int main(void) {
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
 
-  char *sam = "hellaaaaa\n";
-  for(int i = 0; i < 10; i++) {
-    printk("%d", sam[i]);
-  }
-  printk(sam);
-
   enable_irq();
 
   u64 b = (u64)&__usr_begin;
