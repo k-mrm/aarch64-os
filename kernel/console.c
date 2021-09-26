@@ -4,6 +4,8 @@
 #include "console.h"
 #include "driver/uart.h"
 
+#define BACKSPACE 127
+
 struct console cons1;
 
 void console_init() {
@@ -27,7 +29,7 @@ void console_init() {
 #ifdef USE_UART
 
 void csputc(struct console *cs, char c) {
-  if(c == 127) {  /* 127 == BACKSPACE */  
+  if(c == BACKSPACE) {
     uart_putc('\b');
     uart_putc(' ');
     uart_putc('\b');
@@ -55,7 +57,7 @@ int cswrite(struct console *cs, char *s, u64 size) {
 
 int csread(struct console *cs, char *buf, u64 size) {
   u64 i;
-  for(i = 0; i < size; i++, buf++) {
+  for(i = 0; i < size; i++) {
     char c = csgetc(cs);
     if(c == '\r')
       c = '\n';
@@ -64,7 +66,10 @@ int csread(struct console *cs, char *buf, u64 size) {
     if(c == '\n')
       break;
 
-    *buf = c;
+    if(c == BACKSPACE)
+      buf--;
+    else
+      *buf++ = c;
   }
 
   return i;
