@@ -53,7 +53,7 @@ void handle_inst_abort(int el, u64 esr) {
 }
 
 void sync_handler(struct trapframe *tf) {
-  kinfo("sync handler: elr %p\n", tf->elr);
+  // kinfo("sync handler: elr %p\n", tf->elr);
 
   u64 esr = esr_el1();
   u64 ec = (esr >> 26) & 0x3f;

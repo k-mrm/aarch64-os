@@ -56,13 +56,15 @@ int cswrite(struct console *cs, char *s, u64 size) {
 }
 
 int csread(struct console *cs, char *buf, u64 size) {
-  u64 i;
-  for(i = 0; i < size; i++) {
+  u64 b = (u64)buf;
+
+  for(u64 i = 0; i < size; i++) {
     char c = csgetc(cs);
     if(c == '\r')
       c = '\n';
 
     csputc(cs, c);
+
     if(c == '\n')
       break;
 
@@ -72,7 +74,7 @@ int csread(struct console *cs, char *buf, u64 size) {
       *buf++ = c;
   }
 
-  return i;
+  return (u64)buf - b;
 }
 
 #else

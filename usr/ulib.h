@@ -2,7 +2,7 @@
 #define USER_ULIB_H
 
 typedef unsigned long u64;
-typedef long i64;
+typedef signed long i64;
 typedef unsigned int u32;
 typedef signed int i32;
 typedef unsigned short u16;
