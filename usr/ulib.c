@@ -2,13 +2,24 @@
 #include "ulib.h"
 
 u64 strlen(char *s) {
-  int i = 0;
+  u64 i = 0;
   while(*s) {
     i++;
     s++;
   }
 
   return i;
+}
+
+int strcmp(const char *s1, const char *s2) {
+  while(*s1) {
+    if(*s1 != *s2)
+      break;
+    s1++;
+    s2++;
+  }
+
+  return *s1 > *s2? 1 : *s1 == *s2? 0 : -1;
 }
 
 static void uprintiu32(i32 num, int base, bool sign) {

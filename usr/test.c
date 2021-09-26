@@ -21,9 +21,20 @@ void init() {
 
   int pid = fork();
   if(pid == 0) {
+    write("> ", 2);
     read(buf, 128);
-    write("child\n", 6);
-    exit(1);
+    write(buf, strlen(buf));
+    
+    if(strcmp("getpid", buf) == 0) {
+      int pid = getpid();
+      char c = '0' + pid;
+      write(&c, 1);
+      write("\n", 1);
+      exit(0);
+    } else {
+      write("unknown\n", 8);
+      exit(1);
+    }
   } else {
     int status;
     wait(&status);

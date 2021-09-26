@@ -60,11 +60,11 @@ int csread(struct console *cs, char *buf, u64 size) {
     if(c == '\r')
       c = '\n';
 
-    *buf = c;
     csputc(cs, c);
-
     if(c == '\n')
       break;
+
+    *buf = c;
   }
 
   return i;
