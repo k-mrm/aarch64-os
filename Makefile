@@ -47,6 +47,10 @@ kernel8.elf: $(OBJS) kernel/kernel.ld
 kernel8.img: kernel8.elf
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
+fs.img:
+	dd if=/dev/zero of=fs.img count=10000
+	mkfs -t ext2 fs.img
+
 qemu: kernel8.img
 	$(QEMU) $(QEMUOPTS)
 
@@ -62,6 +66,6 @@ raspi: kernel8.img
 	cp kernel8.img $(SDPATH)
 
 clean:
-	$(RM) $(OBJS) kernel8.elf kernel8.img
+	$(RM) $(OBJS) kernel8.elf kernel8.img fs.img
 
 .PHONY: qemu gdb clean dts raspi
