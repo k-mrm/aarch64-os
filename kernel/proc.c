@@ -136,6 +136,10 @@ err:
   return -1;
 }
 
+int _exec(char *path, char **argv) {
+  struct proc *p = curproc;
+}
+
 int _wait(int *status) {
   struct proc *p = curproc;
 
@@ -194,7 +198,7 @@ void _exit(int ret) {
   cswitch(&p->context, &kproc.context);
 }
 
-void curproc_dump() {
+void dump_proc(struct proc *p) {
   ;
 }
 

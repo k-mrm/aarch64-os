@@ -24,7 +24,7 @@ void init() {
     for(;;) {
       for(int i = 0; i < 128; i++)
         buf[i] = 0;
-      write("> ", 2);
+      write("$ ", 2);
       read(buf, 128);
 
       if(strcmp("getpid", buf) == 0) {
@@ -44,7 +44,7 @@ void init() {
     wait(&status);
     char c = '0' + status;
     write(&c, 1);
-    write("parent\n", 7);
+    write("\n", 1);
   }
   exit(0);
 }

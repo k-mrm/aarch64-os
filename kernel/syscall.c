@@ -38,7 +38,8 @@ int sys_read(void) {
 
 int sys_exit(void) {
   int ret = sysarg(0);
-  return _exit(ret);
+  _exit(ret);
+  return 0;
 }
 
 int sys_fork(void) {
