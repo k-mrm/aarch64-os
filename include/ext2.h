@@ -3,9 +3,28 @@
 
 #include "aarch64-os.h"
 
-struct bootblock {
-  ;
-};
+/* inode.i_mode */
+#define EXT2_S_IFSOCK 0xc000
+#define EXT2_S_IFLNK  0xa000
+#define EXT2_S_IFREG  0x8000
+#define EXT2_S_IFBLK  0x6000
+#define EXT2_S_IFDIR  0x4000
+#define EXT2_S_IFCHR  0x2000
+#define EXT2_S_IFIFO  0x1000
+
+#define EXT2_S_ISUID  0x0800
+#define EXT2_S_ISGID  0x0400
+#define EXT2_S_ISVTX  0x0200
+
+#define EXT2_S_IRUSR  0x0100
+#define EXT2_S_IWUSR  0x0080
+#define EXT2_S_IXUSR  0x0040
+#define EXT2_S_IRGRP  0x0020
+#define EXT2_S_IWGRP  0x0010
+#define EXT2_S_IXGRP  0x0008
+#define EXT2_S_IROTH  0x0004
+#define EXT2_S_IWOTH  0x0002
+#define EXT2_S_IXOTH  0x0001
 
 struct superblock {
   u32 s_inodes_count;
@@ -63,16 +82,32 @@ struct superblock {
   char _unused[760];
 };
 
-enum filetype {
-  F_FILE,
-  F_DIR,
+struct inode {
+  u16 i_mode;
+  u16 i_uid;
+  u32 i_size;
+  u32 i_atime;
+  u32 i_ctime;
+  u32 i_mtime;
+  u32 i_dtime;
+  u16 i_gid;
+  u16 u_links_count;
+  u32 i_blocks;
+  u32 i_flags;
+  u32 i_osd1;
+  u32 i_block[15];
+  u32 i_generation;
+  u32 i_file_acl;
+  u32 i_dir_acl;
+  u32 i_faddr;
+  u32 i_osd2[3];
 };
 
-struct inode {
-  enum filetype type;
-  int refcnt;
-  int nbyte;
-  struct blk *blk;
+struct linked_dirent {
+  u32 inode;
+  u16 rec_len;
+  u8 name_len;
+  u8 file_type;
 };
 
 #endif
