@@ -15,8 +15,8 @@ MACHINE_GIC = gic-version=2
 NCPU = 1
 
 QEMUOPTS = -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
-#QEMUOPTS += -drive file=fs.img,format=raw,id=fs
-#QEMUOPTS += -device virtio-blk-device,drive=fs
+QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=d0
+QEMUOPTS += -device virtio-blk-device,drive=d0
 QEMUOPTS += -nographic -kernel kernel8.elf
 
 KOBJS = kernel/boot.o kernel/vectortable.o	\
@@ -51,10 +51,10 @@ fs.img:
 	dd if=/dev/zero of=fs.img count=10000
 	mkfs -t ext2 fs.img
 
-qemu: kernel8.img
+qemu: kernel8.img fs.img
 	$(QEMU) $(QEMUOPTS)
 
-gdb: kernel8.img
+gdb: kernel8.img fs.img
 	$(QEMU) -S -gdb tcp::1234 $(QEMUOPTS)
 
 dts:
@@ -62,7 +62,7 @@ dts:
 	dtc -I dtb -O dts -o virt.dts virt.dtb
 	rm virt.dtb
 
-raspi: kernel8.img
+raspi: kernel8.img fs.img
 	cp kernel8.img $(SDPATH)
 
 clean:

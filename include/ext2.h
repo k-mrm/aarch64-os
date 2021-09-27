@@ -66,7 +66,7 @@ struct superblock {
 
   u8 s_prealloc_blocks;
   u8 s_prealloc_dir_blocks;
-  u16 _align1;
+  u16 _align;
 
   u64 s_journal_uuid[2];
   u32 s_journal_inum;
