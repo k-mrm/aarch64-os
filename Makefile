@@ -19,8 +19,8 @@ QEMUOPTS = -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
 #QEMUOPTS += -device virtio-blk-device,drive=d0
 QEMUOPTS += -nographic -kernel kernel8.elf
 
-KOBJS = kernel/boot.o kernel/vectortable.o	\
-			 kernel/console.o kernel/trap.o kernel/font.o \
+KOBJS = kernel/boot.o kernel/vectortable.o kernel/ramdisk.o	\
+			 kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o \
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o	\
 			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o
 

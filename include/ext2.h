@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_EXT2_H
 #define AARCH64_OS_EXT2_H
 
-#include "aarch64-os.h"
+#include "kernel.h"
 
 /* inode.i_mode */
 #define EXT2_S_IFSOCK 0xc000

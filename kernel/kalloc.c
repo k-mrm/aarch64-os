@@ -45,7 +45,7 @@ void kfree(void *va) {
 }
 
 static inline u64 ksecend() {
-  return ((u64)kend + SECTIONSIZE - 1) & ~(SECTIONSIZE - 1);
+  return (((u64)kend + SECTIONSIZE - 1) & ~(SECTIONSIZE - 1));
 }
 
 void kalloc_init1() {

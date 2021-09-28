@@ -8,6 +8,8 @@
 #include "driver/timer.h"
 #include "log.h"
 #include "kalloc.h"
+#include "ext2.h"
+#include "ramdisk.h"
 
 extern u64 __usr_begin;
 extern u64 __usr_end;
@@ -24,6 +26,9 @@ int main(void) {
   pgt_init();
   kalloc_init2();
   proc_init();
+  ramdisk_init();
+
+  dump_superblock((struct superblock *)diskread(0x400));
 
   kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
   kinfo("current EL: %d\n", cur_el());
