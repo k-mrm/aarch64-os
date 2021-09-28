@@ -22,9 +22,6 @@
 #define KERNBASE    (PKERNBASE + VA_START)
 #define PHYMEMEND   (KERNBASE + 128 * 1024 * 1024)   /* 128MB */
 
-#define PKERNSECEND 0x40200000
-#define KERNSECEND  (PKERNSECEND + VA_START)
-
 #define USEREND     0x7fffffffff
 
 #define USTACKTOP   0x7ffffff000

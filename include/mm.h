@@ -51,6 +51,7 @@
 #define PTE_UXN (1UL << 54)
 
 #define PAGESIZE  4096    /* 4KB */
+#define SECTIONSIZE (2 * 1024 * 1024) /* 2MB */
 
 /* attr index */
 #define AI_DEVICE_nGnRnE_IDX  0x0

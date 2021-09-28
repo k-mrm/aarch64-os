@@ -44,14 +44,18 @@ void kfree(void *va) {
   freelist = p;
 }
 
+static inline u64 ksecend() {
+  return ((u64)kend + SECTIONSIZE - 1) & ~(SECTIONSIZE - 1);
+}
+
 void kalloc_init1() {
-  for(char *p = kend; p + PAGESIZE <= (char *)KERNSECEND; p += PAGESIZE) {
+  for(char *p = kend; p + PAGESIZE <= (char *)ksecend(); p += PAGESIZE) {
     kfree(p);
   }
 }
 
 void kalloc_init2() {
-  for(char *p = (char *)KERNSECEND; p + PAGESIZE <= (char *)PHYMEMEND; p += PAGESIZE) {
+  for(char *p = (char *)ksecend(); p + PAGESIZE <= (char *)PHYMEMEND; p += PAGESIZE) {
     kfree(p);
   }
 }

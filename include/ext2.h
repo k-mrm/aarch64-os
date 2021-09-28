@@ -80,7 +80,7 @@ struct superblock {
   u32 s_default_mount_options;
   u32 s_first_meta_bg;
   char _unused[760];
-};
+} __attribute__((packed));
 
 struct inode {
   u16 i_mode;
@@ -101,13 +101,13 @@ struct inode {
   u32 i_dir_acl;
   u32 i_faddr;
   u32 i_osd2[3];
-};
+} __attribute__((packed));
 
 struct linked_dirent {
   u32 inode;
   u16 rec_len;
   u8 name_len;
   u8 file_type;
-};
+} __attribute__((packed));
 
 #endif
