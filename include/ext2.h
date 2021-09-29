@@ -26,6 +26,14 @@
 #define EXT2_S_IWOTH  0x0002
 #define EXT2_S_IXOTH  0x0001
 
+/* inode number */
+#define EXT2_BAD_INO  1
+#define EXT2_ROOT_INO 2
+#define EXT2_ACL_IDX_INO  3
+#define EXT2_ACL_DATA_INO 4
+#define EXT2_BOOT_LOADER_INO  5
+#define EXT2_UNDEL_DIR_INO  6
+
 struct superblock {
   u32 s_inodes_count;
   u32 s_blocks_count;
@@ -103,11 +111,27 @@ struct inode {
   u32 i_osd2[3];
 } __attribute__((packed));
 
+struct bg_desc {
+  u32 bg_block_bitmap;
+  u32 bg_inode_bitmap;
+  u32 bg_inode_table;
+  u16 bg_free_blocks_count;
+  u16 bg_free_inodes_count;
+  u16 bg_used_dirs_count;
+  u16 bg_pad;
+  char bg_reserved[12];
+} __attribute__((packed));
+
 struct linked_dirent {
   u32 inode;
   u16 rec_len;
   u8 name_len;
   u8 file_type;
 } __attribute__((packed));
+
+struct imginfo {
+};
+
+void dump_superblock(struct superblock *sb);
 
 #endif

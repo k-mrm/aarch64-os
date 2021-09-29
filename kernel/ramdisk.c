@@ -1,4 +1,5 @@
 #include "kernel.h"
+#include "ramdisk.h"
 
 extern char _binary_fs_img_start[];
 extern char _binary_fs_img_end[];

@@ -50,7 +50,7 @@ kernel8.img: kernel8.elf
 
 fs.img:
 	dd if=/dev/zero of=fs.img count=10000
-	mkfs -t ext2 fs.img
+	mkfs -t ext2 -v fs.img
 
 qemu: kernel8.img
 	$(QEMU) $(QEMUOPTS)

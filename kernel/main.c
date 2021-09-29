@@ -28,7 +28,7 @@ int main(void) {
   proc_init();
   ramdisk_init();
 
-  dump_superblock((struct superblock *)diskread(0x400));
+  fs_init(diskread(0));
 
   kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
   kinfo("current EL: %d\n", cur_el());
