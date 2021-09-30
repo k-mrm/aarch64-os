@@ -1,6 +1,7 @@
 #include "ext2.h"
 #include "printk.h"
 #include "log.h"
+#include "string.h"
 
 struct imginfo imginfo;
 
@@ -68,6 +69,23 @@ void dump_dirent_block(char *blk) {
   }
 }
 
+int search_dirent_block(char *blk, char *path) {
+  struct ext2_dirent *d = (struct ext2_dirent *)blk;
+  char *blk_end = blk + imginfo.block_size;
+  char *cd;
+
+  while(d->inode != 0 && blk_end != cd) {
+    if(strcmp(d->name, path) == 0)
+      return d->inode;
+
+    cd = (char *)d;
+    cd += d->rec_len;
+    d = (struct ext2_dirent *)cd;
+  }
+
+  return -1;
+}
+
 struct inode *get_inode(int inum) {
   return (struct inode *)(imginfo.inode_table + (inum - 1) * sizeof(struct inode));
 }
@@ -77,10 +95,66 @@ void *get_block(int bnum) {
 }
 
 void ls_inode(struct inode *ino) {
+  if(ino && (ino->i_mode & EXT2_S_IFDIR) == 0)
+    return;
+
   for(int i = 0; i < inode_nblock(ino); i++) {
     char *d = get_block(ino->i_block[i]);
     dump_dirent_block(d);
   }
+}
+
+int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
+  if((ino->i_mode & EXT2_S_IFDIR) == 0)
+    return -1;
+}
+
+char *skippath(char *path, char *name) {
+  while(*path == '/')
+    path++;
+
+  while((*name = *path) && *path++ != '/')
+    name++;
+
+  if(*name == '/')
+    *name = 0;
+  return path;
+}
+
+struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
+  printk("paa %s\n", path);
+  path = skippath(path, name);
+  if(*path == 0 && *name == 0)
+    return pi;
+  if((pi->i_mode & EXT2_S_IFDIR) == 0)
+    return NULL;
+
+  int inum = -1;
+
+  for(int i = 0; i < inode_nblock(pi); i++) {
+    char *db = get_block(pi->i_block[i]);
+    if((inum = search_dirent_block(db, name)) > 0)
+      break;
+  }
+
+  if(inum < 0)
+    return NULL;
+
+  memset(name, 0, 256);
+
+  return traverse_inode(get_inode(inum), path, name);
+}
+
+struct inode *path2inode(char *path) {
+  struct inode *ino;
+
+  if(*path == '/')
+    ino = get_inode(EXT2_ROOT_INO);
+
+  char name[256] = {0};
+  ino = traverse_inode(ino, path, name);
+
+  return ino;
 }
 
 void fs_init(char *img) {
@@ -99,7 +173,5 @@ void fs_init(char *img) {
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
 
-  struct inode *i = get_inode(EXT2_ROOT_INO);
-  dump_inode(i);
-  ls_inode(i);
+  ls_inode(path2inode("/lost+found////.."));
 }
