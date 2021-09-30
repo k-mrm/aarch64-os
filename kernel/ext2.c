@@ -61,7 +61,7 @@ void dump_dirent_block(char *blk) {
   char *blk_end = blk + imginfo.block_size;
   char *cd;
 
-  while(blk_end != cd && d->inode != 0) {
+  while(d != blk_end && d->inode != 0) {
     dump_ext2_dirent(d);
     cd = (char *)d;
     cd += d->rec_len;
@@ -74,7 +74,7 @@ int search_dirent_block(char *blk, char *path) {
   char *blk_end = blk + imginfo.block_size;
   char *cd;
 
-  while(blk_end != cd && d->inode != 0) {
+  while(d != blk_end && d->inode != 0) {
     if(strcmp(d->name, path) == 0)
       return d->inode;
     cd = (char *)d;
@@ -94,8 +94,12 @@ void *get_block(int bnum) {
 }
 
 void ls_inode(struct inode *ino) {
-  if(!ino || (ino->i_mode & EXT2_S_IFDIR) == 0) {
-    printk("invalid inode\n");
+  if(ino == NULL) {
+    printk("null inode\n");
+    return;
+  }
+  if((ino->i_mode & EXT2_S_IFDIR) == 0) {
+    printk("invalid inode: directory\n");
     return;
   }
 
@@ -163,13 +167,13 @@ struct inode *path2inode(char *path) {
 
 void fs_init(char *img) {
   struct superblock *sb = (struct superblock *)(img + 0x400);
-  dump_superblock(sb);
+  // dump_superblock(sb);
   if(sb->s_magic != 0xef53)
     panic("invalid filesystem");
   u32 block_size = 1024 << sb->s_log_block_size;
 
   struct bg_desc *bg = (struct bg_desc *)(img + 0x800);
-  dump_bg_desc(bg);
+  // dump_bg_desc(bg);
 
   imginfo.base = img;
   imginfo.block_size = block_size;
