@@ -61,7 +61,7 @@ void dump_dirent_block(char *blk) {
   char *blk_end = blk + imginfo.block_size;
   char *cd;
 
-  while(d->inode != 0 && blk_end != cd) {
+  while(blk_end != cd && d->inode != 0) {
     dump_ext2_dirent(d);
     cd = (char *)d;
     cd += d->rec_len;
@@ -74,10 +74,9 @@ int search_dirent_block(char *blk, char *path) {
   char *blk_end = blk + imginfo.block_size;
   char *cd;
 
-  while(d->inode != 0 && blk_end != cd) {
+  while(blk_end != cd && d->inode != 0) {
     if(strcmp(d->name, path) == 0)
       return d->inode;
-
     cd = (char *)d;
     cd += d->rec_len;
     d = (struct ext2_dirent *)cd;
@@ -95,8 +94,10 @@ void *get_block(int bnum) {
 }
 
 void ls_inode(struct inode *ino) {
-  if(ino && (ino->i_mode & EXT2_S_IFDIR) == 0)
+  if(!ino || (ino->i_mode & EXT2_S_IFDIR) == 0) {
+    printk("invalid inode\n");
     return;
+  }
 
   for(int i = 0; i < inode_nblock(ino); i++) {
     char *d = get_block(ino->i_block[i]);
@@ -107,27 +108,30 @@ void ls_inode(struct inode *ino) {
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   if((ino->i_mode & EXT2_S_IFDIR) == 0)
     return -1;
+  /* TODO */
 }
 
 char *skippath(char *path, char *name) {
+  /* skip '/' ("////aaa/" -> "aaa/") */
   while(*path == '/')
     path++;
 
+  /* get elem */
   while((*name = *path) && *path++ != '/')
     name++;
 
+  /* cut '/' ("aaa/" -> "aaa") */
   if(*name == '/')
     *name = 0;
   return path;
 }
 
 struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
-  printk("paa %s\n", path);
   path = skippath(path, name);
   if(*path == 0 && *name == 0)
     return pi;
   if((pi->i_mode & EXT2_S_IFDIR) == 0)
-    return NULL;
+    return pi;
 
   int inum = -1;
 
@@ -173,5 +177,5 @@ void fs_init(char *img) {
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
 
-  ls_inode(path2inode("/lost+found////.."));
+  ls_inode(path2inode("/aaa"));
 }

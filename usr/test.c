@@ -27,12 +27,12 @@ void init() {
       write("$ ", 2);
       read(buf, 128);
 
-      if(strcmp("getpid", buf) == 0) {
+      if(ustrcmp("getpid", buf) == 0) {
         int pid = getpid();
         char c = '0' + pid;
         write(&c, 1);
         write("\n", 1);
-      } else if(strcmp("exit", buf) == 0) {
+      } else if(ustrcmp("exit", buf) == 0) {
         write("bye\n", 4);
         exit(0);
       } else {

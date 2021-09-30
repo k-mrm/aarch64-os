@@ -18,7 +18,7 @@ typedef _Bool bool;
 #define false 0
 
 u64 strlen(char *s);
-int strcmp(const char *s1, const char *s2);
+int ustrcmp(const char *s1, const char *s2);
 int printf(const char *fmt, ...);
 
 #endif
