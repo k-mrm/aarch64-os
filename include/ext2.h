@@ -122,14 +122,20 @@ struct bg_desc {
   char bg_reserved[12];
 } __attribute__((packed));
 
-struct linked_dirent {
+struct ext2_dirent {
   u32 inode;
   u16 rec_len;
   u8 name_len;
   u8 file_type;
+  char name[1];
 } __attribute__((packed));
 
 struct imginfo {
+  char *base;
+  u64 block_size;
+  char *block_bitmap;
+  char *inode_bitmap;
+  char *inode_table;
 };
 
 void dump_superblock(struct superblock *sb);

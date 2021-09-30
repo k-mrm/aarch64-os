@@ -12,10 +12,9 @@ struct {
 
 void ramdisk_init() {
   disk.data = _binary_fs_img_start;
-  disk.size = _binary_fs_img_size;
+  disk.size = (u64)_binary_fs_img_size;
 }
 
 char *diskread(u64 off) {
-  printk("disk %p\n", disk.data);
   return disk.data + off;
 }
