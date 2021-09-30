@@ -34,6 +34,8 @@ void dump_bg_desc(struct bg_desc *bg) {
   printk("bg_used_dirs_count: %d\n", bg->bg_used_dirs_count);
 }
 
+#define inode_nblock(i) ((i)->i_blocks / (2 << 0))
+
 void dump_inode(struct inode *i) {
   printk("inode dump: %p\n", i);
   printk("sizeof *i: %d\n", sizeof(*i));
@@ -53,12 +55,32 @@ void dump_ext2_dirent(struct ext2_dirent *d) {
   printk("name: %s\n", d->name);
 }
 
+void dump_dirent_block(char *blk) {
+  struct ext2_dirent *d = (struct ext2_dirent *)blk;
+  char *blk_end = blk + imginfo.block_size;
+  char *cd;
+
+  while(d->inode != 0 && blk_end != cd) {
+    dump_ext2_dirent(d);
+    cd = (char *)d;
+    cd += d->rec_len;
+    d = (struct ext2_dirent *)cd;
+  }
+}
+
 struct inode *get_inode(int inum) {
   return (struct inode *)(imginfo.inode_table + (inum - 1) * sizeof(struct inode));
 }
 
 void *get_block(int bnum) {
   return imginfo.base + (u64)bnum * imginfo.block_size;
+}
+
+void ls_inode(struct inode *ino) {
+  for(int i = 0; i < inode_nblock(ino); i++) {
+    char *d = get_block(ino->i_block[i]);
+    dump_dirent_block(d);
+  }
 }
 
 void fs_init(char *img) {
@@ -79,12 +101,5 @@ void fs_init(char *img) {
 
   struct inode *i = get_inode(EXT2_ROOT_INO);
   dump_inode(i);
-
-  struct ext2_dirent *d = get_block(i->i_block[0]);
-  while(d->inode != 0) {
-    dump_ext2_dirent(d);
-    char *cd = (char *)d;
-    cd += d->rec_len;
-    d = (struct ext2_dirent *)cd;
-  }
+  ls_inode(i);
 }
