@@ -116,13 +116,17 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 }
 
 char *skippath(char *path, char *name) {
-  /* skip '/' ("////aaa/" -> "aaa/") */
+  /* skip '/' ("////aaa/bbb" -> "aaa/bbb") */
   while(*path == '/')
     path++;
 
-  /* get elem */
-  while((*name = *path) && *path++ != '/')
+  /* get elem and inc path (get "aaa/" from "aaa/bbb", path = "bbb") */
+  int len;
+  while((*name = *path) && *path++ != '/') {
     name++;
+    if(++len > EXT2_DIRENT_NAME_MAX)
+      return NULL;
+  }
 
   /* cut '/' ("aaa/" -> "aaa") */
   if(*name == '/')
@@ -148,7 +152,7 @@ struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
   if(inum < 0)
     return NULL;
 
-  memset(name, 0, 256);
+  memset(name, 0, EXT2_DIRENT_NAME_MAX);
 
   return traverse_inode(get_inode(inum), path, name);
 }
@@ -159,7 +163,7 @@ struct inode *path2inode(char *path) {
   if(*path == '/')
     ino = get_inode(EXT2_ROOT_INO);
 
-  char name[256] = {0};
+  char name[EXT2_DIRENT_NAME_MAX] = {0};
   ino = traverse_inode(ino, path, name);
 
   return ino;
@@ -181,5 +185,5 @@ void fs_init(char *img) {
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
 
-  ls_inode(path2inode("/aaa"));
+  ls_inode(path2inode("/"));
 }

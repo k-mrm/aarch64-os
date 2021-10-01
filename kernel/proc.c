@@ -66,6 +66,8 @@ void userproc_init(u64 ubegin, u64 size, u64 entry) {
 
   map_ustack(p->pgt);
 
+  p->cwd = path2inode("/");
+
   p->tf->elr = entry;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
   p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
@@ -126,6 +128,8 @@ int _fork() {
   *new->tf = *p->tf;
 
   new->tf->x0 = 0;
+  
+  new->cwd = p->cwd;
 
   new->parent = p;
   new->state = RUNNABLE;

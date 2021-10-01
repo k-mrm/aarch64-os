@@ -57,3 +57,4 @@ dkms.conf
 *.dtb
 *.log
 tags
+testfs/

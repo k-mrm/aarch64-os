@@ -2,6 +2,7 @@
 #define AARCH64_OS_PROC_H
 
 #include "kernel.h"
+#include "ext2.h"
 
 typedef int pid_t;
 
@@ -53,6 +54,7 @@ struct proc {
   struct proc *parent;
   char *kstack;
   u64 *pgt;
+  struct inode *cwd;
   char name[16];
 };
 
