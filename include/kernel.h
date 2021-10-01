@@ -21,6 +21,8 @@ typedef _Bool bool;
 
 #define REG(addr) (*(volatile u32 *)(u64)(addr))
 
+#define min(a, b) (((a) < (b))? (a) : (b))
+
 #endif
 
 #endif

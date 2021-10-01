@@ -1,7 +1,10 @@
 #include "ext2.h"
+#include "kernel.h"
 #include "printk.h"
 #include "log.h"
 #include "string.h"
+#include "proc.h"
+#include "kalloc.h"
 
 struct imginfo imginfo;
 
@@ -41,7 +44,8 @@ void dump_inode(struct inode *i) {
   printk("inode dump: %p\n", i);
   printk("sizeof *i: %d\n", sizeof(*i));
   printk("i_mode: %p\n", i->i_mode);
-  printk("i_blocks: %p\n", i->i_blocks);
+  printk("i_size: %d\n", i->i_size);
+  printk("i_blocks: %d\n", i->i_blocks);
   for(int b = 0; b < 15; b++)
     printk("i_block[%d]: %p\n", b, i->i_block[b]);
 }
@@ -110,9 +114,30 @@ void ls_inode(struct inode *ino) {
 }
 
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
-  if((ino->i_mode & EXT2_S_IFDIR) == 0)
+  u32 bsize = imginfo.block_size;
+
+  if((ino->i_mode & EXT2_S_IFREG) == 0)
     return -1;
-  /* TODO */
+
+  if(off > ino->i_size)
+    return -1;
+  if(off + size > ino->i_size)
+    size = ino->i_size - off;
+
+  u32 offblk = off / bsize;
+  u32 lastblk = size / bsize + offblk;
+  u64 ressize = 0;
+
+  for(int i = offblk; i < inode_nblock(ino) && i <= lastblk; i++) {
+    char *d = get_block(ino->i_block[i]);
+    u64 cpsize = min(size, bsize);
+    memcpy(buf, d, cpsize);
+    size -= bsize;
+    buf += cpsize;
+    ressize += cpsize;
+  }
+
+  return ressize;
 }
 
 char *skippath(char *path, char *name) {
@@ -128,7 +153,7 @@ char *skippath(char *path, char *name) {
       return NULL;
   }
 
-  /* cut '/' ("aaa/" -> "aaa") */
+  /* cut '/' from name ("aaa/" -> "aaa") */
   if(*name == '/')
     *name = 0;
   return path;
@@ -162,6 +187,8 @@ struct inode *path2inode(char *path) {
 
   if(*path == '/')
     ino = get_inode(EXT2_ROOT_INO);
+  else
+    ino = curproc->cwd;
 
   char name[EXT2_DIRENT_NAME_MAX] = {0};
   ino = traverse_inode(ino, path, name);
@@ -185,5 +212,6 @@ void fs_init(char *img) {
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
 
-  ls_inode(path2inode("/"));
+  struct inode *tes = path2inode("/virt.dts");
+  dump_inode(tes);
 }

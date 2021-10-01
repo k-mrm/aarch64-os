@@ -142,6 +142,9 @@ err:
 
 int _exec(char *path, char **argv) {
   struct proc *p = curproc;
+
+  struct inode *i = path2inode(path);
+
 }
 
 int _wait(int *status) {
