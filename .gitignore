@@ -58,3 +58,4 @@ dkms.conf
 *.log
 tags
 testfs/
+rootfs/
