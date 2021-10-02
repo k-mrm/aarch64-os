@@ -51,14 +51,15 @@ ULIBS = usr/systable.o usr/ulib.o
 
 UOBJS = usr/test.o usr/init.o usr/sh.o usr/cat.o
 
-UPROGS = usr/test usr/init usr/sh usr/cat
+UPROGS = rootfs/test rootfs/init rootfs/sh rootfs/cat
 
-usr/%: usr/%.o $(ULIBS)
+rootfs/%: usr/%.o $(ULIBS)
+	@mkdir -p rootfs
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 
 fs.img: $(UPROGS)
 	dd if=/dev/zero of=fs.img count=10000
-	mkfs -t ext2 -v fs.img -b 1024
+	mkfs -t ext2 -d rootfs/ -v fs.img -b 1024
 
 kernel8.elf: $(OBJS) kernel/kernel.ld fs.img usr/initcode
 	$(LD) -r -b binary fs.img -o fs.img.o
@@ -84,5 +85,6 @@ raspi: kernel8.img fs.img
 
 clean:
 	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) usr/initcode.o usr/initcode.elf usr/initcode kernel8.elf kernel8.img fs.img fs.img.o
+	rmdir rootfs
 
 .PHONY: qemu gdb clean dts raspi

@@ -4,7 +4,6 @@
 int main() {
   char *s = "init\n";
   write(s, strlen(s));
-  char buf[128];
 
   int pid = fork();
   if(pid == 0) {
