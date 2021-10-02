@@ -92,8 +92,9 @@ int init_userspace(u64 *pgt, char *code, u64 size) {
 }
 
 int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
-  u64 pgsize;
-  for(pgsize = PAGEROUNDUP(size); va < pgsize + va; va += PAGESIZE) {
+  u64 pgsize = PAGEROUNDUP(size);
+  u64 bva = va;
+  for(; va < pgsize + bva; va += PAGESIZE) {
     char *upage = kalloc();
     kinfo("map va %p to page %p\n", va, V2P(upage));
     read_inode(ino, upage, srcoff, size);

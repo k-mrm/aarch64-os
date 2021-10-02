@@ -121,7 +121,7 @@ void ls_inode(struct inode *ino) {
 }
 
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
-  printk("readinode %p %d %d\n", buf, off, size);
+  // printk("readinode %p %d %d\n", buf, off, size);
   u32 bsize = imginfo.block_size;
   char *base = buf;
 
