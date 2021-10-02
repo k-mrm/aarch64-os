@@ -20,5 +20,6 @@ typedef _Bool bool;
 u64 strlen(char *s);
 int strcmp(const char *s1, const char *s2);
 int printf(const char *fmt, ...);
+void *memset(void *dst, int c, u64 n);
 
 #endif

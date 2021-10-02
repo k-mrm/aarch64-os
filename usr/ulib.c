@@ -22,6 +22,15 @@ int strcmp(const char *s1, const char *s2) {
   return *s1 > *s2? 1 : *s1 == *s2? 0 : -1;
 }
 
+void *memset(void *dst, int c, u64 n) {
+  char *d = dst;
+
+  while(n-- > 0)
+    *d++ = c;
+
+  return dst;
+}
+
 static void uprintiu32(i32 num, int base, bool sign) {
   char buf[sizeof(num) * 8 + 1] = {0};
   char *end = buf + sizeof(buf);
