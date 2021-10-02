@@ -11,10 +11,6 @@
 #include "ext2.h"
 #include "ramdisk.h"
 
-extern u64 __usr_begin;
-extern u64 __usr_end;
-extern u64 init;
-
 int main(void) {
   console_init();
   kinfo("booting...\n");
@@ -27,7 +23,6 @@ int main(void) {
   kalloc_init2();
   proc_init();
   ramdisk_init();
-
   fs_init(diskread(0));
 
   kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
@@ -38,10 +33,5 @@ int main(void) {
 
   enable_irq();
 
-  u64 b = (u64)&__usr_begin;
-  u64 e = (u64)&__usr_end;
-  u64 s = (u64)&init;
-  userproc_init(b, e - b, s - b);
-  
   schedule();
 }

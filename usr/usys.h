@@ -5,6 +5,9 @@
 
 int getpid(void);
 int write(char *s, u64 size);
+int read(char *buf, u64 size);
 int exit(int ret);
+int fork(void);
+int wait(int *status);
 
 #endif

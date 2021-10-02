@@ -21,34 +21,34 @@ u64 sysarg(int n) {
 }
 
 int sys_getpid(void) {
-  return _getpid();
+  return getpid();
 }
 
 int sys_write(void) {
   u64 str = sysarg(0);
   u64 size = sysarg(1);
-  return _write((char *)str, size);
+  return write((char *)str, size);
 }
 
 int sys_read(void) {
   u64 buf = sysarg(0);
   u64 size = sysarg(1);
-  return _read((char *)buf, size);
+  return read((char *)buf, size);
 }
 
 int sys_exit(void) {
   int ret = sysarg(0);
-  _exit(ret);
+  exit(ret);
   return 0;
 }
 
 int sys_fork(void) {
-  return _fork();
+  return fork();
 }
 
 int sys_wait(void) {
   u64 addr = sysarg(0);
-  return _wait((int *)addr);
+  return wait((int *)addr);
 }
 
 syscall_t syscall_table[] = {

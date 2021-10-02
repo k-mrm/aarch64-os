@@ -32,7 +32,7 @@ void new_irq(int intid, handler_t handler) {
 /* from EL0 */
 void fault_die(char *reason) {
   printk("%s\n", reason);
-  _exit(1);
+  exit(1);
 }
 
 void handle_data_abort(int el, u64 esr) {

@@ -219,6 +219,6 @@ void fs_init(char *img) {
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
 
-  struct inode *tes = path2inode("/virt.dts");
+  struct inode *tes = path2inode("/");
   dump_inode(tes);
 }

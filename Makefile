@@ -5,7 +5,8 @@ OBJCOPY = $(PREFIX)objcopy
 
 CPU = cortex-a72
 
-CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -DUSE_ARMVIRT -mcpu=$(CPU)
+CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
+CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
 LDFLAGS = -nostdlib -nostartfiles
 
@@ -24,15 +25,13 @@ KOBJS = kernel/boot.o kernel/vectortable.o kernel/ramdisk.o	\
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o	\
 			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o
 
-UOBJS = usr/systable.o usr/test.o usr/ulib.o
-
 DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o
 
 VIRTDRV = $(DRIVER) kernel/driver/virt/uart.o
 
 RPI4DRV = $(DRIVER)
 
-OBJS = $(KOBJS)	$(UOBJS) $(VIRTDRV)
+OBJS = $(KOBJS)	$(VIRTDRV)
 
 SDPATH = /media/k-mrm/09D0-F0A8
 %.o: %.c
@@ -41,16 +40,26 @@ SDPATH = /media/k-mrm/09D0-F0A8
 %.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $@
 
+
+ULIBS = usr/systable.o usr/ulib.o
+
+UOBJS = usr/test.o usr/init.o
+
+UPROGS = usr/test usr/init
+
+usr/%: usr/%.o $(ULIBS)
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+
+fs.img: $(UPROGS)
+	dd if=/dev/zero of=fs.img count=10000
+	mkfs -t ext2 -v fs.img -b 1024
+
 kernel8.elf: $(OBJS) kernel/kernel.ld fs.img
 	$(LD) -r -b binary fs.img -o fs.img.o
 	$(LD) $(LDFLAGS) -T kernel/kernel.ld -o $@ $(OBJS) fs.img.o
 
 kernel8.img: kernel8.elf
 	$(OBJCOPY) -O binary $^ $@
-
-fs.img:
-	dd if=/dev/zero of=fs.img count=10000
-	mkfs -t ext2 -v fs.img -b 1024
 
 qemu: kernel8.img
 	$(QEMU) $(QEMUOPTS)
@@ -67,6 +76,6 @@ raspi: kernel8.img fs.img
 	cp kernel8.img $(SDPATH)
 
 clean:
-	$(RM) $(OBJS) kernel8.elf kernel8.img fs.img
+	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) kernel8.elf kernel8.img fs.img
 
 .PHONY: qemu gdb clean dts raspi

@@ -77,7 +77,7 @@ void userproc_init(u64 ubegin, u64 size, u64 entry) {
   p->state = RUNNABLE;
 }
 
-int _getpid(void) {
+int getpid(void) {
   return curproc->pid;
 }
 
@@ -117,7 +117,7 @@ void yield() {
   cswitch(&p->context, &kproc.context);
 }
 
-int _fork() {
+int fork() {
   struct proc *p = curproc;
   struct proc *new = newproc();
   if(new == NULL)
@@ -142,7 +142,7 @@ err:
   return -1;
 }
 
-int _exec(char *path, char **argv) {
+int exec(char *path, char **argv) {
   struct proc *p = curproc;
 
   struct inode *ino = path2inode(path);
@@ -166,7 +166,7 @@ int _exec(char *path, char **argv) {
   }
 }
 
-int _wait(int *status) {
+int wait(int *status) {
   struct proc *p = curproc;
 
   for(;;) {
@@ -207,7 +207,7 @@ void wakeup(struct proc *proc) {
   }
 }
 
-void _exit(int ret) {
+void exit(int ret) {
   kinfo("exit\n");
   struct proc *p = curproc;
 

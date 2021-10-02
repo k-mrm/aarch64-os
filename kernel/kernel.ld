@@ -9,14 +9,6 @@ SECTIONS {
     }
 
     . = ALIGN(4096);
-    __usr_begin = .;
-    .text.usr : { usr/* (.text .text.*) }
-    .rodata.usr : { usr/* (.rodata .rodata.*) }
-    .data.usr : { usr/* (.data .data.*) }
-    .bss.usr : { usr/* (.bss .bss.*) }
-    .eh_frame.usr : { usr/* (.eh_frame) }
-    . = ALIGN(4096);
-    __usr_end = .;
 
     .text : AT(ADDR(.text) - 0xffffff8000000000) {
       *(.text) *(.text.*)
