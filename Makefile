@@ -34,6 +34,12 @@ RPI4DRV = $(DRIVER)
 OBJS = $(KOBJS)	$(VIRTDRV)
 
 SDPATH = /media/k-mrm/09D0-F0A8
+
+usr/initcode: usr/initcode.S
+	$(CC) $(CFLAGS) -c usr/initcode.S -o usr/initcode.o
+	$(LD) $(LDFLAGS) -N -e initcode -Ttext 0 -o usr/initcode.elf usr/initcode.o
+	$(OBJCOPY) -S -O binary usr/initcode.elf usr/initcode
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -43,9 +49,9 @@ SDPATH = /media/k-mrm/09D0-F0A8
 
 ULIBS = usr/systable.o usr/ulib.o
 
-UOBJS = usr/test.o usr/init.o
+UOBJS = usr/test.o usr/init.o usr/sh.o
 
-UPROGS = usr/test usr/init
+UPROGS = usr/test usr/init usr/sh
 
 usr/%: usr/%.o $(ULIBS)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
@@ -54,9 +60,10 @@ fs.img: $(UPROGS)
 	dd if=/dev/zero of=fs.img count=10000
 	mkfs -t ext2 -v fs.img -b 1024
 
-kernel8.elf: $(OBJS) kernel/kernel.ld fs.img
+kernel8.elf: $(OBJS) kernel/kernel.ld fs.img usr/initcode
 	$(LD) -r -b binary fs.img -o fs.img.o
-	$(LD) $(LDFLAGS) -T kernel/kernel.ld -o $@ $(OBJS) fs.img.o
+	$(LD) -r -b binary usr/initcode -o usr/initcode.o
+	$(LD) $(LDFLAGS) -T kernel/kernel.ld -o $@ $(OBJS) fs.img.o usr/initcode.o
 
 kernel8.img: kernel8.elf
 	$(OBJCOPY) -O binary $^ $@
@@ -76,6 +83,6 @@ raspi: kernel8.img fs.img
 	cp kernel8.img $(SDPATH)
 
 clean:
-	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) kernel8.elf kernel8.img fs.img
+	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) usr/initcode.o usr/initcode.elf usr/initcode kernel8.elf kernel8.img fs.img fs.img.o
 
 .PHONY: qemu gdb clean dts raspi

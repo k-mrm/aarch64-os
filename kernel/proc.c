@@ -60,17 +60,21 @@ void free_proc(struct proc *p) {
   p->state = UNUSED;
 }
 
-void userproc_init(u64 ubegin, u64 size, u64 entry) {
+extern char _binary_usr_initcode_start[];
+extern u64 _binary_usr_initcode_size[];
+
+void userproc_init() {
   struct proc *p = newproc();
 
-  // init_userspace(p->pgt, ubegin, size);
-  p->size = size;
+  char *ustart = _binary_usr_initcode_start;
+  u64 size = (u64)_binary_usr_initcode_size;
+  p->size = init_userspace(p->pgt, ustart, size);
 
   map_ustack(p->pgt);
 
   p->cwd = path2inode("/");
 
-  p->tf->elr = entry;  /* `eret` jump to elr */
+  p->tf->elr = 0x0;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
   p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
 

@@ -33,5 +33,7 @@ int main(void) {
 
   enable_irq();
 
+  userproc_init();
+
   schedule();
 }

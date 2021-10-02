@@ -51,6 +51,11 @@ int sys_wait(void) {
   return wait((int *)addr);
 }
 
+int sys_exec(void) {
+  u64 path = sysarg(0);
+  return exec((char *)path, 0);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -58,6 +63,7 @@ syscall_t syscall_table[] = {
   sys_exit,
   sys_fork,
   sys_wait,
+  sys_exec,
 };
 
 void syscall(struct trapframe *tf) {

@@ -223,5 +223,5 @@ void fs_init(char *img) {
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
 
-  dump_elf(path2inode("/test"));
+  dump_elf(path2inode("/init"));
 }

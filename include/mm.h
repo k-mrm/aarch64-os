@@ -66,11 +66,12 @@
 
 #include "ext2.h"
 
-void init_userspace(u64 *pgt, u64 src, u64 size);
+int init_userspace(u64 *pgt, char *code, u64 size);
 int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size);
 void load_userspace(u64 *pgt);
 void free_userspace(u64 *pgt, u64 size);
 void forget_userspace(void);
+void map_ustack(u64 *pgt);
 
 #endif
 

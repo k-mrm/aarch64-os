@@ -78,6 +78,18 @@ void free_table(u64 *pgt) {
   kfree(pgt);
 }
 
+int init_userspace(u64 *pgt, char *code, u64 size) {
+  u64 pgsize = PAGEROUNDUP(size);
+  for(u64 va = 0; va < pgsize; va += PAGESIZE) {
+    char *upage = kalloc();
+    memcpy(upage, (char *)code, size);
+    for(int i = 0; i < size; i++)
+      printk("%x ", upage[i]);
+    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
+  }
+
+  return pgsize;
+}
 
 int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
   u64 pgsize;
