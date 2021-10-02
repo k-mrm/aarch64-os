@@ -94,6 +94,7 @@ void schedule() {
       if(p->state == RUNNABLE) {
         load_userspace(p->pgt);
         p->state = RUNNING;
+        kinfo("load userspace %p\n", p->pgt);
         kinfo("enter proc %d\n", p->pid);
         kinfo("sp %p elr %p\n", p->tf->sp, p->tf->elr);
 
@@ -170,7 +171,6 @@ int exec(char *path, char **argv) {
       return -1;
     if(ph.p_type != PT_LOAD)
       continue;
-    printk("kokoko");
     memsize += alloc_userspace(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_memsz);
   }
 
@@ -178,9 +178,7 @@ int exec(char *path, char **argv) {
 
   struct proc *p = curproc;
 
-  u64 *oldpgt = p->pgt;
-  u64 oldsize = p->size;
-  free_userspace(oldpgt, oldsize);
+  free_userspace(p->pgt, p->size);
 
   p->size = memsize;
   p->tf->elr = eh.e_entry;  /* `eret` jump to elr */
@@ -188,7 +186,11 @@ int exec(char *path, char **argv) {
   p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
   p->pgt = pgt;
 
-  return 0;
+  load_userspace(p->pgt);
+
+  printk("exec saraba\n");
+
+  return 1;
 }
 
 int wait(int *status) {
