@@ -49,9 +49,9 @@ usr/initcode: usr/initcode.S
 
 ULIBS = usr/systable.o usr/ulib.o
 
-UOBJS = usr/test.o usr/init.o usr/sh.o
+UOBJS = usr/test.o usr/init.o usr/sh.o usr/cat.o
 
-UPROGS = usr/test usr/init usr/sh
+UPROGS = usr/test usr/init usr/sh usr/cat
 
 usr/%: usr/%.o $(ULIBS)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
