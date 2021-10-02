@@ -51,6 +51,8 @@
 #define PTE_UXN (1UL << 54)
 
 #define PAGESIZE  4096    /* 4KB */
+#define PAGEROUNDUP(p)  ((p + PAGESIZE - 1) & ~(PAGESIZE - 1))
+
 #define SECTIONSIZE (2 * 1024 * 1024) /* 2MB */
 
 /* attr index */
@@ -62,7 +64,10 @@
 
 #ifndef __ASSEMBLER__
 
-void alloc_userspace(u64 *pgt, u64 begin, u64 size);
+#include "ext2.h"
+
+void init_userspace(u64 *pgt, u64 src, u64 size);
+int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size);
 void load_userspace(u64 *pgt);
 void free_userspace(u64 *pgt, u64 size);
 void forget_userspace(void);

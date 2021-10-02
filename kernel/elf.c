@@ -13,18 +13,22 @@ bool is_elf(struct ehdr *e) {
 
 void dump_phdr(struct phdr *p) {
   printk("dump phdr\n");
+  printk("sizeof *p: %d\n", sizeof(*p));
   printk("p_type %p\n", p->p_type);
+  printk("p_flags %p\n", p->p_flags);
   printk("p_offset %p\n", p->p_offset);
   printk("p_vaddr %p\n", p->p_vaddr);
-  printk("p_filesz %d\n", p->p_filesz);
-  printk("p_memsz %d\n", p->p_memsz);
+  printk("p_filesz %d(%p)\n", p->p_filesz, p->p_filesz);
+  printk("p_memsz %d(%p)\n", p->p_memsz, p->p_memsz);
 }
 
 void dump_ehdr(struct ehdr *e) {
   printk("dump ehdr\n");
+  printk("sizeof *e: %d\n", sizeof(*e));
   printk("e_entry: %d\n", e->e_entry);
   printk("e_phnum: %d\n", e->e_phnum);
-  printk("e_phoff: %d\n", e->e_phoff);
+  printk("e_phoff: %d(%p)\n", e->e_phoff, e->e_phoff);
+  printk("e_shoff: %d(%p)\n", e->e_shoff, e->e_shoff);
 }
 
 void dump_elf(struct inode *ino) {

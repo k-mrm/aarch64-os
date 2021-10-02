@@ -63,7 +63,7 @@ void free_proc(struct proc *p) {
 void userproc_init(u64 ubegin, u64 size, u64 entry) {
   struct proc *p = newproc();
 
-  alloc_userspace(p->pgt, ubegin, size);
+  // init_userspace(p->pgt, ubegin, size);
   p->size = size;
 
   map_ustack(p->pgt);
@@ -143,11 +143,12 @@ err:
 }
 
 int exec(char *path, char **argv) {
-  struct proc *p = curproc;
-
   struct inode *ino = path2inode(path);
   struct ehdr eh;
   struct phdr ph;
+  int memsize = 0;
+
+  u64 *pgt = kalloc();
 
   if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
     return -1;
@@ -163,7 +164,24 @@ int exec(char *path, char **argv) {
       return -1;
     if(ph.p_type != PT_LOAD)
       continue;
+    memsize += alloc_userspace(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_memsz);
   }
+
+  map_ustack(pgt);
+
+  struct proc *p = curproc;
+
+  u64 *oldpgt = p->pgt;
+  u64 oldsize = p->size;
+  free_userspace(oldpgt, oldsize);
+
+  p->size = memsize;
+  p->tf->elr = eh.e_entry;  /* `eret` jump to elr */
+  p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
+  p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
+  p->pgt = pgt;
+
+  return 0;
 }
 
 int wait(int *status) {

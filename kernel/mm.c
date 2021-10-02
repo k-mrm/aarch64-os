@@ -79,18 +79,17 @@ void free_table(u64 *pgt) {
 }
 
 
-void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
-  if(size % PAGESIZE)
-    panic("invalid size");
-
-  /* map usr_begin ~ usr_end to 0 ~  */
-  for(u64 va = 0; va < size; va += PAGESIZE) {
+int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
+  u64 pgsize;
+  for(pgsize = PAGEROUNDUP(size); va < pgsize + va; va += PAGESIZE) {
     char *upage = kalloc();
     kinfo("map va %p to page %p\n", va, V2P(upage));
-    memcpy(upage, (char *)begin, PAGESIZE);
+    read_inode(ino, upage, srcoff, size);
     kinfo("upage pa %p\n", va2pa(upage));
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
+
+  return pgsize;
 }
 
 void map_ustack(u64 *pgt) {
