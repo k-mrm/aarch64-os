@@ -121,6 +121,7 @@ void ls_inode(struct inode *ino) {
 }
 
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
+  printk("readinode %p %d %d\n", buf, off, size);
   u32 bsize = imginfo.block_size;
   char *base = buf;
 
@@ -133,12 +134,15 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
     size = ino->i_size - off;
 
   u32 offblk = off / bsize;
-  u32 lastblk = size / bsize + offblk;
+  u32 lastblk = (size + off) / bsize;
+  u32 offblkoff = off % bsize;
 
   for(int i = offblk; i < inode_nblock(ino) && i <= lastblk; i++) {
     char *d = inode_block(ino, i);
     u64 cpsize = min(size, bsize);
-    memcpy(buf, d, cpsize - off % bsize);
+    if(offblkoff + cpsize > bsize)
+      cpsize -= offblkoff;
+    memcpy(buf, d + offblkoff, cpsize);
     buf += cpsize;
     size -= bsize;
     off = 0;
@@ -219,6 +223,5 @@ void fs_init(char *img) {
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
 
-  struct inode *tes = path2inode("/");
-  dump_inode(tes);
+  dump_elf(path2inode("/test"));
 }
