@@ -145,7 +145,7 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
     memcpy(buf, d + offblkoff, cpsize);
     buf += cpsize;
     size -= bsize;
-    off = 0;
+    offblkoff = 0;
   }
 
   return buf - base;
@@ -157,7 +157,7 @@ static char *skippath(char *path, char *name) {
     path++;
 
   /* get elem and inc path (get "aaa/" from "aaa/bbb", path = "bbb") */
-  int len;
+  int len = 0;
   while((*name = *path) && *path++ != '/') {
     name++;
     if(++len > EXT2_DIRENT_NAME_MAX)
