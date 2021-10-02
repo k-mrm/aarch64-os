@@ -65,13 +65,13 @@ int csread(struct console *cs, char *buf, u64 size) {
 
     csputc(cs, c);
 
-    if(c == '\n')
-      break;
-
     if(c == BACKSPACE)
       buf--;
     else
       *buf++ = c;
+
+    if(c == '\n')
+      break;
   }
 
   return (u64)buf - b;

@@ -8,6 +8,7 @@ int main(void) {
     if(pid == 0) {
       write("$ ", 2);
       read(buf, 128);
+      buf[strlen(buf) - 1] = '\0';
       exec(buf, NULL);
       memset(buf, 0, 128);
     } else {
