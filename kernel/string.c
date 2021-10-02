@@ -52,3 +52,12 @@ int strncmp(const char *s1, const char *s2, u64 len) {
   return *s1 - *s2;
 }
 
+u64 strlen(const char *s) {
+  u64 i = 0;
+  while(*s) {
+    i++;
+    s++;
+  }
+
+  return i;
+}

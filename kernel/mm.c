@@ -83,8 +83,6 @@ int init_userspace(u64 *pgt, char *code, u64 size) {
   for(u64 va = 0; va < pgsize; va += PAGESIZE) {
     char *upage = kalloc();
     memcpy(upage, (char *)code, size);
-    for(int i = 0; i < size; i++)
-      printk("%x ", upage[i]);
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
 

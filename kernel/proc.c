@@ -188,8 +188,6 @@ int exec(char *path, char **argv) {
 
   load_userspace(p->pgt);
 
-  printk("exec saraba\n");
-
   return 1;
 }
 

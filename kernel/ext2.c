@@ -77,13 +77,16 @@ int search_dirent_block(char *blk, char *path) {
   struct ext2_dirent *d = (struct ext2_dirent *)blk;
   char *blk_end = blk + imginfo.block_size;
   char *cd;
+  char buf[EXT2_DIRENT_NAME_MAX] = {0};
 
   while(d != blk_end && d->inode != 0) {
-    if(strcmp(d->name, path) == 0)
+    memcpy(buf, d->name, d->name_len);
+    if(strcmp(buf, path) == 0)
       return d->inode;
     cd = (char *)d;
     cd += d->rec_len;
     d = (struct ext2_dirent *)cd;
+    memset(buf, 0, EXT2_DIRENT_NAME_MAX);
   }
 
   return -1;
@@ -222,4 +225,9 @@ void fs_init(char *img) {
   imginfo.block_bitmap = get_block(bg->bg_block_bitmap);
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
+
+  ls_inode(path2inode("/"));
+  dump_inode(path2inode("/cat"));
+  dump_inode(path2inode("/sh"));
+  dump_inode(path2inode("/init"));
 }
