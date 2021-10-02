@@ -22,7 +22,7 @@ QEMUOPTS += -nographic -kernel kernel8.elf
 KOBJS = kernel/boot.o kernel/vectortable.o kernel/ramdisk.o	\
 			 kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o \
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o	\
-			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o
+			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o
 
 UOBJS = usr/systable.o usr/test.o usr/ulib.o
 

@@ -8,6 +8,8 @@
 #include "mm.h"
 #include "memmap.h"
 #include "log.h"
+#include "elf.h"
+#include "ext2.h"
 
 struct proc proctable[NPROC];
 /* proctable[0] == kernel proc */
@@ -61,7 +63,7 @@ void free_proc(struct proc *p) {
 void userproc_init(u64 ubegin, u64 size, u64 entry) {
   struct proc *p = newproc();
 
-  init_userspace(p->pgt, ubegin, size);
+  alloc_userspace(p->pgt, ubegin, size);
   p->size = size;
 
   map_ustack(p->pgt);
@@ -143,8 +145,25 @@ err:
 int _exec(char *path, char **argv) {
   struct proc *p = curproc;
 
-  struct inode *i = path2inode(path);
+  struct inode *ino = path2inode(path);
+  struct ehdr eh;
+  struct phdr ph;
 
+  if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
+    return -1;
+  if(!is_elf(&eh))
+    return -1;
+  if(eh.e_type != ET_EXEC)
+    return -1;
+
+  int i = 0;
+  u64 off = eh.e_phoff;
+  for(; i < eh.e_phnum; i++, off += sizeof(ph)) {
+    if(read_inode(ino, (char *)&ph, off, sizeof(ph)) != sizeof(ph))
+      return -1;
+    if(ph.p_type != PT_LOAD)
+      continue;
+  }
 }
 
 int _wait(int *status) {

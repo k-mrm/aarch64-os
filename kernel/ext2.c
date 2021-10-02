@@ -97,6 +97,13 @@ void *get_block(int bnum) {
   return imginfo.base + (u64)bnum * imginfo.block_size;
 }
 
+char *inode_block(struct inode *ino, int bi) {
+  if(bi < 12)
+    return get_block(ino->i_block[bi]);
+  /* unimpl */
+  return NULL;
+}
+
 void ls_inode(struct inode *ino) {
   if(ino == NULL) {
     printk("null inode\n");
@@ -108,13 +115,14 @@ void ls_inode(struct inode *ino) {
   }
 
   for(int i = 0; i < inode_nblock(ino); i++) {
-    char *d = get_block(ino->i_block[i]);
+    char *d = inode_block(ino, i);
     dump_dirent_block(d);
   }
 }
 
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   u32 bsize = imginfo.block_size;
+  char *base = buf;
 
   if((ino->i_mode & EXT2_S_IFREG) == 0)
     return -1;
@@ -126,21 +134,20 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 
   u32 offblk = off / bsize;
   u32 lastblk = size / bsize + offblk;
-  u64 ressize = 0;
 
   for(int i = offblk; i < inode_nblock(ino) && i <= lastblk; i++) {
-    char *d = get_block(ino->i_block[i]);
+    char *d = inode_block(ino, i);
     u64 cpsize = min(size, bsize);
-    memcpy(buf, d, cpsize);
-    size -= bsize;
+    memcpy(buf, d, cpsize - off % bsize);
     buf += cpsize;
-    ressize += cpsize;
+    size -= bsize;
+    off = 0;
   }
 
-  return ressize;
+  return buf - base;
 }
 
-char *skippath(char *path, char *name) {
+static char *skippath(char *path, char *name) {
   /* skip '/' ("////aaa/bbb" -> "aaa/bbb") */
   while(*path == '/')
     path++;
@@ -159,7 +166,7 @@ char *skippath(char *path, char *name) {
   return path;
 }
 
-struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
+static struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
   path = skippath(path, name);
   if(*path == 0 && *name == 0)
     return pi;
@@ -169,7 +176,7 @@ struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
   int inum = -1;
 
   for(int i = 0; i < inode_nblock(pi); i++) {
-    char *db = get_block(pi->i_block[i]);
+    char *db = inode_block(pi, i);
     if((inum = search_dirent_block(db, name)) > 0)
       break;
   }

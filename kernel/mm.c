@@ -79,7 +79,7 @@ void free_table(u64 *pgt) {
 }
 
 
-void init_userspace(u64 *pgt, u64 begin, u64 size) {
+void alloc_userspace(u64 *pgt, u64 begin, u64 size) {
   if(size % PAGESIZE)
     panic("invalid size");
 
