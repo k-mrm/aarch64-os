@@ -6,17 +6,14 @@ int main(void) {
   int pid = fork();
   for(;;) {
     if(pid == 0) {
+      memset(buf, 0, 128);
       write("$ ", 2);
       read(buf, 128);
       buf[strlen(buf) - 1] = '\0';
       exec(buf, NULL);
-      memset(buf, 0, 128);
-    } else {
-      int status;
-      wait(&status);
-      char c = '0' + status;
-      write(&c, 1);
-      write("\n", 1);
+      write("failed\n", 7);
     }
+    int status;
+    wait(&status);
   }
 }

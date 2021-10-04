@@ -83,6 +83,7 @@ int search_dirent_block(char *blk, char *path) {
     memcpy(buf, d->name, d->name_len);
     if(strcmp(buf, path) == 0)
       return d->inode;
+
     cd = (char *)d;
     cd += d->rec_len;
     d = (struct ext2_dirent *)cd;
@@ -154,7 +155,7 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   return buf - base;
 }
 
-static char *skippath(char *path, char *name) {
+static char *skippath(char *path, char *name, int *err) {
   /* skip '/' ("////aaa/bbb" -> "aaa/bbb") */
   while(*path == '/')
     path++;
@@ -163,8 +164,10 @@ static char *skippath(char *path, char *name) {
   int len = 0;
   while((*name = *path) && *path++ != '/') {
     name++;
-    if(++len > EXT2_DIRENT_NAME_MAX)
+    if(++len > EXT2_DIRENT_NAME_MAX) {
+      *err = 1;
       return NULL;
+    }
   }
 
   /* cut '/' from name ("aaa/" -> "aaa") */
@@ -174,7 +177,10 @@ static char *skippath(char *path, char *name) {
 }
 
 static struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
-  path = skippath(path, name);
+  int err = 0;
+  path = skippath(path, name, &err);
+  if(err)
+    return NULL;
   if(*path == 0 && *name == 0)
     return pi;
   if((pi->i_mode & EXT2_S_IFDIR) == 0)
@@ -225,9 +231,4 @@ void fs_init(char *img) {
   imginfo.block_bitmap = get_block(bg->bg_block_bitmap);
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
-
-  ls_inode(path2inode("/"));
-  dump_inode(path2inode("/cat"));
-  dump_inode(path2inode("/sh"));
-  dump_inode(path2inode("/init"));
 }

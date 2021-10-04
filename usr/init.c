@@ -2,8 +2,8 @@
 #include "ulib.h"
 
 int main() {
-  char *s = "init\n";
-  write(s, strlen(s));
+  write("init\n", 5);
+  write("starting sh\n", 12);
 
   int pid = fork();
   if(pid == 0) {

@@ -13,7 +13,7 @@
 
 int main(void) {
   console_init();
-  kinfo("booting...\n");
+  printk("booting...\n");
   kinfo("kernel main @%p\n", main);
   gicv2_init();
   trap_init();

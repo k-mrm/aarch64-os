@@ -148,7 +148,7 @@ err:
 }
 
 int exec(char *path, char **argv) {
-  printk("exec %s\n", path);
+  kinfo("exec %s\n", path);
   struct inode *ino = path2inode(path);
   struct ehdr eh;
   struct phdr ph;
@@ -165,7 +165,6 @@ int exec(char *path, char **argv) {
 
   int i = 0;
   u64 off = eh.e_phoff;
-  dump_ehdr(&eh);
   for(; i < eh.e_phnum; i++, off += sizeof(ph)) {
     if(read_inode(ino, (char *)&ph, off, sizeof(ph)) != sizeof(ph))
       return -1;
