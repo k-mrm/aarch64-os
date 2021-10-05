@@ -12,8 +12,9 @@ int main(void) {
       buf[strlen(buf) - 1] = '\0';
       exec(buf, NULL);
       write("failed\n", 7);
+    } else {
+      int status;
+      wait(&status);
     }
-    int status;
-    wait(&status);
   }
 }
