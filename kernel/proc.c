@@ -128,7 +128,7 @@ int fork() {
   if(new == NULL)
     goto err;
 
-  cp_userspace(new->pgt, p->pgt);
+  cp_userspace(new->pgt, p->pgt, p->size);
   cp_ustack(new->pgt, p->pgt);
   new->size = p->size;
 
@@ -187,7 +187,7 @@ int exec(char *path, char **argv) {
     if(sp < stackbase)
       return -1;
     memcpy(sp, argv[argc], strlen(argv[argc]));
-    ustack[argc] = sp;
+    ustack[argc] = USTACKTOP - (top - sp);
   }
 
   ustack[argc] = 0;
@@ -200,7 +200,7 @@ int exec(char *path, char **argv) {
   free_userspace(p->pgt, p->size);
 
   p->size = memsize;
-  p->tf->x1 = sp;
+  p->tf->x1 = (u64)USTACKTOP - (top - sp);
   p->tf->elr = eh.e_entry;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
   p->tf->sp = (u64)USTACKTOP - (top - sp); /* sp_el0 */

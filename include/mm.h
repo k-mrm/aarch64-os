@@ -72,8 +72,8 @@ void load_userspace(u64 *pgt);
 void free_userspace(u64 *pgt, u64 size);
 void forget_userspace(void);
 char *map_ustack(u64 *pgt);
-char *cp_userspace(u64 *newpgt, u64 *oldpgt);
-char *cp_ustack(u64 *newpgt, u64 *oldpgt);
+void cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size);
+void cp_ustack(u64 *newpgt, u64 *oldpgt);
 void dump_ustack(u64 *pgt);
 
 #endif
