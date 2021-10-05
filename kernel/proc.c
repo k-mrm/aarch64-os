@@ -179,9 +179,7 @@ int exec(char *path, char **argv) {
   char *top = sp;
   int argc = 0;
 
-  printk("argv %p\n", argv);
   for(; argv && argv[argc]; argc++) {
-    printk("argv %s %p\n", argv[argc], argv + argc);
     sp -= strlen(argv[argc]) + 1;
     sp = (char *)((u64)sp & ~(0xf));
     if(argc >= 8)
@@ -191,7 +189,6 @@ int exec(char *path, char **argv) {
     memcpy(sp, argv[argc], strlen(argv[argc]));
     ustack[argc] = sp;
   }
-  printk("argc %d\n", argc);
 
   ustack[argc] = 0;
   sp -= sizeof(ustack[0]) * (argc + 1);

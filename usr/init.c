@@ -9,7 +9,6 @@ int main() {
 
   int pid = fork();
   if(pid == 0) {
-    write(argv[0], strlen(argv[0]));
     exec("sh", (char **)argv);
   } else {
     int status;
