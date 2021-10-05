@@ -103,9 +103,16 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
   return pgsize;
 }
 
-void map_ustack(u64 *pgt) {
+char *map_ustack(u64 *pgt) {
   char *ustack = kalloc();
   pagemap(pgt, USTACKBOTTOM, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
+}
+
+void dump_ustack(u64 *pgt) {
+  char *page = P2V(uva2pa(pgt, USTACKBOTTOM));
+
+  for(int i = 0; i < PAGESIZE; i++)
+    printk("%x ", page[i]);
 }
 
 void cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
@@ -117,6 +124,15 @@ void cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
     
     pagemap(newpgt, va, V2P(page), PAGESIZE, PTE_NORMAL | PTE_U);
   }
+}
+
+void cp_ustack(u64 *newpgt, u64 *oldpgt) {
+  u64 *pte = pagewalk(oldpgt, USTACKBOTTOM);
+  u64 pa = PTE_PA(*pte);
+  char *newstack = kalloc();
+  memcpy(newstack, (char *)P2V(pa), PAGESIZE);
+
+  pagemap(newpgt, USTACKBOTTOM, V2P(newstack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
 }
 
 void free_userspace(u64 *pgt, u64 size) {

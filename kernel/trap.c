@@ -40,7 +40,7 @@ void handle_data_abort(int el, u64 esr) {
 
   /* TODO */
 
-  kinfo("elr %p far %p\n", elr_el1(), far_el1());
+  printk("elr %p far %p\n", elr_el1(), far_el1());
   if(el == 0)
     fault_die("data abort EL0");
   else

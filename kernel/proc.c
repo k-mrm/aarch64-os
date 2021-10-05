@@ -129,7 +129,7 @@ int fork() {
     goto err;
 
   cp_userspace(new->pgt, p->pgt);
-  map_ustack(new->pgt);
+  cp_ustack(new->pgt, p->pgt);
   new->size = p->size;
 
   *new->tf = *p->tf;
@@ -173,21 +173,45 @@ int exec(char *path, char **argv) {
     memsize += alloc_userspace(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_memsz);
   }
 
-  map_ustack(pgt);
+  u64 ustack[9];
+  char *stackbase = map_ustack(pgt);
+  char *sp = stackbase + PAGESIZE;
+  char *top = sp;
+  int argc = 0;
+
+  printk("argv %p\n", argv);
+  for(; argv && argv[argc]; argc++) {
+    printk("argv %s %p\n", argv[argc], argv + argc);
+    sp -= strlen(argv[argc]) + 1;
+    sp = (char *)((u64)sp & ~(0xf));
+    if(argc >= 8)
+      return -1;
+    if(sp < stackbase)
+      return -1;
+    memcpy(sp, argv[argc], strlen(argv[argc]));
+    ustack[argc] = sp;
+  }
+  printk("argc %d\n", argc);
+
+  ustack[argc] = 0;
+  sp -= sizeof(ustack[0]) * (argc + 1);
+  sp = (char *)((u64)sp & ~(0xf));
+  memcpy(sp, ustack, sizeof(ustack[0]) * (argc + 1));
 
   struct proc *p = curproc;
 
   free_userspace(p->pgt, p->size);
 
   p->size = memsize;
+  p->tf->x1 = sp;
   p->tf->elr = eh.e_entry;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
-  p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
+  p->tf->sp = (u64)USTACKTOP - (top - sp); /* sp_el0 */
   p->pgt = pgt;
 
   load_userspace(p->pgt);
 
-  return 1;
+  return argc;  /* p->tf->x0 */
 }
 
 int wait(int *status) {

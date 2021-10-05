@@ -71,7 +71,8 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size);
 void load_userspace(u64 *pgt);
 void free_userspace(u64 *pgt, u64 size);
 void forget_userspace(void);
-void map_ustack(u64 *pgt);
+char *map_ustack(u64 *pgt);
+void dump_ustack(u64 *pgt);
 
 #endif
 

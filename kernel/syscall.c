@@ -53,7 +53,8 @@ int sys_wait(void) {
 
 int sys_exec(void) {
   u64 path = sysarg(0);
-  return exec((char *)path, 0);
+  u64 argv = sysarg(1);
+  return exec((char *)path, (char **)argv);
 }
 
 syscall_t syscall_table[] = {

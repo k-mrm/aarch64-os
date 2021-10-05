@@ -51,7 +51,7 @@ ULIBS = usr/systable.o usr/ulib.o
 
 UOBJS = usr/test.o usr/init.o usr/sh.o usr/cat.o
 
-UPROGS = rootfs/init rootfs/sh rootfs/cat
+UPROGS = rootfs/init rootfs/sh rootfs/cat rootfs/echo
 
 rootfs/%: usr/%.o $(ULIBS)
 	@mkdir -p rootfs
