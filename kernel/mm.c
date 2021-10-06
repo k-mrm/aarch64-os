@@ -105,11 +105,15 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
 
 char *map_ustack(u64 *pgt) {
   char *ustack = kalloc();
+  kinfo("ustack %p\n", ustack);
   pagemap(pgt, USTACKBOTTOM, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
+
+  return ustack;
 }
 
 void dump_ustack(u64 *pgt) {
   char *page = P2V(uva2pa(pgt, USTACKBOTTOM));
+  kinfo("dump ustack %p\n", page);
 
   for(int i = 0; i < PAGESIZE; i++)
     printk("%x ", page[i]);

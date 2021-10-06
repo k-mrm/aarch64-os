@@ -21,11 +21,12 @@ void read_cmd(char *buf) {
 int main(void) {
   char *argv[8];
   char buf[128] = {0};
-  int pid = fork();
   for(;;) {
+    read_cmd(buf);
+    parse(buf, argv);
+
+    int pid = fork();
     if(pid == 0) {
-      read_cmd(buf);
-      parse(buf, argv);
       exec(argv[0], argv);
       write("failed\n", 7);
     } else {
