@@ -27,19 +27,19 @@ int sys_getpid(void) {
 int sys_write(void) {
   u64 str = sysarg(0);
   u64 size = sysarg(1);
-  return write((char *)str, size);
+  return console_write((char *)str, size);
 }
 
 int sys_read(void) {
   u64 buf = sysarg(0);
   u64 size = sysarg(1);
-  return read((char *)buf, size);
+  return console_read((char *)buf, size);
 }
 
 int sys_exit(void) {
   int ret = sysarg(0);
   exit(ret);
-  return 0;
+  return 0; /* unreachable */
 }
 
 int sys_fork(void) {

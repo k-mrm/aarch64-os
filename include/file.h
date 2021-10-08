@@ -4,11 +4,21 @@
 #include "kernel.h"
 #include "ext2.h"
 
-struct dirent {
-  u32 inode;
-  u8 name_len;
-  u8 file_type;
-  char name[EXT2_DIRENT_NAME_MAX];
+#define NFILE 128
+
+struct file {
+  int ref;
+  struct inode *ino;
+  u64 off;
 };
+
+extern struct file ftable[];
+
+struct cdevsw {
+  int (*read)(void);
+  int (*write)(void);
+};
+
+void file_init(void);
 
 #endif

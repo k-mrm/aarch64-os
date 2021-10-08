@@ -3,6 +3,7 @@
 
 #include "kernel.h"
 #include "ext2.h"
+#include "file.h"
 
 typedef int pid_t;
 
@@ -55,6 +56,7 @@ struct proc {
   char *kstack;
   u64 *pgt;
   struct inode *cwd;
+  struct file *ofile[16];
   char name[16];
 };
 

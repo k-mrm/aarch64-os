@@ -132,9 +132,9 @@ struct bg_desc {
   char bg_reserved[12];
 } __attribute__((packed));
 
-#define EXT2_DIRENT_NAME_MAX 255
+#define DIRENT_NAME_MAX 255
 
-struct ext2_dirent {
+struct dirent {
   u32 inode;
   u16 rec_len;
   u8 name_len;

@@ -10,6 +10,7 @@
 #include "kalloc.h"
 #include "ext2.h"
 #include "ramdisk.h"
+#include "file.h"
 
 int main(void) {
   console_init();
@@ -24,6 +25,7 @@ int main(void) {
   proc_init();
   ramdisk_init();
   fs_init(diskread(0));
+  file_init();
 
   kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
   kinfo("current EL: %d\n", cur_el());

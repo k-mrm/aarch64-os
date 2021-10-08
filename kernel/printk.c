@@ -78,9 +78,14 @@ int printk(const char *fmt, ...) {
         case 'c':
           csputc(&cons1, __builtin_va_arg(ap, int));
           break;
-        case 's':
-          csputs(&cons1, __builtin_va_arg(ap, char *));
+        case 's': {
+          char *s = __builtin_va_arg(ap, char *);
+          if(s == NULL)
+            s = "(null)";
+
+          csputs(&cons1, s);
           break;
+        }
         case '%':
           csputc(&cons1, '%');
           break;

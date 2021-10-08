@@ -114,10 +114,10 @@ void csputs(struct console *cs, char *s) {
 
 #endif
 
-int write(char *s, u64 size) {
+int console_write(char *s, u64 size) {
   return cswrite(&cons1, s, size);
 }
 
-int read(char *buf, u64 size) {
+int console_read(char *buf, u64 size) {
   return csread(&cons1, buf, size);
 }

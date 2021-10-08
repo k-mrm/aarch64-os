@@ -29,6 +29,7 @@ int main(void) {
     if(pid == 0) {
       exec(argv[0], argv);
       write("failed\n", 7);
+      exit(1);
     } else {
       int status;
       wait(&status);

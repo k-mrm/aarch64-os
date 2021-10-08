@@ -5,7 +5,8 @@ void ls(char *path) {
   ;
 }
 
-int main(void) {
-  ls(".");
+int main(int argc, char **argv) {
+  if(argc == 1)
+    ls(".");
   exit(0);
 }

@@ -50,8 +50,8 @@ void dump_inode(struct inode *i) {
     printk("i_block[%d]: %p\n", b, i->i_block[b]);
 }
 
-void dump_ext2_dirent(struct ext2_dirent *d) {
-  printk("ext2_dirent dump: %p\n", d);
+void dump_dirent(struct dirent *d) {
+  printk("dirent dump: %p\n", d);
   printk("sizeof *d: %d\n", sizeof(*d));
   printk("inode: %d\n", d->inode);
   printk("rec_len: %d\n", d->rec_len);
@@ -61,23 +61,23 @@ void dump_ext2_dirent(struct ext2_dirent *d) {
 }
 
 void dump_dirent_block(char *blk) {
-  struct ext2_dirent *d = (struct ext2_dirent *)blk;
+  struct dirent *d = (struct dirent *)blk;
   char *blk_end = blk + imginfo.block_size;
   char *cd;
 
   while(d != blk_end && d->inode != 0) {
-    dump_ext2_dirent(d);
+    dump_dirent(d);
     cd = (char *)d;
     cd += d->rec_len;
-    d = (struct ext2_dirent *)cd;
+    d = (struct dirent *)cd;
   }
 }
 
 int search_dirent_block(char *blk, char *path) {
-  struct ext2_dirent *d = (struct ext2_dirent *)blk;
+  struct dirent *d = (struct dirent *)blk;
   char *blk_end = blk + imginfo.block_size;
   char *cd;
-  char buf[EXT2_DIRENT_NAME_MAX] = {0};
+  char buf[DIRENT_NAME_MAX] = {0};
 
   while(d != blk_end && d->inode != 0) {
     memcpy(buf, d->name, d->name_len);
@@ -86,18 +86,18 @@ int search_dirent_block(char *blk, char *path) {
 
     cd = (char *)d;
     cd += d->rec_len;
-    d = (struct ext2_dirent *)cd;
-    memset(buf, 0, EXT2_DIRENT_NAME_MAX);
+    d = (struct dirent *)cd;
+    memset(buf, 0, DIRENT_NAME_MAX);
   }
 
   return -1;
 }
 
-struct inode *get_inode(int inum) {
+static struct inode *get_inode(int inum) {
   return (struct inode *)(imginfo.inode_table + (inum - 1) * sizeof(struct inode));
 }
 
-void *get_block(int bnum) {
+static void *get_block(int bnum) {
   return imginfo.base + (u64)bnum * imginfo.block_size;
 }
 
@@ -164,7 +164,7 @@ static char *skippath(char *path, char *name, int *err) {
   int len = 0;
   while((*name = *path) && *path++ != '/') {
     name++;
-    if(++len > EXT2_DIRENT_NAME_MAX) {
+    if(++len > DIRENT_NAME_MAX) {
       *err = 1;
       return NULL;
     }
@@ -197,7 +197,7 @@ static struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
   if(inum < 0)
     return NULL;
 
-  memset(name, 0, EXT2_DIRENT_NAME_MAX);
+  memset(name, 0, DIRENT_NAME_MAX);
 
   return traverse_inode(get_inode(inum), path, name);
 }
@@ -210,7 +210,7 @@ struct inode *path2inode(char *path) {
   else
     ino = curproc->cwd;
 
-  char name[EXT2_DIRENT_NAME_MAX] = {0};
+  char name[DIRENT_NAME_MAX] = {0};
   ino = traverse_inode(ino, path, name);
 
   return ino;
