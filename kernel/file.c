@@ -18,7 +18,7 @@ struct file *alloc_file() {
 int read_file(struct file *f, char *buf, u64 sz) {
   struct inode *ino = f->ino;
   
-  int n = read_inode(f, buf, f->off, sz);
+  int n = read_inode(ino, buf, f->off, sz);
   if(n < 0)
     return -1;   
 
@@ -27,10 +27,24 @@ int read_file(struct file *f, char *buf, u64 sz) {
   return n;
 }
 
+int write_file(struct file *f, char *buf, u64 sz) {
+  struct inode *ino = f->ino;
+
+  /* TODO */
+
+  return 0;
+}
+
 int read(int fd, char *buf, u64 sz) {
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];
   return read_file(f, buf, sz);
+}
+
+int write(int fd, char *buf, u64 sz) {
+  struct proc *p = curproc;
+  struct file *f = p->ofile[fd];
+  return write_file(f, buf, sz);
 }
 
 int open(char *path) {
