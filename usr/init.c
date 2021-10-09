@@ -4,8 +4,8 @@
 int main() {
   char *argv[] = {"sh", 0};
 
-  write("init\n", 5);
-  write("starting sh\n", 12);
+  write(1, "init\n", 5);
+  write(1, "starting sh\n", 12);
 
   int pid = fork();
   if(pid == 0) {

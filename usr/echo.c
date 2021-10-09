@@ -3,8 +3,8 @@
 
 int main(int argc, char **argv) {
   for(int i = 1; i < argc; i++) {
-    write(argv[i], strlen(argv[i]));
-    write(i < argc-1? " " : "\n", 1);
+    write(1, argv[i], strlen(argv[i]));
+    write(1, i < argc-1? " " : "\n", 1);
   }
   exit(0);
 }

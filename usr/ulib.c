@@ -84,7 +84,7 @@ static void uprintiu32(i32 num, int base, bool sign) {
   if(neg)
     *--cur = '-';
 
-  write(cur, strlen(cur));
+  write(1, cur, strlen(cur));
 }
 
 static void uprintiu64(i64 num, int base, bool sign) {
@@ -108,7 +108,13 @@ static void uprintiu64(i64 num, int base, bool sign) {
   if(neg)
     *--cur = '-';
 
-  write(cur, strlen(cur));
+  write(1, cur, strlen(cur));
+}
+
+int puts(char *s) {
+  int r = write(1, s, strlen(s));
+  write(1, "\n", 1);
+  return r;
 }
 
 void printx(u64 n) {
@@ -138,28 +144,28 @@ int printf(const char *fmt, ...) {
           uprintiu64(__builtin_va_arg(ap, u64), 16, false);
           break;
         case 'p':
-          write("0x", 2);
+          write(1, "0x", 2);
           uprintiu64(__builtin_va_arg(ap, u64), 16, false);
           break;
         case 'c':
           tmpc = __builtin_va_arg(ap, int);
-          write(&tmpc, 1);
+          write(1, &tmpc, 1);
           break;
         case 's':
           tmps = __builtin_va_arg(ap, char *);
-          write(tmps, strlen(tmps));
+          write(1, tmps, strlen(tmps));
           break;
         case '%':
-          write(&c, 1);
+          write(1, &c, 1);
           break;
         default:
           tmpc = '%';
-          write(&tmpc, 1);
-          write(&c, 1);
+          write(1, &tmpc, 1);
+          write(1, &c, 1);
           break;
       }
     } else {
-      write(&c, 1);
+      write(1, &c, 1);
     }
   }
 

@@ -25,15 +25,17 @@ int sys_getpid(void) {
 }
 
 int sys_write(void) {
-  u64 str = sysarg(0);
-  u64 size = sysarg(1);
-  return console_write((char *)str, size);
+  int fd = sysarg(0);
+  u64 str = sysarg(1);
+  u64 size = sysarg(2);
+  return write(fd, (char *)str, size);
 }
 
 int sys_read(void) {
-  u64 buf = sysarg(0);
-  u64 size = sysarg(1);
-  return console_read((char *)buf, size);
+  int fd = sysarg(0);
+  u64 buf = sysarg(1);
+  u64 size = sysarg(2);
+  return read(fd, (char *)buf, size);
 }
 
 int sys_exit(void) {
@@ -57,6 +59,17 @@ int sys_exec(void) {
   return exec((char *)path, (char **)argv);
 }
 
+int sys_open(void) {
+  u64 path = sysarg(0);
+  int flags = sysarg(1);
+  return open((char *)path, flags);
+}
+
+int sys_close(void) {
+  int fd = sysarg(0);
+  return close(fd);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -65,6 +78,7 @@ syscall_t syscall_table[] = {
   sys_fork,
   sys_wait,
   sys_exec,
+  sys_open,
 };
 
 void syscall(struct trapframe *tf) {

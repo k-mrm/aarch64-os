@@ -36,18 +36,22 @@ int write_file(struct file *f, char *buf, u64 sz) {
 }
 
 int read(int fd, char *buf, u64 sz) {
+  if(fd < 3)
+    return console_read(buf, sz);
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];
   return read_file(f, buf, sz);
 }
 
 int write(int fd, char *buf, u64 sz) {
+  if(fd < 3)
+    return console_write(buf, sz);
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];
   return write_file(f, buf, sz);
 }
 
-int open(char *path) {
+int open(char *path, int flags) {
   struct file *f = alloc_file();
   struct proc *p = curproc;
 
@@ -55,7 +59,7 @@ int open(char *path) {
   f->off = 0;
 
   int fd;
-  for(fd = 0; fd < 16; fd++) {
+  for(fd = 3; fd < 16; fd++) {
     if(p->ofile[fd] == NULL)
       break;
   }

@@ -4,11 +4,14 @@
 #include "ulib.h"
 
 int getpid(void);
-int write(char *s, u64 size);
-int read(char *buf, u64 size);
+int write(int fd, char *s, u64 size);
+int read(int fd, char *buf, u64 size);
 int exit(int ret);
 int fork(void);
 int wait(int *status);
 int exec(char *path, char **argv);
+int open(char *path, int flags);
+int close(int fd);
+
 
 #endif
