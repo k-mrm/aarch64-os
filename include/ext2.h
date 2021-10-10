@@ -109,7 +109,7 @@ struct inode {
   u32 i_mtime;
   u32 i_dtime;
   u16 i_gid;
-  u16 u_links_count;
+  u16 i_links_count;
   u32 i_blocks;
   u32 i_flags;
   u32 i_osd1;

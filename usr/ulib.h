@@ -27,4 +27,8 @@ void *memset(void *dst, int c, u64 n);
 
 void printx(u64 n);
 
+struct DIR {
+
+};
+
 #endif

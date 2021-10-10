@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
       if((fd = open(p, 0)) < 0)
         exit(1);
       cat(fd);
+      close(fd);
     }
   }
   exit(0);

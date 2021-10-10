@@ -70,6 +70,12 @@ int sys_close(void) {
   return close(fd);
 }
 
+int sys_fstat(void) {
+  int fd = sysarg(0);
+  void *addr = sysarg(1);
+  return fstat(fd, addr);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -79,6 +85,8 @@ syscall_t syscall_table[] = {
   sys_wait,
   sys_exec,
   sys_open,
+  sys_close,
+  sys_fstat,
 };
 
 void syscall(struct trapframe *tf) {

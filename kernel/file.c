@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "file.h"
 #include "proc.h"
+#include "stat.h"
 
 struct file ftable[NFILE];
 
@@ -51,11 +52,28 @@ int write(int fd, char *buf, u64 sz) {
   return write_file(f, buf, sz);
 }
 
+int fstat(int fd, void *vst) {
+  struct stat *st = (struct stat *)vst;
+  struct proc *p = curproc;
+  struct file *f = p->ofile[fd];
+  struct inode *ino = f->ino;
+
+  st->st_dev = 0; /* TODO */
+  st->st_ino = 0; /* TODO */
+  st->st_mode = ino->i_mode;
+  st->st_size = ino->i_size;
+  st->st_nlink = ino->i_links_count;
+}
+
 int open(char *path, int flags) {
+  struct inode *ino = path2inode(path);
+  if(!ino)
+    return -1;
+
   struct file *f = alloc_file();
   struct proc *p = curproc;
 
-  f->ino = path2inode(path);
+  f->ino = ino;
   f->off = 0;
 
   int fd;
