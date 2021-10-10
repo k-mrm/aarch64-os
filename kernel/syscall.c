@@ -5,6 +5,19 @@
 
 typedef int (*syscall_t)(void);
 
+struct stat;
+
+int getpid(void);
+int write(int fd, char *s, u64 size);
+int read(int fd, char *buf, u64 size);
+int exit(int ret);
+int fork(void);
+int wait(int *status);
+int exec(char *path, char **argv);
+int open(char *path, int flags);
+int close(int fd);
+int fstat(int fd, struct stat *st);
+
 u64 sysarg(int n) {
   switch(n) {
     case 0:
@@ -72,7 +85,7 @@ int sys_close(void) {
 
 int sys_fstat(void) {
   int fd = sysarg(0);
-  void *addr = sysarg(1);
+  struct stat *addr = (struct stat *)sysarg(1);
   return fstat(fd, addr);
 }
 

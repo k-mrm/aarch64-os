@@ -1,9 +1,10 @@
 #include "ulib.h"
 #include "usys.h"
 #include "stat.h"
+#include "fcntl.h"
 
 void ls(char *path) {
-  int fd = open(path, 0);
+  int fd = open(path, O_RDONLY);
   if(fd < 0) {
     puts("No such file or directory");
     return;
@@ -14,6 +15,8 @@ void ls(char *path) {
 
   if(st.st_mode & S_IFREG) {
     puts(path);
+  } else if(st.st_mode & S_IFDIR) {
+    puts("dirrrrrrrr");
   }
 
   close(fd);

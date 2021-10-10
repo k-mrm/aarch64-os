@@ -2,6 +2,8 @@
 #include "file.h"
 #include "proc.h"
 #include "stat.h"
+#include "string.h"
+#include "fcntl.h"
 
 struct file ftable[NFILE];
 
@@ -17,6 +19,9 @@ struct file *alloc_file() {
 }
 
 int read_file(struct file *f, char *buf, u64 sz) {
+  if(!f->readable)
+    return -1;
+
   struct inode *ino = f->ino;
   
   int n = read_inode(ino, buf, f->off, sz);
@@ -29,6 +34,9 @@ int read_file(struct file *f, char *buf, u64 sz) {
 }
 
 int write_file(struct file *f, char *buf, u64 sz) {
+  if(!f->writable)
+    return -1;
+
   struct inode *ino = f->ino;
 
   /* TODO */
@@ -52,8 +60,7 @@ int write(int fd, char *buf, u64 sz) {
   return write_file(f, buf, sz);
 }
 
-int fstat(int fd, void *vst) {
-  struct stat *st = (struct stat *)vst;
+int fstat(int fd, struct stat *st) {
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];
   struct inode *ino = f->ino;
@@ -76,11 +83,31 @@ int open(char *path, int flags) {
   f->ino = ino;
   f->off = 0;
 
+  switch(flags & O_ACCMODE) {
+    case O_RDONLY:
+      f->readable = 1;
+      break;
+    case O_WRONLY:
+      f->writable = 1;
+      break;
+    case O_RDWR:
+      f->readable = 1;
+      f->writable = 1;
+      break; 
+  }
+
+  if((flags & O_DIRECTORY) && !(ino->i_mode & S_IFDIR))
+    return -1;
+
   int fd;
   for(fd = 3; fd < 16; fd++) {
     if(p->ofile[fd] == NULL)
-      break;
+      goto found;
   }
+
+  return -1;
+
+found:
   p->ofile[fd] = f;
 
   return fd;

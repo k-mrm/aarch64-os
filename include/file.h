@@ -10,6 +10,8 @@ struct file {
   int ref;
   struct inode *ino;
   u64 off;
+  int readable;
+  int writable;
 };
 
 extern struct file ftable[];

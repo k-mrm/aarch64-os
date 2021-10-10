@@ -1,4 +1,5 @@
 #include "usys.h"
+#include "fcntl.h"
 
 char buf[512];
 
@@ -19,7 +20,7 @@ int main(int argc, char **argv) {
     for(int i = 1; i < argc; i++) {
       int fd;
       char *p = argv[i];
-      if((fd = open(p, 0)) < 0)
+      if((fd = open(p, O_RDONLY)) < 0)
         exit(1);
       cat(fd);
       close(fd);

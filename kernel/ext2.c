@@ -77,9 +77,10 @@ int search_dirent_block(char *blk, char *path) {
   struct dirent *d = (struct dirent *)blk;
   char *blk_end = blk + imginfo.block_size;
   char *cd;
-  char buf[DIRENT_NAME_MAX] = {0};
+  char buf[DIRENT_NAME_MAX];
 
   while(d != blk_end && d->inode != 0) {
+    memset(buf, 0, DIRENT_NAME_MAX);
     memcpy(buf, d->name, d->name_len);
     if(strcmp(buf, path) == 0)
       return d->inode;
@@ -87,7 +88,6 @@ int search_dirent_block(char *blk, char *path) {
     cd = (char *)d;
     cd += d->rec_len;
     d = (struct dirent *)cd;
-    memset(buf, 0, DIRENT_NAME_MAX);
   }
 
   return -1;
