@@ -2,7 +2,7 @@
 #include "usys.h"
 #include "stat.h"
 #include "fcntl.h"
-#include "ext2.h"
+#include "dirent.h"
 
 void ls(char *path) {
   int fd = open(path, O_RDONLY);

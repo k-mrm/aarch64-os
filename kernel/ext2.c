@@ -1,5 +1,6 @@
-#include "ext2.h"
 #include "kernel.h"
+#include "ext2.h"
+#include "dirent.h"
 #include "printk.h"
 #include "log.h"
 #include "string.h"

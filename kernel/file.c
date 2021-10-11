@@ -1,9 +1,11 @@
 #include "kernel.h"
 #include "file.h"
+#include "ext2.h"
 #include "proc.h"
 #include "stat.h"
 #include "string.h"
 #include "fcntl.h"
+#include "dirent.h"
 
 struct file ftable[NFILE];
 
