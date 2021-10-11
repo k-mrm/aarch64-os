@@ -2,9 +2,7 @@
 #include "usys.h"
 
 int main(int argc, char **argv) {
-  for(int i = 1; i < argc; i++) {
-    write(1, argv[i], strlen(argv[i]));
-    write(1, i < argc-1? " " : "\n", 1);
-  }
+  for(int i = 1; i < argc; i++)
+    printf("%s%c", argv[i], i < argc - 1 ? ' ' : '\n');
   exit(0);
 }

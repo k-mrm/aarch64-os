@@ -143,12 +143,17 @@ void printx(u64 n) {
   uprintiu64(n, 16, true);
 }
 
+#define va_list __builtin_va_list
+#define va_start  __builtin_va_start
+#define va_arg  __builtin_va_arg
+#define va_end __builtin_va_end
+
 int printf(const char *fmt, ...) {
   char tmpc;
   char *tmps;
 
-  __builtin_va_list ap;
-  __builtin_va_start(ap, fmt);
+  va_list ap;
+  va_start(ap, fmt);
 
   for(int i = 0; fmt[i]; i++) {
     char c = fmt[i];
@@ -157,24 +162,24 @@ int printf(const char *fmt, ...) {
 
       switch(c) {
         case 'd':
-          uprintiu32(__builtin_va_arg(ap, i32), 10, true);
+          uprintiu32(va_arg(ap, i32), 10, true);
           break;
         case 'u':
-          uprintiu32(__builtin_va_arg(ap, u32), 10, false);
+          uprintiu32(va_arg(ap, u32), 10, false);
           break;
         case 'x':
-          uprintiu64(__builtin_va_arg(ap, u64), 16, false);
+          uprintiu64(va_arg(ap, u64), 16, false);
           break;
         case 'p':
           write(1, "0x", 2);
-          uprintiu64(__builtin_va_arg(ap, u64), 16, false);
+          uprintiu64(va_arg(ap, u64), 16, false);
           break;
         case 'c':
-          tmpc = __builtin_va_arg(ap, int);
+          tmpc = va_arg(ap, int);
           write(1, &tmpc, 1);
           break;
         case 's':
-          tmps = __builtin_va_arg(ap, char *);
+          tmps = va_arg(ap, char *);
           write(1, tmps, strlen(tmps));
           break;
         case '%':
@@ -191,7 +196,7 @@ int printf(const char *fmt, ...) {
     }
   }
 
-  __builtin_va_end(ap);
+  va_end(ap);
 
   return 0;
 }

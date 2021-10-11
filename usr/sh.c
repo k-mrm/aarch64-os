@@ -14,7 +14,7 @@ void parse(char *cmd, char **argv) {
 
 void read_cmd(char *buf) {
   memset(buf, 0, 128);
-  write(1, "$ ", 2);
+  printf("$ ");
   read(0, buf, 128);
 }
 
@@ -28,7 +28,7 @@ int main(void) {
     int pid = fork();
     if(pid == 0) {
       exec(argv[0], argv);
-      write(1, "failed\n", 7);
+      puts("failed");
       exit(1);
     } else {
       int status;
