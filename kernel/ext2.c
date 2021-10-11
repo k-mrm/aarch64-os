@@ -129,9 +129,6 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   u32 bsize = imginfo.block_size;
   char *base = buf;
 
-  if((ino->i_mode & EXT2_S_IFREG) == 0)
-    return -1;
-
   if(off > ino->i_size)
     return -1;
   if(off + size > ino->i_size)
@@ -214,6 +211,10 @@ struct inode *path2inode(char *path) {
   ino = traverse_inode(ino, path, name);
 
   return ino;
+}
+
+int ext2_getdents(struct inode *ino, struct dirent *dir, u64 count) {
+  ;
 }
 
 void fs_init(char *img) {

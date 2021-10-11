@@ -24,11 +24,9 @@ char *strtok(char *s1, const char *s2);
 int printf(const char *fmt, ...);
 int puts(char *s);
 void *memset(void *dst, int c, u64 n);
+void *memcpy(void *dst, const void *src, u64 n);
+void *memmove(void *dst, const void *src, u64 n);
 
 void printx(u64 n);
-
-struct DIR {
-
-};
 
 #endif

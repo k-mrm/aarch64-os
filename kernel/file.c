@@ -60,6 +60,10 @@ int write(int fd, char *buf, u64 sz) {
   return write_file(f, buf, sz);
 }
 
+int getdents(int fd, struct dirent *dir, u64 count) {
+  ;
+}
+
 int fstat(int fd, struct stat *st) {
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];

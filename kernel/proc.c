@@ -150,6 +150,9 @@ err:
 int exec(char *path, char **argv) {
   kinfo("exec %s\n", path);
   struct inode *ino = path2inode(path);
+  if(!ino)
+    return -1;
+
   struct ehdr eh;
   struct phdr ph;
   int memsize = 0;
