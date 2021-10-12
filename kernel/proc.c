@@ -65,6 +65,8 @@ extern u64 _binary_usr_initcode_size[];
 
 void userproc_init() {
   struct proc *p = newproc();
+  if(!p)
+    panic("initproc");
 
   char *ustart = _binary_usr_initcode_start;
   u64 size = (u64)_binary_usr_initcode_size;
@@ -117,9 +119,6 @@ void yield() {
 
   struct proc *p = curproc;
 
-  if(!p)
-    panic("bad yield");
-
   p->state = RUNNABLE;
   cswitch(&p->context, &kproc.context);
 }
@@ -127,19 +126,17 @@ void yield() {
 int fork() {
   struct proc *p = curproc;
   struct proc *new = newproc();
-  if(new == NULL)
+  if(!new)
     goto err;
 
   cp_userspace(new->pgt, p->pgt, p->size);
   cp_ustack(new->pgt, p->pgt);
   new->size = p->size;
-
   *new->tf = *p->tf;
 
   new->tf->x0 = 0;
-  
-  new->cwd = p->cwd;
 
+  new->cwd = p->cwd;
   new->parent = p;
   new->state = RUNNABLE;
 
@@ -229,7 +226,7 @@ int wait(int *status) {
 
       if(cp->state == ZOMBIE) {
         int pid = cp->pid;
-        if(status != NULL)
+        if(status)
           *status = cp->ret;
 
         free_proc(cp);
@@ -262,9 +259,6 @@ void wakeup(struct proc *proc) {
 void exit(int ret) {
   kinfo("exit\n");
   struct proc *p = curproc;
-
-  if(!p)
-    panic("bad exit");
 
   free_userspace(p->pgt, p->size);
 
