@@ -4,7 +4,7 @@
 initcode:
   ldr x0, =init
   ldr x1, =argv 
-  mov x6, SYS_EXEC
+  mov x6, SYS_exec
   svc #0
 
 init:

@@ -21,7 +21,7 @@ QEMUOPTS = -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
 QEMUOPTS += -nographic -kernel kernel8.elf
 
 KOBJS = kernel/boot.o kernel/vectortable.o kernel/ramdisk.o	kernel/file.o \
-			 kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o \
+			 kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o kernel/uname.o \
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o	\
 			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o
 
@@ -49,9 +49,7 @@ usr/initcode: usr/initcode.S
 
 ULIBS = usr/systable.o usr/ulib.o
 
-UOBJS = usr/test.o usr/init.o usr/sh.o usr/cat.o
-
-UPROGS = rootfs/init rootfs/sh rootfs/cat rootfs/echo rootfs/ls
+UPROGS = rootfs/init rootfs/sh rootfs/cat rootfs/echo rootfs/ls rootfs/uname
 
 rootfs/%: usr/%.o $(ULIBS)
 	@mkdir -p rootfs

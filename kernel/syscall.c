@@ -6,6 +6,7 @@
 typedef int (*syscall_t)(void);
 
 struct stat;
+struct utsname;
 
 int getpid(void);
 int write(int fd, char *s, u64 size);
@@ -17,6 +18,7 @@ int exec(char *path, char **argv);
 int open(char *path, int flags);
 int close(int fd);
 int fstat(int fd, struct stat *st);
+int uname(struct utsname *u);
 
 u64 sysarg(int n) {
   switch(n) {
@@ -89,6 +91,11 @@ int sys_fstat(void) {
   return fstat(fd, addr);
 }
 
+int sys_uname(void) {
+  struct utsname *addr = (struct utsname *)sysarg(0);
+  return uname(addr);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -100,6 +107,7 @@ syscall_t syscall_table[] = {
   sys_open,
   sys_close,
   sys_fstat,
+  sys_uname,
 };
 
 void syscall(struct trapframe *tf) {

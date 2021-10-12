@@ -7,13 +7,14 @@
   ret
 .endm
 
-SYSCALL getpid, SYS_GETPID
-SYSCALL write, SYS_WRITE
-SYSCALL read, SYS_READ
-SYSCALL exit, SYS_EXIT
-SYSCALL fork, SYS_FORK
-SYSCALL wait, SYS_WAIT
-SYSCALL exec, SYS_EXEC
-SYSCALL open, SYS_OPEN
-SYSCALL close, SYS_CLOSE
-SYSCALL fstat, SYS_FSTAT
+SYSCALL getpid, SYS_getpid
+SYSCALL write, SYS_write
+SYSCALL read, SYS_read
+SYSCALL exit, SYS_exit
+SYSCALL fork, SYS_fork
+SYSCALL wait, SYS_wait
+SYSCALL exec, SYS_exec
+SYSCALL open, SYS_open
+SYSCALL close, SYS_close
+SYSCALL fstat, SYS_fstat
+SYSCALL uname, SYS_uname

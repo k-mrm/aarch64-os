@@ -4,6 +4,7 @@
 #include "ulib.h"
 
 struct stat;
+struct utsname;
 
 int getpid(void);
 int write(int fd, char *s, u64 size);
@@ -15,6 +16,7 @@ int exec(char *path, char **argv);
 int open(char *path, int flags);
 int close(int fd);
 int fstat(int fd, struct stat *st);
+int uname(struct utsname *u);
 
 
 #endif
