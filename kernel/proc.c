@@ -73,6 +73,8 @@ void userproc_init() {
   map_ustack(p->pgt);
 
   p->cwd = path2inode("/");
+  if(!p->cwd)
+    panic("no filesystem");
 
   p->tf->elr = 0x0;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
@@ -157,14 +159,14 @@ int exec(char *path, char **argv) {
   struct phdr ph;
   int memsize = 0;
 
-  u64 *pgt = kalloc();
-
   if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
     return -1;
   if(!is_elf(&eh))
     return -1;
   if(eh.e_type != ET_EXEC)
     return -1;
+
+  u64 *pgt = kalloc();
 
   int i = 0;
   u64 off = eh.e_phoff;
@@ -196,6 +198,8 @@ int exec(char *path, char **argv) {
   ustack[argc] = 0;
   sp -= sizeof(ustack[0]) * (argc + 1);
   sp = (char *)((u64)sp & ~(0xf));
+  if(sp < stackbase)
+    return -1;
   memcpy(sp, ustack, sizeof(ustack[0]) * (argc + 1));
 
   struct proc *p = curproc;

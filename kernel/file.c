@@ -21,10 +21,12 @@ struct file *alloc_file() {
 }
 
 int read_file(struct file *f, char *buf, u64 sz) {
-  if(!f->readable)
+  if(!f || !f->readable)
     return -1;
 
   struct inode *ino = f->ino;
+  if(!ino)
+    return -1;
   
   int n = read_inode(ino, buf, f->off, sz);
   if(n < 0)
@@ -36,10 +38,12 @@ int read_file(struct file *f, char *buf, u64 sz) {
 }
 
 int write_file(struct file *f, char *buf, u64 sz) {
-  if(!f->writable)
+  if(!f || !f->writable)
     return -1;
 
   struct inode *ino = f->ino;
+  if(!ino)
+    return -1;
 
   /* TODO */
 

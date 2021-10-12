@@ -4,12 +4,12 @@
 #include "fcntl.h"
 #include "dirent.h"
 
-void ls(char *path) {
-  int fd = open(path, O_RDONLY);
+int ls(char *path) {
   char buf[1024];
+  int fd = open(path, O_RDONLY);
   if(fd < 0) {
     puts("No such file or directory");
-    return;
+    return -1;
   }
 
   struct stat st;
@@ -37,15 +37,20 @@ void ls(char *path) {
   }
 
   close(fd);
+  return 0;
 }
 
 int main(int argc, char **argv) {
+  int err = 0;
+
   if(argc == 1) {
     ls(".");
   } else {
     for(int i = 1; i < argc; i++) {
-      ls(argv[i]);
+      if(ls(argv[i]) < 0)
+        err = 1;
     }
   }
-  exit(0);
+
+  exit(err);
 }
