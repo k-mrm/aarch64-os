@@ -145,8 +145,12 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
     if(offblkoff + cpsize > bsize)
       cpsize -= offblkoff;
     memcpy(buf, d + offblkoff, cpsize);
+
     buf += cpsize;
-    size -= bsize;
+    if(size > bsize)
+      size -= bsize;
+    else
+      size = 0;
     offblkoff = 0;
   }
 
