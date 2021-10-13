@@ -3,9 +3,9 @@ CC = $(PREFIX)gcc
 LD = $(PREFIX)ld
 OBJCOPY = $(PREFIX)objcopy
 
-CPU = cortex-a72
+CPU = cortex-a72+nofp
 
-CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
+CFLAGS = -Wall -O2 -g -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
 LDFLAGS = -nostdlib -nostartfiles
@@ -15,7 +15,8 @@ MACHINE = virt
 MACHINE_GIC = gic-version=2
 NCPU = 1
 
-QEMUOPTS = -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
+QCPU = cortex-a72
+QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
 #QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=d0
 #QEMUOPTS += -device virtio-blk-device,drive=d0
 QEMUOPTS += -nographic -kernel kernel8.elf
@@ -74,7 +75,7 @@ gdb: kernel8.img
 	$(QEMU) -S -gdb tcp::1234 $(QEMUOPTS)
 
 dts:
-	$(QEMU) -S -cpu $(CPU) -machine $(MACHINE),$(MACHINE_GIC),dumpdtb=virt.dtb -smp $(NCPU) -nographic
+	$(QEMU) -S -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC),dumpdtb=virt.dtb -smp $(NCPU) -nographic
 	dtc -I dtb -O dts -o virt.dts virt.dtb
 	rm virt.dtb
 

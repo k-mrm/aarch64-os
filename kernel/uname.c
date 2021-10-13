@@ -1,5 +1,6 @@
 #include "kernel.h"
 #include "utsname.h"
+#include "string.h"
 
 struct utsname aarch64_os =  {
   .sysname = "aarch64-os",
@@ -13,6 +14,6 @@ int uname(struct utsname *u) {
   if(!u)
     return -1;
 
-  memcpy(u, aarch64_os, sizeof(*u));
+  memcpy(u, &aarch64_os, sizeof(*u));
   return 0;
 }

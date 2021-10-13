@@ -180,6 +180,9 @@ int printf(const char *fmt, ...) {
           break;
         case 's':
           tmps = va_arg(ap, char *);
+          if(tmps == NULL)
+            tmps = "(null)";
+
           write(1, tmps, strlen(tmps));
           break;
         case '%':

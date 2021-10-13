@@ -64,6 +64,8 @@ void sync_handler(struct trapframe *tf) {
     case 0b010101:  /* svc */
       syscall(tf);
       return;
+    case 0b000111:
+      return;
     case 0b100110:
       panic("sp alignment fault");
     case 0b100100:

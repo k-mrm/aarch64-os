@@ -3,7 +3,13 @@
 #include "printk.h"
 #include "console.h"
 
-static void printiu32(i32 num, int base, bool sign) {
+#define va_list __builtin_va_list
+#define va_start(v, l)  __builtin_va_start(v, l)
+#define va_arg(v, l)  __builtin_va_arg(v, l)
+#define va_end(v) __builtin_va_end(v)
+#define va_copy(d, s) __builtin_va_copy(d, s)
+
+void printiu32(i32 num, int base, bool sign) {
   char buf[sizeof(num) * 8 + 1] = {0};
   char *end = buf + sizeof(buf);
   char *cur = end - 1;
@@ -27,7 +33,7 @@ static void printiu32(i32 num, int base, bool sign) {
   csputs(&cons1, cur);
 }
 
-static void printiu64(i64 num, int base, bool sign) {
+void printiu64(i64 num, int base, bool sign) {
   char buf[sizeof(num) * 8 + 1] = {0};
   char *end = buf + sizeof(buf);
   char *cur = end - 1;
@@ -51,10 +57,7 @@ static void printiu64(i64 num, int base, bool sign) {
   csputs(&cons1, cur);
 }
 
-int printk(const char *fmt, ...) {
-  __builtin_va_list ap;
-  __builtin_va_start(ap, fmt);
-
+static int vprintk(const char *fmt, va_list ap) {
   for(int i = 0; fmt[i]; i++) {
     char c = fmt[i];
     if(c == '%') {
@@ -62,24 +65,24 @@ int printk(const char *fmt, ...) {
 
       switch(c) {
         case 'd':
-          printiu32(__builtin_va_arg(ap, i32), 10, true);
+          printiu32(va_arg(ap, i32), 10, true);
           break;
         case 'u':
-          printiu32(__builtin_va_arg(ap, u32), 10, false);
+          printiu32(va_arg(ap, u32), 10, false);
           break;
         case 'x':
-          printiu64(__builtin_va_arg(ap, u64), 16, false);
+          printiu64(va_arg(ap, u64), 16, false);
           break;
         case 'p':
           csputc(&cons1, '0');
           csputc(&cons1, 'x');
-          printiu64(__builtin_va_arg(ap, u64), 16, false);
+          printiu64(va_arg(ap, u64), 16, false);
           break;
         case 'c':
-          csputc(&cons1, __builtin_va_arg(ap, int));
+          csputc(&cons1, va_arg(ap, int));
           break;
         case 's': {
-          char *s = __builtin_va_arg(ap, char *);
+          char *s = va_arg(ap, char *);
           if(s == NULL)
             s = "(null)";
 
@@ -99,13 +102,29 @@ int printk(const char *fmt, ...) {
     }
   }
 
-  __builtin_va_end(ap);
+  return 0;
+}
+
+int printk(const char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+
+  vprintk(fmt, ap);
+
+  va_end(ap);
 
   return 0;
 }
 
-void panic(const char *s) {
-  printk("[panic]: %s\n", s);
+void panic(const char *s, ...) {
+  va_list ap;
+  va_start(ap, s);
+
+  printk("[panic]: ");
+  vprintk(s, ap);
+  printk("\n");
+
+  va_end(ap);
 
   disable_irq();
 
