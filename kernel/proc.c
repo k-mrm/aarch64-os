@@ -41,12 +41,16 @@ found:
   memset(&p->context, 0, sizeof(p->context));
 
   p->kstack = kalloc();
+  if(!p->kstack)
+    return NULL;
   char *sp = p->kstack + PAGESIZE;
   sp -= sizeof(struct trapframe);
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(*p->tf));
 
   p->pgt = kalloc();
+  if(!p->pgt)
+    return NULL;
 
   p->context.lr = (u64)forkret;
   p->context.sp = (u64)sp;    /* == p->tf */
@@ -129,8 +133,9 @@ int fork() {
   if(!new)
     goto err;
 
-  cp_userspace(new->pgt, p->pgt, p->size);
-  cp_ustack(new->pgt, p->pgt);
+  if(cp_userspace(new->pgt, p->pgt, p->size) < 0)
+    return -1;
+
   new->size = p->size;
   *new->tf = *p->tf;
 
@@ -164,6 +169,8 @@ int exec(char *path, char **argv) {
     return -1;
 
   u64 *pgt = kalloc();
+  if(!pgt)
+    return -1;
 
   int i = 0;
   u64 off = eh.e_phoff;

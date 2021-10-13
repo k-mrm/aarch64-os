@@ -18,6 +18,8 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
       pgt = (u64 *)P2V(PTE_PA(*pte));
     } else {
       pgt = kalloc();
+      if(!pgt)
+        return NULL;
       *pte = PTE_PA(V2P(pgt)) | PTE_TABLE | PTE_VALID;
     }
   }
@@ -82,6 +84,8 @@ int init_userspace(u64 *pgt, char *code, u64 size) {
   u64 pgsize = PAGEROUNDUP(size);
   for(u64 va = 0; va < pgsize; va += PAGESIZE) {
     char *upage = kalloc();
+    if(!upage)
+      panic("init_userspace");
     memcpy(upage, (char *)code, size);
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
@@ -94,6 +98,8 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
   u64 bva = va;
   for(; va < pgsize + bva; va += PAGESIZE) {
     char *upage = kalloc();
+    if(!upage)
+      return -1;
     kinfo("map va %p to page %p\n", va, V2P(upage));
     read_inode(ino, upage, srcoff, size);
     kinfo("upage pa %p\n", va2pa(upage));
@@ -105,6 +111,8 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
 
 char *map_ustack(u64 *pgt) {
   char *ustack = kalloc();
+  if(!ustack)
+    return NULL;
   kinfo("ustack %p\n", ustack);
   pagemap(pgt, USTACKBOTTOM, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
 
@@ -119,24 +127,32 @@ void dump_ustack(u64 *pgt) {
     printk("%x ", page[i]);
 }
 
-void cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
+int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
+  u64 *pte;
+  u64 pa;
+
   for(u64 va = 0; va < size; va += PAGESIZE) {
-    u64 *pte = pagewalk(oldpgt, va);
-    u64 pa = PTE_PA(*pte);
+    pte = pagewalk(oldpgt, va);
+    pa = PTE_PA(*pte);
     char *page = kalloc();
+    if(!page)
+      return -1;
     memcpy(page, (char *)P2V(pa), PAGESIZE);
     
     pagemap(newpgt, va, V2P(page), PAGESIZE, PTE_NORMAL | PTE_U);
   }
-}
 
-void cp_ustack(u64 *newpgt, u64 *oldpgt) {
-  u64 *pte = pagewalk(oldpgt, USTACKBOTTOM);
-  u64 pa = PTE_PA(*pte);
+  /* copy ustack */
+  pte = pagewalk(oldpgt, USTACKBOTTOM);
+  pa = PTE_PA(*pte);
   char *newstack = kalloc();
+  if(!newstack)
+    return -1;
   memcpy(newstack, (char *)P2V(pa), PAGESIZE);
 
   pagemap(newpgt, USTACKBOTTOM, V2P(newstack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
+
+  return 0;
 }
 
 void free_userspace(u64 *pgt, u64 size) {
