@@ -9,7 +9,7 @@
 #define va_end(v) __builtin_va_end(v)
 #define va_copy(d, s) __builtin_va_copy(d, s)
 
-void printiu32(i32 num, int base, bool sign) {
+static void printiu32(i32 num, int base, bool sign) {
   char buf[sizeof(num) * 8 + 1] = {0};
   char *end = buf + sizeof(buf);
   char *cur = end - 1;
@@ -33,7 +33,7 @@ void printiu32(i32 num, int base, bool sign) {
   csputs(&cons1, cur);
 }
 
-void printiu64(i64 num, int base, bool sign) {
+static void printiu64(i64 num, int base, bool sign) {
   char buf[sizeof(num) * 8 + 1] = {0};
   char *end = buf + sizeof(buf);
   char *cur = end - 1;

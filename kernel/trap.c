@@ -79,9 +79,8 @@ void sync_handler(struct trapframe *tf) {
       return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());
-      printk("ec %d\n", ec);
       dump_tf(tf);
-      panic("unknown");
+      panic("unknown ec: %d", ec);
   }
 }
 
@@ -116,8 +115,8 @@ void uirq_handler(struct trapframe *tf) {
 }
 
 void unknownint(int arg) {
-  printk("elr: %p arg: %d\n", elr_el1(), arg);
-  panic("unknown interrupt");
+  printk("elr: %p arg: %d\n", elr_el1());
+  panic("unknown interrupt: arg: %d", arg);
 }
 
 void dump_tf(struct trapframe *tf) {
