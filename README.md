@@ -11,11 +11,11 @@ a simple OS for aarch64(qemu virt board)
   - round-robin
 - file system(ramfs)
   - ext2
-- UNIX like syscall
+- UNIX-like syscalls
 - isolation of address space by MMU
   - multiple address space
 - command-line interface(sh)
-- some core util
+- some core utils
   - ls, cat, echo etc...
 
 ## Required
