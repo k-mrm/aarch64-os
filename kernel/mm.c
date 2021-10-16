@@ -120,7 +120,7 @@ char *map_ustack(u64 *pgt) {
 }
 
 void dump_ustack(u64 *pgt) {
-  char *page = P2V(uva2pa(pgt, USTACKBOTTOM));
+  char *page = (char *)P2V(uva2pa(pgt, USTACKBOTTOM));
   kinfo("dump ustack %p\n", page);
 
   for(int i = 0; i < PAGESIZE; i++)
@@ -157,8 +157,8 @@ int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
 
 void free_userspace(u64 *pgt, u64 size) {
   kinfo("free userspace pgt %p size %d\n", pgt, size);
-  pageunmap(pgt, 0, size);
 
+  pageunmap(pgt, 0, size);
   pageunmap(pgt, USTACKBOTTOM, PAGESIZE);
 
   free_table(pgt);
@@ -179,7 +179,6 @@ void forget_userspace() {
 void kpgt_init() {
   /* remap kernel */
   pagemap(l1kpgt, KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_NORMAL);
-
   /* map kend ~ PHYMEMEND */
   pagemap(l1kpgt, (u64)kend, V2P(kend), PHYMEMEND - (u64)kend, PTE_NORMAL);
 }
