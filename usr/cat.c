@@ -20,8 +20,10 @@ int main(int argc, char **argv) {
     for(int i = 1; i < argc; i++) {
       int fd;
       char *p = argv[i];
-      if((fd = open(p, O_RDONLY)) < 0)
+      if((fd = open(p, O_RDONLY)) < 0) {
+        printf("%s: not found\n", p);
         exit(1);
+      }
       cat(fd);
       close(fd);
     }

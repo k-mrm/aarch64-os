@@ -18,3 +18,4 @@ SYSCALL open, SYS_open
 SYSCALL close, SYS_close
 SYSCALL fstat, SYS_fstat
 SYSCALL uname, SYS_uname
+SYSCALL chdir, SYS_chdir

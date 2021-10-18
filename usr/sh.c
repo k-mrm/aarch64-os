@@ -1,7 +1,7 @@
 #include "ulib.h"
 #include "usys.h"
 
-void parse(char *cmd, char **argv) {
+int parse(char *cmd, char **argv) {
   static const char *ws = " \n\t";
   int argc = 0;
   argv[argc++] = strtok(cmd, ws);
@@ -10,6 +10,8 @@ void parse(char *cmd, char **argv) {
     argv[argc++] = tok;
   }
   argv[argc] = 0;
+
+  return argc;
 }
 
 void read_cmd(char *buf) {
@@ -18,12 +20,34 @@ void read_cmd(char *buf) {
   read(0, buf, 128);
 }
 
+int builtincmd(int argc, char *argv) {
+  if(strcmp(argv[0], "cd") == 0) {
+    if(argc < 2) {
+      if(chdir("/") < 0)
+        return -1;
+    } else if(argc == 2) {
+      if(chdir(argv[1]) < 0)
+        return -1;
+    } else {
+      puts("too many args");
+      return -1;
+    }
+
+    return 1;
+  }
+
+  return 0;
+}
+
 int main(void) {
   char *argv[8];
   char buf[128] = {0};
   for(;;) {
     read_cmd(buf);
-    parse(buf, argv);
+    int argc = parse(buf, argv);
+
+    if(builtincmd(argc, argv))
+      continue;
 
     int pid = fork();
     if(pid == 0) {
