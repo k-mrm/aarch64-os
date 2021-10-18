@@ -144,5 +144,6 @@ void dump_superblock(struct superblock *sb);
 struct inode *path2inode(char *path);
 void fs_init(char *img);
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size);
+bool isdir(struct inode *ino);
 
 #endif

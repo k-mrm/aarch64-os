@@ -202,6 +202,10 @@ static struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
   return traverse_inode(get_inode(inum), path, name);
 }
 
+bool isdir(struct inode *ino) {
+  return ino->i_mode & EXT2_S_IFDIR;
+}
+
 struct inode *path2inode(char *path) {
   struct inode *ino;
 

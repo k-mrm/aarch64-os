@@ -96,6 +96,11 @@ int sys_uname(void) {
   return uname(addr);
 }
 
+int sys_chdir(void) {
+  u64 path = sysarg(0);
+  return chdir((char *)path);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -108,6 +113,7 @@ syscall_t syscall_table[] = {
   sys_close,
   sys_fstat,
   sys_uname,
+  sys_chdir,
 };
 
 void syscall(struct trapframe *tf) {

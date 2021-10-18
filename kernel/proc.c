@@ -277,6 +277,19 @@ void exit(int ret) {
   cswitch(&p->context, &kproc.context);
 }
 
+int chdir(char *path) {
+  struct proc *p = curproc;
+  struct inode *ino = path2inode(path);
+  if(!ino)
+    return -1;
+  if(!isdir(ino))
+    return -1;
+
+  p->cwd = ino;
+
+  return 0;
+}
+
 void dump_proc(struct proc *p) {
   ;
 }
