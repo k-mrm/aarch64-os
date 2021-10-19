@@ -20,7 +20,7 @@ void read_cmd(char *buf) {
   read(0, buf, 128);
 }
 
-int builtincmd(int argc, char *argv) {
+int builtincmd(int argc, char **argv) {
   if(strcmp(argv[0], "cd") == 0) {
     if(argc < 2) {
       if(chdir("/") < 0)

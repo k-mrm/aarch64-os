@@ -63,12 +63,17 @@ int csread(struct console *cs, char *buf, u64 size) {
     if(c == '\r')
       c = '\n';
 
-    csputc(cs, c);
-
-    if(c == BACKSPACE)
-      buf--;
-    else
+    if(c == BACKSPACE) {
+      if(buf > b)
+        buf--;
+      else
+        continue;
+    }
+    else {
       *buf++ = c;
+    }
+
+    csputc(cs, c);
 
     if(c == '\n')
       break;
