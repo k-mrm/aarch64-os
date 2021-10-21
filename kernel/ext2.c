@@ -94,18 +94,102 @@ int search_dirent_block(char *blk, char *path) {
   return -1;
 }
 
+static inline char *block_bitmap() {
+  return imginfo.block_bitmap;
+}
+
+static inline char *inode_bitmap() {
+  return imginfo.inode_bitmap;
+}
+
+static int find_free_ino(char *bitmap) {
+  char chunk = 0xff;
+  int inum = 1;
+  for(int i = 0; i < imginfo.block_size; i++) {
+    if((chunk = bitmap[i]) != 0xff)
+      break;
+    inum += 8;
+  }
+
+  if(chunk == 0xff)   /* no free inode */
+    return -1;
+
+  for(; chunk & 1; chunk >>= 1)
+    inum++;
+
+  return inum;
+}
+
+static int find_free_block(char *bitmap) {
+  char chunk = 0xff;
+  int bnum = 0;
+  for(int i = 0; i < imginfo.block_size; i++) {
+    if((chunk = bitmap[i]) != 0xff)
+      break;
+    bnum += 8;
+  }
+
+  if(chunk == 0xff)   /* no free inode */
+    return -1;
+
+  for(; chunk & 1; chunk >>= 1)
+    bnum++;
+
+  return bnum;
+}
+
+static int ibmp_write_bit(char *bitmap, int ino, int val) {
+  int bitn = ino - 1;
+  int chunkn;
+  char c;
+  for(chunkn = 0; chunkn < imginfo.block_size; chunkn++) {
+    if(bitn < 8)
+      goto found;
+    bitn -= 8;
+  }
+
+  /* invalid inode number */
+  return -1;
+
+found:
+  c = bitmap[chunkn];
+  if(val)
+    c |= 1 << bitn;
+  else
+    c &= ~(char)(1 << bitn);
+  bitmap[chunkn] = c;
+
+  return 0;
+}
+
 static struct inode *get_inode(int inum) {
   return (struct inode *)(imginfo.inode_table + (inum - 1) * sizeof(struct inode));
+}
+
+static struct inode *new_inode(struct inode *dir) {
+  int inum = find_free_ino(inode_bitmap());
+  if(inum < 0)
+    return NULL;
+
+  struct inode *ino = get_inode(inum);
+
+  ibmp_write_bit(inode_bitmap(), inum, 1);
+
+  return ino;
 }
 
 static void *get_block(int bnum) {
   return imginfo.base + (u64)bnum * imginfo.block_size;
 }
 
+void w_inode_block(struct inode *ino, int bi, char *blk) {
+}
+
 char *inode_block(struct inode *ino, int bi) {
   if(bi < 12)
     return get_block(ino->i_block[bi]);
-  /* unimpl */
+  else
+    ; /* unimpl */
   return NULL;
 }
 
@@ -153,6 +237,33 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   }
 
   return buf - base;
+}
+
+int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
+  u32 bsize = imginfo.block_size;
+  char *base = buf;
+
+  if(off > ino->i_size)
+    return -1;
+  if(off + size > ino->i_size)
+    size = ino->i_size - off;
+
+  u32 offblk = off / bsize;
+  u32 lastblk = (size + off) / bsize;
+  u32 offblkoff = off % bsize;
+
+  for(int i = offblk; i < inode_nblock(ino) && i <= lastblk; i++) {
+    char *d = inode_block(ino, i);
+    u64 cpsize = min(size, bsize);
+    if(offblkoff + cpsize > bsize)
+      cpsize = bsize - offblkoff;
+
+    memcpy(d + offblkoff, buf, cpsize);
+
+    buf += cpsize;
+    size = size > bsize? size - bsize : 0;
+    offblkoff = 0;
+  }
 }
 
 static char *skippath(char *path, char *name, int *err) {
@@ -220,10 +331,6 @@ struct inode *path2inode(char *path) {
   return ino;
 }
 
-int ext2_getdents(struct inode *ino, struct dirent *dir, u64 count) {
-  ;
-}
-
 void fs_init(char *img) {
   struct superblock *sb = (struct superblock *)(img + 0x400);
   // dump_superblock(sb);
@@ -239,4 +346,7 @@ void fs_init(char *img) {
   imginfo.block_bitmap = get_block(bg->bg_block_bitmap);
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
+
+  ls_inode(path2inode("/"));
+  new_inode(1);
 }

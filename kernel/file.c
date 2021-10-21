@@ -136,6 +136,10 @@ int close(int fd) {
   return 0;
 }
 
+int mknod(const char *path, int mode, int dev) {
+  ;
+}
+
 void file_init() {
   memset(ftable, 0, sizeof(ftable));
 }

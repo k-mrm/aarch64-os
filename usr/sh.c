@@ -52,7 +52,7 @@ int main(void) {
     int pid = fork();
     if(pid == 0) {
       exec(argv[0], argv);
-      puts("failed");
+      printf("%s failed\n", argv[0]);
       exit(1);
     } else {
       int status;
