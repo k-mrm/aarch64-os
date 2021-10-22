@@ -55,6 +55,7 @@ UPROGS = rootfs/init rootfs/sh rootfs/cat rootfs/echo rootfs/ls rootfs/uname
 rootfs/%: usr/%.o $(ULIBS)
 	@mkdir -p rootfs
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	cp README.md rootfs/
 
 fs.img: $(UPROGS)
 	dd if=/dev/zero of=fs.img count=10000

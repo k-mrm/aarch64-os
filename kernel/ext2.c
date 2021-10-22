@@ -94,6 +94,9 @@ int search_dirent_block(char *blk, char *path) {
   return -1;
 }
 
+static void add_dirent(struct inode *dir, struct inode *ino) {
+}
+
 static inline char *block_bitmap() {
   return imginfo.block_bitmap;
 }
@@ -166,20 +169,36 @@ static struct inode *get_inode(int inum) {
   return (struct inode *)(imginfo.inode_table + (inum - 1) * sizeof(struct inode));
 }
 
-static struct inode *new_inode(struct inode *dir) {
+static struct inode *alloc_inode(int mode) {
   int inum = find_free_ino(inode_bitmap());
   if(inum < 0)
     return NULL;
 
-  struct inode *ino = get_inode(inum);
-
   ibmp_write_bit(inode_bitmap(), inum, 1);
+
+  struct inode *ino = get_inode(inum);
+  ino->i_mode = mode;
+
+  return ino;
+}
+
+static struct inode *new_inode(struct inode *dir, int mode) {
+  struct inode *ino = alloc_inode(mode);
+  if(!ino)
+    return NULL;
+
+  add_dirent(dir, ino);
 
   return ino;
 }
 
 static void *get_block(int bnum) {
   return imginfo.base + (u64)bnum * imginfo.block_size;
+}
+
+static void *get_indirect_block(u32 *map, int bi) {
+  char idx = bi - 12;
+  return get_block(map[idx]);
 }
 
 void w_inode_block(struct inode *ino, int bi, char *blk) {
@@ -189,7 +208,7 @@ char *inode_block(struct inode *ino, int bi) {
   if(bi < 12)
     return get_block(ino->i_block[bi]);
   else
-    ; /* unimpl */
+    return get_indirect_block((u32 *)get_block(ino->i_block[12]), bi);
   return NULL;
 }
 
@@ -347,6 +366,6 @@ void fs_init(char *img) {
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
 
-  ls_inode(path2inode("/"));
-  new_inode(1);
+  dump_inode(path2inode("/cat"));
+  alloc_inode(1);
 }

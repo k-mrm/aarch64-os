@@ -17,6 +17,7 @@ int open(char *path, int flags);
 int close(int fd);
 int fstat(int fd, struct stat *st);
 int uname(struct utsname *u);
+int chdir(char *path);
 
 
 #endif
