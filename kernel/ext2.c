@@ -182,7 +182,7 @@ static struct inode *alloc_inode(int mode) {
   return ino;
 }
 
-static struct inode *new_inode(struct inode *dir, int mode) {
+static struct inode *new_inode(struct inode *dir, int mode, int major, int minor) {
   struct inode *ino = alloc_inode(mode);
   if(!ino)
     return NULL;
@@ -192,12 +192,20 @@ static struct inode *new_inode(struct inode *dir, int mode) {
   return ino;
 }
 
+static struct inode *ext2_mkreg(char *path, struct inode *cwd) {
+  struct inode *ino = new_inode(cwd, EXT2_S_IFREG, 0, 0);
+}
+
+static struct inode *ext2_mkdir(char *path, struct inode *cwd) {
+  struct inode *ino = new_inode(cwd, EXT2_S_IFDIR, 0, 0);
+}
+
 static void *get_block(int bnum) {
   return imginfo.base + (u64)bnum * imginfo.block_size;
 }
 
-static void *get_indirect_block(u32 *map, int bi) {
-  char idx = bi - 12;
+static void *get_indirect_block(u32 *map, int bnum) {
+  char idx = bnum - 12;
   return get_block(map[idx]);
 }
 
