@@ -44,7 +44,7 @@
 #define EXT2_FT_SOCK  6
 #define EXT2_FT_SYMLINK  7
 
-struct superblock {
+struct ext2_superblock {
   u32 s_inodes_count;
   u32 s_blocks_count;
   u32 s_r_blocks_count;
@@ -100,7 +100,8 @@ struct superblock {
   char _unused[760];
 } __attribute__((packed));
 
-struct inode {
+/* on disk inode */
+struct ext2_inode {
   u16 i_mode;
   u16 i_uid;
   u32 i_size;
@@ -121,7 +122,7 @@ struct inode {
   u32 i_osd2[3];
 } __attribute__((packed));
 
-struct bg_desc {
+struct ext2_bg_desc {
   u32 bg_block_bitmap;
   u32 bg_inode_bitmap;
   u32 bg_inode_table;
@@ -140,10 +141,8 @@ struct imginfo {
   char *inode_table;
 };
 
-void dump_superblock(struct superblock *sb);
-struct inode *path2inode(char *path);
-void fs_init(char *img);
-int read_inode(struct inode *ino, char *buf, u64 off, u64 size);
-bool isdir(struct inode *ino);
+struct ext2_inode *ext2_path2inode(char *path);
+void ext2_init(char *img);
+int ext2_read_inode(struct ext2_inode *ino, char *buf, u64 off, u64 size);
 
 #endif

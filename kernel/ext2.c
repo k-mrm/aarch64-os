@@ -9,7 +9,7 @@
 
 struct imginfo imginfo;
 
-void dump_superblock(struct superblock *sb) {
+void dump_superblock(struct ext2_superblock *sb) {
   printk("superblock dump sb %p\n", sb);
   printk("sizeof *sb %d\n", sizeof(*sb));
   printk("s_inodes_count: %d\n", sb->s_inodes_count);
@@ -28,7 +28,7 @@ void dump_superblock(struct superblock *sb) {
   printk("s_inodes_per_group %d\n", sb->s_inodes_per_group);
 }
 
-void dump_bg_desc(struct bg_desc *bg) {
+void dump_bg_desc(struct ext2_bg_desc *bg) {
   printk("bg_desc dump %p\n", bg);
   printk("sizeof *bg: %d\n", sizeof(*bg));
   printk("bg_block_bitmap: %d\n", bg->bg_block_bitmap);
@@ -41,7 +41,7 @@ void dump_bg_desc(struct bg_desc *bg) {
 
 #define inode_nblock(i) ((i)->i_blocks / (2 << 0))
 
-void dump_inode(struct inode *i) {
+void dump_inode(struct ext2_inode *i) {
   printk("inode dump: %p\n", i);
   printk("sizeof *i: %d\n", sizeof(*i));
   printk("i_mode: %p\n", i->i_mode);
@@ -49,16 +49,6 @@ void dump_inode(struct inode *i) {
   printk("i_blocks: %d\n", i->i_blocks);
   for(int b = 0; b < 15; b++)
     printk("i_block[%d]: %p\n", b, i->i_block[b]);
-}
-
-void dump_dirent(struct dirent *d) {
-  printk("dirent dump: %p\n", d);
-  printk("sizeof *d: %d\n", sizeof(*d));
-  printk("inode: %d\n", d->inode);
-  printk("rec_len: %d\n", d->rec_len);
-  printk("name_len: %d\n", d->name_len);
-  printk("file_type: %d\n", d->file_type);
-  printk("name: %s\n", d->name);
 }
 
 void dump_dirent_block(char *blk) {
@@ -94,9 +84,6 @@ int search_dirent_block(char *blk, char *path) {
   return -1;
 }
 
-static void add_dirent(struct inode *dir, struct inode *ino) {
-}
-
 static inline char *block_bitmap() {
   return imginfo.block_bitmap;
 }
@@ -123,7 +110,7 @@ static int find_free_ino(char *bitmap) {
   return inum;
 }
 
-static int find_free_block(char *bitmap) {
+static int ext2_find_free_block(char *bitmap) {
   char chunk = 0xff;
   int bnum = 0;
   for(int i = 0; i < imginfo.block_size; i++) {
@@ -165,11 +152,11 @@ found:
   return 0;
 }
 
-static struct inode *get_inode(int inum) {
-  return (struct inode *)(imginfo.inode_table + (inum - 1) * sizeof(struct inode));
+static struct ext2_inode *ext2_get_inode(int inum) {
+  return (struct ext2_inode *)(imginfo.inode_table + (inum - 1) * sizeof(struct ext2_inode));
 }
 
-static struct inode *alloc_inode(int mode) {
+static struct inode *alloc_inode(int mode, int major, int minor) {
   int inum = find_free_ino(inode_bitmap());
   if(inum < 0)
     return NULL;
@@ -182,22 +169,35 @@ static struct inode *alloc_inode(int mode) {
   return ino;
 }
 
-static struct inode *new_inode(struct inode *dir, int mode, int major, int minor) {
-  struct inode *ino = alloc_inode(mode);
+static int dirlink(struct inode *pdir, char *pname, struct inode *ino) {
+}
+
+static struct inode *new_inode(char *path, struct inode *dir, int mode, int major, int minor) {
+  struct inode *ino = alloc_inode(mode, major, minor);
   if(!ino)
     return NULL;
 
-  add_dirent(dir, ino);
+  struct inode *pdir;
+
+  dirlink(dir, path, ino);
 
   return ino;
 }
 
 static struct inode *ext2_mkreg(char *path, struct inode *cwd) {
-  struct inode *ino = new_inode(cwd, EXT2_S_IFREG, 0, 0);
+  struct inode *ino = new_inode(path, cwd, EXT2_S_IFREG, 0, 0);
 }
 
 static struct inode *ext2_mkdir(char *path, struct inode *cwd) {
-  struct inode *ino = new_inode(cwd, EXT2_S_IFDIR, 0, 0);
+  struct inode *ino = new_inode(path, cwd, EXT2_S_IFDIR, 0, 0);
+}
+
+static struct inode *ext2_mkcdev(char *path, struct inode *cwd, int major, int minor) {
+  struct inode *ino = new_inode(path, cwd, EXT2_S_IFCHR, major, minor);
+}
+
+static struct inode *ext2_mkbdev(char *path, struct inode *cwd, int major, int minor) {
+  struct inode *ino = new_inode(path, cwd, EXT2_S_IFBLK, major, minor);
 }
 
 static void *get_block(int bnum) {
@@ -314,7 +314,7 @@ static char *skippath(char *path, char *name, int *err) {
   return path;
 }
 
-static struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
+static struct ext2_inode *traverse_inode(struct ext2_inode *pi, char *path, char *name) {
   int err = 0;
   path = skippath(path, name, &err);
   if(err)
@@ -337,18 +337,14 @@ static struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
 
   memset(name, 0, DIRENT_NAME_MAX);
 
-  return traverse_inode(get_inode(inum), path, name);
+  return traverse_inode(ext2_get_inode(inum), path, name);
 }
 
-bool isdir(struct inode *ino) {
-  return ino->i_mode & EXT2_S_IFDIR;
-}
-
-struct inode *path2inode(char *path) {
-  struct inode *ino;
+struct ext2_inode *ext2_path2inode(char *path) {
+  struct ext2_inode *ino;
 
   if(*path == '/')
-    ino = get_inode(EXT2_ROOT_INO);
+    ino = ext2_get_inode(EXT2_ROOT_INO);
   else
     ino = curproc->cwd;
 
@@ -358,7 +354,7 @@ struct inode *path2inode(char *path) {
   return ino;
 }
 
-void fs_init(char *img) {
+void ext2_init(char *img) {
   struct superblock *sb = (struct superblock *)(img + 0x400);
   // dump_superblock(sb);
   if(sb->s_magic != 0xef53)
@@ -373,7 +369,4 @@ void fs_init(char *img) {
   imginfo.block_bitmap = get_block(bg->bg_block_bitmap);
   imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
   imginfo.inode_table = get_block(bg->bg_inode_table);
-
-  dump_inode(path2inode("/cat"));
-  alloc_inode(1);
 }

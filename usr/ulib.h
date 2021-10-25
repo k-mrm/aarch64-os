@@ -27,6 +27,4 @@ void *memset(void *dst, int c, u64 n);
 void *memcpy(void *dst, const void *src, u64 n);
 void *memmove(void *dst, const void *src, u64 n);
 
-void printx(u64 n);
-
 #endif
