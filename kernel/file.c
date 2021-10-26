@@ -76,10 +76,10 @@ int fstat(int fd, struct stat *st) {
   struct inode *ino = f->ino;
 
   st->st_dev = 0; /* TODO */
-  st->st_ino = 0; /* TODO */
-  st->st_mode = ino->i_mode;
-  st->st_size = ino->i_size;
-  st->st_nlink = ino->i_links_count;
+  st->st_ino = ino->inum; /* TODO */
+  st->st_mode = ino->mode;
+  st->st_size = ino->size;
+  st->st_nlink = ino->links_count;
 }
 
 int open(char *path, int flags) {
@@ -106,11 +106,11 @@ int open(char *path, int flags) {
       break; 
   }
 
-  if((flags & O_DIRECTORY) && !(ino->i_mode & S_IFDIR))
+  if((flags & O_DIRECTORY) && !isdir(ino))
     return -1;
 
   int fd;
-  for(fd = 3; fd < 16; fd++) {
+  for(fd = 3; fd < NOFILE; fd++) {
     if(p->ofile[fd] == NULL)
       goto found;
   }

@@ -2,6 +2,7 @@
 #define AARCH64_OS_EXT2_H
 
 #include "kernel.h"
+#include "fs.h"
 
 /* inode.i_mode */
 #define EXT2_S_IFSOCK 0xc000
@@ -132,14 +133,6 @@ struct ext2_bg_desc {
   u16 bg_pad;
   char bg_reserved[12];
 } __attribute__((packed));
-
-struct imginfo {
-  char *base;
-  u64 block_size;
-  char *block_bitmap;
-  char *inode_bitmap;
-  char *inode_table;
-};
 
 struct ext2_inode *ext2_path2inode(char *path);
 void ext2_init(char *img);

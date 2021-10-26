@@ -45,6 +45,8 @@ enum procstate {
   ZOMBIE,
 };
 
+#define NOFILE  16
+
 struct proc {
   enum procstate state;
   int ret;
@@ -56,7 +58,7 @@ struct proc {
   char *kstack;
   u64 *pgt;
   struct inode *cwd;
-  struct file *ofile[16];
+  struct file *ofile[NOFILE];
   char name[16];
 };
 

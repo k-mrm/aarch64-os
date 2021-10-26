@@ -2,32 +2,48 @@
 #define AARCH64_OS_FS_H
 
 #include "kernel.h"
-#include "ext2.h"
 
 /* inode.mode */
-#define S_IFSOCK  EXT2_S_IFSOCK
-#define S_IFLNK EXT2_S_IFLNK
-#define S_IFREG EXT2_S_IFREG
-#define S_IFBLK EXT2_S_IFBLK
-#define S_IFDIR EXT2_S_IFDIR
-#define S_IFCHR EXT2_S_IFCHR
-#define S_IFIFO EXT2_S_IFIFO
-                
-#define S_ISUID EXT2_S_ISUID
-#define S_ISGID EXT2_S_ISGID
-#define S_ISVTX EXT2_S_ISVTX
-                
-#define S_IRUSR EXT2_S_IRUSR
-#define S_IWUSR EXT2_S_IWUSR
-#define S_IXUSR EXT2_S_IXUSR
-#define S_IRGRP EXT2_S_IRGRP
-#define S_IWGRP EXT2_S_IWGRP
-#define S_IXGRP EXT2_S_IXGRP
-#define S_IROTH EXT2_S_IROTH
-#define S_IWOTH EXT2_S_IWOTH
-#define S_IXOTH EXT2_S_IXOTH
+#define S_IFSOCK  0xc000
+#define S_IFLNK   0xa000
+#define S_IFREG   0x8000
+#define S_IFBLK   0x6000
+#define S_IFDIR   0x4000
+#define S_IFCHR   0x2000
+#define S_IFIFO   0x1000
+
+#define S_ISUID   0x0800
+#define S_ISGID   0x0400
+#define S_ISVTX   0x0200
+
+#define S_IRUSR   0x0100
+#define S_IWUSR   0x0080
+#define S_IXUSR   0x0040
+#define S_IRGRP   0x0020
+#define S_IWGRP   0x0010
+#define S_IXGRP   0x0008
+#define S_IROTH   0x0004
+#define S_IWOTH   0x0002
+#define S_IXOTH   0x0001
 
 #define NINODE  256
+
+struct superblock {
+  u32 inodes_count;
+  u32 blocks_count;
+  u32 first_data_block;
+  u32 blocks_per_group;
+  u32 inodes_per_group;
+  u32 mtime;
+  u32 wtime;
+  u32 first_ino;
+  u16 inode_size;
+
+  u32 block_size;
+  char *block_bitmap;
+  char *inode_bitmap;
+  char *inode_table;
+};
 
 /* on memory inode */
 struct inode {
@@ -49,7 +65,7 @@ struct inode {
   u32 minor;
 };
 
-void fs_init(char *img);
+void fs_init(void);
 bool isdir(struct inode *ino);
 
 #endif

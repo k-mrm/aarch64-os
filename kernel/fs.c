@@ -1,18 +1,9 @@
 #include "fs.h"
-#include "ext2.h"
 #include "dirent.h"
 
-struct inode itable[NINODE];
+#define inode_nblock(i) ((i)->blocks / (2 << 0))
 
-void dump_dirent(struct dirent *d) {
-  printk("dirent dump: %p\n", d);
-  printk("sizeof *d: %d\n", sizeof(*d));
-  printk("inode: %d\n", d->inode);
-  printk("rec_len: %d\n", d->rec_len);
-  printk("name_len: %d\n", d->name_len);
-  printk("file_type: %d\n", d->file_type);
-  printk("name: %s\n", d->name);
-}
+struct inode itable[NINODE];
 
 static struct inode *load_dinode(struct ext2_inode *e, struct inode *i) {
   i->mode = e->i_mode;
@@ -31,6 +22,15 @@ static struct inode *load_dinode(struct ext2_inode *e, struct inode *i) {
   return i;
 }
 
+char *inode_block(struct inode *ino, int bi) {
+  if(bi < 12)
+    return get_block(ino->block[bi]);
+  else
+    return get_indirect_block((u32 *)get_block(ino->block[12]), bi);
+
+  return NULL;
+}
+
 static struct inode *alloc_inode() {
   struct inode *ino;
   for(int i = 0; i < NINODE; i++) {
@@ -40,6 +40,14 @@ static struct inode *alloc_inode() {
   }
 
   return NULL;
+}
+
+static void free_inode(struct inode *ino) {
+  memset(ino, 0, sizeof(*ino));
+}
+
+static void sync_inode(struct inode *ino) {
+  ;
 }
 
 static struct inode *get_inode(int inum) {
@@ -57,8 +65,24 @@ static struct inode *get_inode(int inum) {
   struct ext2_inode *eino = ext2_get_inode(inum);
 
   load_dinode(eino, ino, inum);
+  ino->inum = inum;
+
+  return ino;
+}
+
+struct inode *new_inode(char *path, struct inode *dir, int mode, int major, int minor) {
+  struct inode *ino = alloc_inode();
+  if(!ino)
+    return NULL;
+
+  int inum = ext2_alloc_inum();
+  if(inum < 0)
+    return NULL;
 
   ino->inum = inum;
+  ino->mode = mode;
+  ino->major = major;
+  ino->minor = minor;
 
   return ino;
 }
@@ -71,8 +95,8 @@ struct inode *path2i(char *path) {
   struct ext2_inode *eino = ext2_path2inode(path);
 }
 
-void fs_init(char *img) {
-  ext2_init(img);
+void fs_init() {
+  ext2_init();
 
   memset(itable, 0, sizeof(struct inode) * NINODE);
 }

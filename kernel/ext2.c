@@ -6,8 +6,9 @@
 #include "string.h"
 #include "proc.h"
 #include "kalloc.h"
+#include "ramdisk.h"
 
-struct imginfo imginfo;
+struct superblock sb;
 
 void dump_superblock(struct ext2_superblock *sb) {
   printk("superblock dump sb %p\n", sb);
@@ -39,8 +40,6 @@ void dump_bg_desc(struct ext2_bg_desc *bg) {
   printk("bg_used_dirs_count: %d\n", bg->bg_used_dirs_count);
 }
 
-#define inode_nblock(i) ((i)->i_blocks / (2 << 0))
-
 void dump_inode(struct ext2_inode *i) {
   printk("inode dump: %p\n", i);
   printk("sizeof *i: %d\n", sizeof(*i));
@@ -51,9 +50,19 @@ void dump_inode(struct ext2_inode *i) {
     printk("i_block[%d]: %p\n", b, i->i_block[b]);
 }
 
+void dump_dirent(struct dirent *d) {
+  printk("dirent dump: %p\n", d);
+  printk("sizeof *d: %d\n", sizeof(*d));
+  printk("inode: %d\n", d->inode);
+  printk("rec_len: %d\n", d->rec_len);
+  printk("name_len: %d\n", d->name_len);
+  printk("file_type: %d\n", d->file_type);
+  printk("name: %s\n", d->name);
+}
+
 void dump_dirent_block(char *blk) {
   struct dirent *d = (struct dirent *)blk;
-  char *blk_end = blk + imginfo.block_size;
+  char *blk_end = blk + sb.bsize;
   char *cd;
 
   while(d != blk_end && d->inode != 0) {
@@ -66,7 +75,7 @@ void dump_dirent_block(char *blk) {
 
 int search_dirent_block(char *blk, char *path) {
   struct dirent *d = (struct dirent *)blk;
-  char *blk_end = blk + imginfo.block_size;
+  char *blk_end = blk + sb.bsize;
   char *cd;
   char buf[DIRENT_NAME_MAX];
 
@@ -85,17 +94,17 @@ int search_dirent_block(char *blk, char *path) {
 }
 
 static inline char *block_bitmap() {
-  return imginfo.block_bitmap;
+  return sb.block_bitmap;
 }
 
 static inline char *inode_bitmap() {
-  return imginfo.inode_bitmap;
+  return sb.inode_bitmap;
 }
 
-static int find_free_ino(char *bitmap) {
+static int find_free_ino(struct superblock *sb, char *bitmap) {
   char chunk = 0xff;
   int inum = 1;
-  for(int i = 0; i < imginfo.block_size; i++) {
+  for(int i = 0; i < sb->block_size; i++) {
     if((chunk = bitmap[i]) != 0xff)
       break;
     inum += 8;
@@ -110,10 +119,10 @@ static int find_free_ino(char *bitmap) {
   return inum;
 }
 
-static int ext2_find_free_block(char *bitmap) {
+static int find_free_block(char *bitmap) {
   char chunk = 0xff;
   int bnum = 0;
-  for(int i = 0; i < imginfo.block_size; i++) {
+  for(int i = 0; i < sb.bsize; i++) {
     if((chunk = bitmap[i]) != 0xff)
       break;
     bnum += 8;
@@ -132,7 +141,7 @@ static int ibmp_write_bit(char *bitmap, int ino, int val) {
   int bitn = ino - 1;
   int chunkn;
   char c;
-  for(chunkn = 0; chunkn < imginfo.block_size; chunkn++) {
+  for(chunkn = 0; chunkn < sb.bsize; chunkn++) {
     if(bitn < 8)
       goto found;
     bitn -= 8;
@@ -152,21 +161,18 @@ found:
   return 0;
 }
 
-static struct ext2_inode *ext2_get_inode(int inum) {
-  return (struct ext2_inode *)(imginfo.inode_table + (inum - 1) * sizeof(struct ext2_inode));
+struct ext2_inode *ext2_get_inode(int inum) {
+  return (struct ext2_inode *)(sb.inode_table + (inum - 1) * sizeof(struct ext2_inode));
 }
 
-static struct inode *alloc_inode(int mode, int major, int minor) {
+struct int ext2_alloc_inum() {
   int inum = find_free_ino(inode_bitmap());
   if(inum < 0)
-    return NULL;
+    return -1;
 
   ibmp_write_bit(inode_bitmap(), inum, 1);
 
-  struct inode *ino = get_inode(inum);
-  ino->i_mode = mode;
-
-  return ino;
+  return inum;
 }
 
 static int dirlink(struct inode *pdir, char *pname, struct inode *ino) {
@@ -200,8 +206,8 @@ static struct inode *ext2_mkbdev(char *path, struct inode *cwd, int major, int m
   struct inode *ino = new_inode(path, cwd, EXT2_S_IFBLK, major, minor);
 }
 
-static void *get_block(int bnum) {
-  return imginfo.base + (u64)bnum * imginfo.block_size;
+static void *ext2_get_block(int bnum) {
+  return diskread((u64)bnum * sb.bsize);
 }
 
 static void *get_indirect_block(u32 *map, int bnum) {
@@ -210,14 +216,6 @@ static void *get_indirect_block(u32 *map, int bnum) {
 }
 
 void w_inode_block(struct inode *ino, int bi, char *blk) {
-}
-
-char *inode_block(struct inode *ino, int bi) {
-  if(bi < 12)
-    return get_block(ino->i_block[bi]);
-  else
-    return get_indirect_block((u32 *)get_block(ino->i_block[12]), bi);
-  return NULL;
 }
 
 void ls_inode(struct inode *ino) {
@@ -238,7 +236,7 @@ void ls_inode(struct inode *ino) {
 
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   // printk("readinode %p %d %d\n", buf, off, size);
-  u32 bsize = imginfo.block_size;
+  u32 bsize = sb.bsize;
   char *base = buf;
 
   if(off > ino->i_size)
@@ -267,7 +265,7 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 }
 
 int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
-  u32 bsize = imginfo.block_size;
+  u32 bsize = ino->sb->bsize;
   char *base = buf;
 
   if(off > ino->i_size)
@@ -354,19 +352,19 @@ struct ext2_inode *ext2_path2inode(char *path) {
   return ino;
 }
 
-void ext2_init(char *img) {
-  struct superblock *sb = (struct superblock *)(img + 0x400);
+void ext2_init() {
+  char *img = diskread(0);
+  struct ext2_superblock *esb = (struct ext2_superblock *)(img + 0x400);
   // dump_superblock(sb);
-  if(sb->s_magic != 0xef53)
+  if(esb->s_magic != 0xef53)
     panic("invalid filesystem");
-  u32 block_size = 1024 << sb->s_log_block_size;
 
-  struct bg_desc *bg = (struct bg_desc *)(img + 0x800);
-  // dump_bg_desc(bg);
+  sb.block_size = 1024 << esb->s_log_block_size;
 
-  imginfo.base = img;
-  imginfo.block_size = block_size;
-  imginfo.block_bitmap = get_block(bg->bg_block_bitmap);
-  imginfo.inode_bitmap = get_block(bg->bg_inode_bitmap);
-  imginfo.inode_table = get_block(bg->bg_inode_table);
+  struct ext2_bg_desc *bg = (struct ext2_bg_desc *)(img + 0x800);
+
+  sb.bsize = block_size;
+  sb.block_bitmap = ext2_get_block(bg->bg_block_bitmap);
+  sb.inode_bitmap = ext2_get_block(bg->bg_inode_bitmap);
+  sb.inode_table = ext2_get_block(bg->bg_inode_table);
 }

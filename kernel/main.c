@@ -24,7 +24,7 @@ int main(void) {
   kalloc_init2();
   proc_init();
   ramdisk_init();
-  fs_init(diskread(0));
+  fs_init();
   file_init();
 
   kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
