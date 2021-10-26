@@ -3,14 +3,14 @@
 
 #include "kernel.h"
 
-#define T_UNKNOWN   EXT2_FT_UNKNOWN
-#define T_REG_FILE  EXT2_FT_REG_FILE
-#define T_DIR       EXT2_FT_DIR
-#define T_CHRDEV    EXT2_FT_CHRDEV
-#define T_BLKDEV    EXT2_FT_BLKDEV
-#define T_FIFO      EXT2_FT_FIFO
-#define T_SOCK      EXT2_FT_SOCK
-#define T_SYMLINK   EXT2_FT_SYMLINK
+#define DT_UNKNOWN  EXT2_FT_UNKNOWN
+#define DT_REG      EXT2_FT_REG_FILE
+#define DT_DIR      EXT2_FT_DIR
+#define DT_CHR      EXT2_FT_CHRDEV
+#define DT_BLK      EXT2_FT_BLKDEV
+#define DT_FIFO     EXT2_FT_FIFO
+#define DT_SOCK     EXT2_FT_SOCK
+#define DT_LNK      EXT2_FT_SYMLINK
 
 struct dirent {
   u32 inode;
