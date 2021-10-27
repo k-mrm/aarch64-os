@@ -20,6 +20,9 @@ static void dump_bg_desc(struct ext2_bg_desc *bg) __unused;
 static void dump_ext2_inode(struct ext2_inode *i) __unused;
 static void dump_dirent(struct dirent *d) __unused;
 
+struct inode *ext2_path2inode(char *path);
+struct inode *ext2_path2inode_parent(char *path, char *namebuf);
+
 static void dump_superblock(struct ext2_superblock *sb) {
   printk("superblock dump sb %p\n", sb);
   printk("sizeof *sb %d\n", sizeof(*sb));
@@ -448,12 +451,16 @@ int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 }
 */
 
-struct inode *ext2_mkcdev(const char *path, int dev, struct inode *dir) {
-  return ext2_new_inode(path, dir, S_IFCHR, dev);
+struct inode *ext2_mkcdev(const char *path, int dev) {
+  char namebuf[DIRENT_NAME_MAX] = {0};
+  struct inode *pdir = ext2_path2inode_parent(path, namebuf);
+  return ext2_new_inode(namebuf, pdir, S_IFCHR, dev);
 }
 
-struct inode *ext2_mkdir(const char *path, struct inode *dir) {
-  return ext2_new_inode(path, dir, S_IFDIR, 0);
+struct inode *ext2_mkdir(const char *path) {
+  char namebuf[DIRENT_NAME_MAX] = {0};
+  struct inode *pdir = ext2_path2inode_parent(path, namebuf);
+  return ext2_new_inode(namebuf, pdir, S_IFDIR, 0);
 }
 
 static char *skippath(char *path, char *name, int *err) {
@@ -561,7 +568,7 @@ struct inode *ext2_path2inode(char *path) {
 }
 
 /* return parent inode of inode by path */
-struct inode *ext2_path2inode_parent(char *path) {
+struct inode *ext2_path2inode_parent(char *path, char *namebuf) {
   struct inode *ino;
 
   if(*path == '/')
@@ -569,8 +576,7 @@ struct inode *ext2_path2inode_parent(char *path) {
   else
     ino = curproc->cwd;
 
-  char name[DIRENT_NAME_MAX] = {0};
-  ino = traverse_inode_parent(ino, path, name);
+  ino = traverse_inode_parent(ino, path, namebuf);
 
   return ino;
 }
@@ -598,5 +604,7 @@ void ext2_init() {
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
 
-  ls_inode(ext2_path2inode_parent("/cat"));
+  ext2_mkdir("/fuck");
+  ls_inode(ext2_path2inode("/"));
+  ls_inode(ext2_path2inode("/fuck"));
 }
