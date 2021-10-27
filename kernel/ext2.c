@@ -259,6 +259,22 @@ static struct inode *ext2_alloc_inode() {
 
 #define roundup_4byte(m)  (((u64)(m)+3) & ~3)
 
+/* @buf must be (sb.bsize)byte buffer */
+static void make_dirent(u32 inode, char *name, u8 file_type, struct dirent *buf) {
+  memset(buf, 0, sb.bsize);
+
+  buf->inode = inode;
+  buf->file_type = file_type;
+
+  u32 name_len = strlen(name);
+  buf->name_len = name_len;
+
+  memcpy(buf->name, name, buf->name_len+1);
+
+  u32 len = ((u64)buf->name + name_len) - (u64)buf;
+  buf->rec_len = roundup_4byte(len);
+}
+
 static int dirlink(struct inode *pdir, struct dirent *de) {
   struct dirent *d;
   char *b; 
@@ -268,6 +284,7 @@ static int dirlink(struct inode *pdir, struct dirent *de) {
   /* find last block */
   for(int i = 0; i < ext2_inode_nblock(pdir); i++) {
     b = ext2_inode_block(pdir, i);
+    d = (struct dirent *)b;
     bend = b + sb.bsize;
 
     for(u64 bpos = 0; bpos < sb.bsize; ) {
@@ -298,6 +315,7 @@ empty_block:
   d->inode = de->inode;
   d->rec_len = sb.bsize;
   d->name_len = de->name_len;
+  d->file_type = de->file_type;
   memcpy(d->name, de->name, de->name_len + 1);
 
   return 0;
@@ -313,16 +331,19 @@ found:
   newd->inode = de->inode;
   newd->rec_len = (u64)(bend - debegin);
   newd->name_len = de->name_len;
+  newd->file_type = de->file_type;
   memcpy(newd->name, de->name, de->name_len + 1);
 
   return 0;
 }
 
+/* synchronize @ino with disk inode */
 static void inode_sync(struct inode *ino) {
   ;
 }
 
 static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int dev) {
+  char buf[1024];
   struct inode *ino = ext2_alloc_inode();
 
   ino->mode = mode;
@@ -330,10 +351,19 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
   ino->links_count = 1;
 
   if(S_ISDIR(mode)) {
-    ;
+    dir->links_count++;
+    make_dirent(ino->inum, ".", DT_DIR, (struct dirent *)buf);
+    dirlink(ino, (struct dirent *)buf);  /* dirlink "." */
+    make_dirent(dir->inum, "..", DT_DIR, (struct dirent *)buf);
+    dirlink(ino, (struct dirent *)buf);  /* dirlink ".." */
   }
 
+  make_dirent(ino->inum, name, DT_DIR, (struct dirent *)buf);
+  dirlink(dir, (struct dirent *)buf);  /* dirlink new inode to dir */
+
   // inode_sync(ino);
+
+  return ino;
 }
 
 struct inode *ext2_get_inode(int inum) {
