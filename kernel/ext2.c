@@ -85,26 +85,6 @@ void dump_dirent_block(char *blk) {
   }
 }
 
-int search_dirent_block(char *blk, char *path) {
-  struct dirent *d = (struct dirent *)blk;
-  char *blk_end = blk + sb.bsize;
-  char *cd;
-  char buf[DIRENT_NAME_MAX];
-
-  while(d != blk_end && d->inode != 0) {
-    memset(buf, 0, DIRENT_NAME_MAX);
-    memcpy(buf, d->name, d->name_len);
-    if(strcmp(buf, path) == 0)
-      return d->inode;
-
-    cd = (char *)d;
-    cd += d->rec_len;
-    d = (struct dirent *)cd;
-  }
-
-  return -1;
-}
-
 static int find_free_ino(char *bitmap) {
   char chunk = 0xff;
   int inum = 1;
@@ -491,7 +471,37 @@ static char *skippath(char *path, char *name, int *err) {
   return path;
 }
 
-static struct inode *ext2_traverse_inode(struct inode *pi, char *path, char *name) {
+static int search_dirent_block(char *blk, char *path) {
+  struct dirent *d;
+  char buf[DIRENT_NAME_MAX];
+
+  for(u64 bpos = 0; bpos < sb.bsize; ) {
+    d = (struct dirent *)(blk + bpos);
+
+    memset(buf, 0, DIRENT_NAME_MAX);
+    memcpy(buf, d->name, d->name_len);
+    if(strcmp(buf, path) == 0)
+      return d->inode;
+
+    bpos += d->rec_len;
+  }
+
+  return -1;
+}
+
+static int ext2_search_dir(struct inode *dir, char *name) {
+  int inum;
+  for(int i = 0; i < ext2_inode_nblock(dir); i++) {
+    char *db = ext2_inode_block(dir, i);
+    if((inum = search_dirent_block(db, name)) > 0)
+      return inum;
+  }
+
+  return -1;
+}
+
+/* traverse and return inode by path */
+static struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
   int err = 0;
   path = skippath(path, name, &err);
   if(err)
@@ -501,22 +511,16 @@ static struct inode *ext2_traverse_inode(struct inode *pi, char *path, char *nam
   if(!S_ISDIR(pi->mode))
     return pi;
 
-  int inum = -1;
-
-  for(int i = 0; i < ext2_inode_nblock(pi); i++) {
-    char *db = ext2_inode_block(pi, i);
-    if((inum = search_dirent_block(db, name)) > 0)
-      break;
-  }
-
+  int inum = ext2_search_dir(pi, name);
   if(inum < 0)
     return NULL;
 
   memset(name, 0, DIRENT_NAME_MAX);
 
-  return ext2_traverse_inode(ext2_get_inode(inum), path, name);
+  return traverse_inode(ext2_get_inode(inum), path, name);
 }
 
+/* return inode by path */
 struct inode *ext2_path2inode(char *path) {
   struct inode *ino;
 
@@ -526,9 +530,14 @@ struct inode *ext2_path2inode(char *path) {
     ino = curproc->cwd;
 
   char name[DIRENT_NAME_MAX] = {0};
-  ino = ext2_traverse_inode(ino, path, name);
+  ino = traverse_inode(ino, path, name);
 
   return ino;
+}
+
+/* return parent inode of inode by path */
+struct inode *ext2_path2inode_parent(char *path) {
+  ;
 }
 
 void ext2_init() {
