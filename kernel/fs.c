@@ -48,7 +48,7 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   return ext2_read_inode(ino, buf, off, size);
 }
 
-struct inode *new_inode(char *path, struct inode *dir, int mode, int major, int minor) {
+int write_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   ;
 }
 

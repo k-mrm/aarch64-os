@@ -198,6 +198,18 @@ found:
   return 0;
 }
 
+static int ext2_alloc_block() {
+  char *bbmp = sb.block_bitmap;
+
+  int bn = find_free_block(bbmp);
+  if(bn < 0)
+    return -1;
+
+  bbmp_write_bit(bbmp, bn, 1);
+
+  return bn;
+}
+
 struct ext2_inode *ext2_raw_inode(int inum) {
   return (struct ext2_inode *)(sb.inode_table + (inum - 1) * sizeof(struct ext2_inode));
 }
@@ -209,6 +221,22 @@ char *ext2_inode_block(struct inode *ino, int bi) {
     return get_indirect_block((u32 *)get_block(ino->block[12]), bi);
 
   return NULL;
+}
+
+int ext2_append_inode_block(struct inode *ino, int blockn) {
+  int i;
+  for(i = 0; i < 12; i++) {
+    if(ino->block[i] == 0)
+      goto found_free;
+  }
+
+  /* unimpl: indirect block */
+  return -1;
+
+found_free:
+  ino->block[i] = blockn;
+
+  return 0;
 }
 
 static int ext2_alloc_inum() {
@@ -223,7 +251,89 @@ static int ext2_alloc_inum() {
   return inum;
 }
 
-static int dirlink(struct inode *pdir, char *name, struct inode *ino) {
+static struct inode *ext2_alloc_inode() {
+  int inum = ext2_alloc_inum();
+
+  return find_inode(inum);
+}
+
+#define roundup_4byte(m)  (((u64)(m)+3) & ~3)
+
+static int dirlink(struct inode *pdir, struct dirent *de) {
+  struct dirent *d;
+  char *b; 
+  char *bend;
+  char *dend;
+  char *debegin;
+  /* find last block */
+  for(int i = 0; i < ext2_inode_nblock(pdir); i++) {
+    b = ext2_inode_block(pdir, i);
+    bend = b + sb.bsize;
+
+    for(u64 bpos = 0; bpos < sb.bsize; ) {
+      d = (struct dirent *)(b + bpos);
+      if(d->rec_len == 0) /* empty block */
+        goto empty_block;
+      bpos += d->rec_len;
+    }
+
+    /* can append de */
+    if((u64)bend - ((u64)d->name + strlen(d->name)) > de->rec_len)
+      goto found;
+  }
+
+  if(ext2_inode_nblock(pdir) == 0) {
+    int bn = ext2_alloc_block();
+    ext2_append_inode_block(pdir, bn);
+    b = get_block(bn);
+    d = (struct dirent *)b;
+    goto empty_block;
+  }
+
+  /* no free space */
+  return -1;
+
+empty_block:
+  /* d indicates b */
+  d->inode = de->inode;
+  d->rec_len = sb.bsize;
+  d->name_len = de->name_len;
+  memcpy(d->name, de->name, de->name_len + 1);
+
+  return 0;
+
+found:
+  /* d indicates last dirent of block(b) */
+  /* dirent must be aligned 4byte */
+  dend = d->name + strlen(d->name);
+  debegin = (char *)roundup_4byte(dend);
+  d->rec_len = (u64)debegin - (u64)d;
+
+  struct dirent *newd = (struct dirent *)debegin;
+  newd->inode = de->inode;
+  newd->rec_len = (u64)(bend - debegin);
+  newd->name_len = de->name_len;
+  memcpy(newd->name, de->name, de->name_len + 1);
+
+  return 0;
+}
+
+static void inode_sync(struct inode *ino) {
+  ;
+}
+
+static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int dev) {
+  struct inode *ino = ext2_alloc_inode();
+
+  ino->mode = mode;
+  ino->major = dev;
+  ino->links_count = 1;
+
+  if(S_ISDIR(mode)) {
+    ;
+  }
+
+  // inode_sync(ino);
 }
 
 struct inode *ext2_get_inode(int inum) {
@@ -244,18 +354,6 @@ struct inode *ext2_get_inode(int inum) {
   memcpy(i->block, e->i_block, sizeof(u32) * 15);
 
   return i;
-}
-
-static struct inode *ext2_new_inode(char *path, struct inode *dir, int mode, int major, int minor) {
-  struct inode *ino = alloc_inode();
-  if(!ino)
-    return NULL;
-
-  struct inode *pdir;
-
-  dirlink(dir, path, ino);
-
-  return ino;
 }
 
 /* for debug */
@@ -333,6 +431,14 @@ int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   }
 }
 */
+
+struct inode *ext2_mkcdev(const char *path, int dev, struct inode *dir) {
+  return ext2_new_inode(path, dir, S_IFCHR, dev);
+}
+
+struct inode *ext2_mkdir(const char *path, struct inode *dir) {
+  return ext2_new_inode(path, dir, S_IFDIR, 0);
+}
 
 static char *skippath(char *path, char *name, int *err) {
   /* skip '/' ("////aaa/bbb" -> "aaa/bbb") */
