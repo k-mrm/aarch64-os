@@ -133,7 +133,11 @@ int close(int fd) {
   return 0;
 }
 
-int mknod(const char *path, int mode, int dev) {
+int mknod(const char *path, int dev) {
+  ;
+}
+
+int mkdir(const char *path) {
   ;
 }
 

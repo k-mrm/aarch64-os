@@ -52,7 +52,11 @@ struct inode *new_inode(char *path, struct inode *dir, int mode, int major, int 
   ;
 }
 
-struct inode *create(char *path, int mode, int major, int minor) {
+struct inode *fs_mknod(const char *path, int dev) {
+  ;
+}
+
+struct inode *fs_mkdir(const char *path) {
   ;
 }
 

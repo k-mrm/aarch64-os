@@ -4,6 +4,9 @@
 #include "kernel.h"
 
 /* inode.mode */
+
+#define S_IFMT    0xf000
+
 #define S_IFSOCK  0xc000
 #define S_IFLNK   0xa000
 #define S_IFREG   0x8000
@@ -26,13 +29,13 @@
 #define S_IWOTH   0x0002
 #define S_IXOTH   0x0001
 
-#define S_ISSOCK(m) ((m) & S_IFSOCK)
-#define S_ISLNK(m)  ((m) & S_IFLNK)
-#define S_ISREG(m)  ((m) & S_IFREG)
-#define S_ISBLK(m)  ((m) & S_IFBLK)
-#define S_ISDIR(m)  ((m) & S_IFDIR)
-#define S_ISCHR(m)  ((m) & S_IFCHR)
-#define S_ISFIFO(m) ((m) & S_IFIFO)
+#define S_ISSOCK(m) (((m) & S_IFMT) == S_IFSOCK)
+#define S_ISLNK(m)  (((m) & S_IFMT) == S_IFLNK)
+#define S_ISREG(m)  (((m) & S_IFMT) == S_IFREG)
+#define S_ISBLK(m)  (((m) & S_IFMT) == S_IFBLK)
+#define S_ISDIR(m)  (((m) & S_IFMT) == S_IFDIR)
+#define S_ISCHR(m)  (((m) & S_IFMT) == S_IFCHR)
+#define S_ISFIFO(m) (((m) & S_IFMT) == S_IFIFO)
 
 #define NINODE  256
 
