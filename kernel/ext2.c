@@ -275,7 +275,7 @@ static void make_dirent(u32 inode, char *name, u8 file_type, struct dirent *buf)
   buf->rec_len = roundup_4byte(len);
 }
 
-static int dirlink(struct inode *pdir, struct dirent *de) {
+static int ext2_dirlink(struct inode *pdir, struct dirent *de) {
   struct dirent *d;
   char *b; 
   char *bend;
@@ -353,13 +353,13 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
   if(S_ISDIR(mode)) {
     dir->links_count++;
     make_dirent(ino->inum, ".", DT_DIR, (struct dirent *)buf);
-    dirlink(ino, (struct dirent *)buf);  /* dirlink "." */
+    ext2_dirlink(ino, (struct dirent *)buf);  /* dirlink "." */
     make_dirent(dir->inum, "..", DT_DIR, (struct dirent *)buf);
-    dirlink(ino, (struct dirent *)buf);  /* dirlink ".." */
+    ext2_dirlink(ino, (struct dirent *)buf);  /* dirlink ".." */
   }
 
   make_dirent(ino->inum, name, DT_DIR, (struct dirent *)buf);
-  dirlink(dir, (struct dirent *)buf);  /* dirlink new inode to dir */
+  ext2_dirlink(dir, (struct dirent *)buf);  /* dirlink new inode to dir */
 
   // inode_sync(ino);
 
