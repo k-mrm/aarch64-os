@@ -13,6 +13,13 @@
 static void *get_block(int bnum);
 static void *get_indirect_block(u32 *map, int bnum);
 
+#define __unused __attribute__((unused))
+
+static void dump_superblock(struct ext2_superblock *sb) __unused;
+static void dump_bg_desc(struct ext2_bg_desc *bg) __unused;
+static void dump_ext2_inode(struct ext2_inode *i) __unused;
+static void dump_dirent(struct dirent *d) __unused;
+
 static void dump_superblock(struct ext2_superblock *sb) {
   printk("superblock dump sb %p\n", sb);
   printk("sizeof *sb %d\n", sizeof(*sb));
@@ -43,7 +50,7 @@ static void dump_bg_desc(struct ext2_bg_desc *bg) {
   printk("bg_used_dirs_count: %d\n", bg->bg_used_dirs_count);
 }
 
-static void dump_inode(struct ext2_inode *i) {
+static void dump_ext2_inode(struct ext2_inode *i) {
   printk("inode dump: %p\n", i);
   printk("sizeof *i: %d\n", sizeof(*i));
   printk("i_mode: %p\n", i->i_mode);
@@ -55,7 +62,6 @@ static void dump_inode(struct ext2_inode *i) {
 
 static void dump_dirent(struct dirent *d) {
   printk("dirent dump: %p\n", d);
-  printk("sizeof *d: %d\n", sizeof(*d));
   printk("inode: %d\n", d->inode);
   printk("rec_len: %d\n", d->rec_len);
   printk("name_len: %d\n", d->name_len);
@@ -520,6 +526,25 @@ static struct inode *traverse_inode(struct inode *pi, char *path, char *name) {
   return traverse_inode(ext2_get_inode(inum), path, name);
 }
 
+static struct inode *traverse_inode_parent(struct inode *pi, char *path, char *name) {
+  int err = 0;
+  path = skippath(path, name, &err);
+  if(err)
+    return NULL;
+  if(*path == 0)
+    return pi;
+  if(!S_ISDIR(pi->mode))
+    return pi;
+
+  int inum = ext2_search_dir(pi, name);
+  if(inum < 0)
+    return NULL;
+
+  memset(name, 0, DIRENT_NAME_MAX);
+
+  return traverse_inode_parent(ext2_get_inode(inum), path, name);
+}
+
 /* return inode by path */
 struct inode *ext2_path2inode(char *path) {
   struct inode *ino;
@@ -537,7 +562,17 @@ struct inode *ext2_path2inode(char *path) {
 
 /* return parent inode of inode by path */
 struct inode *ext2_path2inode_parent(char *path) {
-  ;
+  struct inode *ino;
+
+  if(*path == '/')
+    ino = ext2_get_inode(EXT2_ROOT_INO);
+  else
+    ino = curproc->cwd;
+
+  char name[DIRENT_NAME_MAX] = {0};
+  ino = traverse_inode_parent(ino, path, name);
+
+  return ino;
 }
 
 void ext2_init() {
@@ -562,4 +597,6 @@ void ext2_init() {
   sb.wtime = esb->s_wtime;
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
+
+  ls_inode(ext2_path2inode_parent("/cat"));
 }
