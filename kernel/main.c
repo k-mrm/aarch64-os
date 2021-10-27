@@ -8,8 +8,8 @@
 #include "driver/timer.h"
 #include "log.h"
 #include "kalloc.h"
-#include "ext2.h"
 #include "ramdisk.h"
+#include "fs.h"
 #include "file.h"
 
 int main(void) {

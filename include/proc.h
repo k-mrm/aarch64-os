@@ -2,7 +2,7 @@
 #define AARCH64_OS_PROC_H
 
 #include "kernel.h"
-#include "ext2.h"
+#include "fs.h"
 #include "file.h"
 
 typedef int pid_t;

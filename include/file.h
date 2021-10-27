@@ -2,7 +2,7 @@
 #define AARCH64_OS_FILE_H
 
 #include "kernel.h"
-#include "ext2.h"
+#include "fs.h"
 
 #define NFILE 128
 

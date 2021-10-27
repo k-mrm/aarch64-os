@@ -64,7 +64,7 @@
 
 #ifndef __ASSEMBLER__
 
-#include "ext2.h"
+#include "fs.h"
 
 int init_userspace(u64 *pgt, char *code, u64 size);
 int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size);

@@ -1,7 +1,7 @@
 #include "kernel.h"
 #include "elf.h"
 #include "printk.h"
-#include "ext2.h"
+#include "fs.h"
 
 bool is_elf(struct ehdr *e) {
   if(e->e_ident[0] == 0x7f && e->e_ident[1] == 'E' &&

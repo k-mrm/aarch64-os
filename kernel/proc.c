@@ -9,7 +9,7 @@
 #include "memmap.h"
 #include "log.h"
 #include "elf.h"
-#include "ext2.h"
+#include "fs.h"
 
 struct proc proctable[NPROC];
 /* proctable[0] == kernel proc */
