@@ -52,12 +52,12 @@ int write_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   ;
 }
 
-struct inode *fs_mknod(const char *path, int dev) {
+struct inode *fs_mknod(char *path, int mode, int dev) {
   ;
 }
 
-struct inode *fs_mkdir(const char *path) {
-  ;
+struct inode *fs_mkdir(char *path) {
+  return ext2_mkdir(path);
 }
 
 struct inode *path2inode(char *path) {

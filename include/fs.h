@@ -61,16 +61,13 @@ extern struct superblock sb;
 /* on memory inode */
 struct inode {
   u16 mode;
-  u16 uid;
   u32 size;
   u32 atime;
   u32 ctime;
   u32 mtime;
   u32 dtime;
-  u16 gid;
   u16 links_count;
   u32 blocks;
-  u32 flags;
   u32 block[15];
 
   u32 inum;

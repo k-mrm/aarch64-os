@@ -20,6 +20,8 @@ static void dump_bg_desc(struct ext2_bg_desc *bg) __unused;
 static void dump_ext2_inode(struct ext2_inode *i) __unused;
 static void dump_dirent(struct dirent *d) __unused;
 
+static void inode_sync(struct inode *i);
+
 struct inode *ext2_path2inode(char *path);
 struct inode *ext2_path2inode_parent(char *path, char *namebuf);
 
@@ -224,6 +226,9 @@ int ext2_append_inode_block(struct inode *ino, int blockn) {
 
 found_free:
   ino->block[i] = blockn;
+  ino->blocks += sb.bsize / 512;
+
+  inode_sync(ino);
 
   return 0;
 }
@@ -327,8 +332,18 @@ found:
 }
 
 /* synchronize @ino with disk inode */
-static void inode_sync(struct inode *ino) {
-  ;
+static void inode_sync(struct inode *i) {
+  struct ext2_inode *e = ext2_raw_inode(i->inum);
+  
+  e->i_mode = i->mode;
+  e->i_size = i->size;
+  e->i_atime = i->atime;
+  e->i_ctime = i->ctime;
+  e->i_mtime = i->mtime;
+  e->i_dtime = i->dtime;
+  e->i_links_count = i->links_count;
+  e->i_blocks = i->blocks;
+  memcpy(e->i_block, i->block, sizeof(u32) * 15);
 }
 
 static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int dev) {
@@ -350,7 +365,7 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
   make_dirent(ino->inum, name, DT_DIR, (struct dirent *)buf);
   ext2_dirlink(dir, (struct dirent *)buf);  /* dirlink new inode to dir */
 
-  // inode_sync(ino);
+  inode_sync(ino);
 
   return ino;
 }
@@ -360,16 +375,13 @@ struct inode *ext2_get_inode(int inum) {
   struct ext2_inode *e = ext2_raw_inode(inum);
 
   i->mode = e->i_mode;
-  i->uid = e->i_uid;
   i->size = e->i_size;
   i->atime = e->i_atime;
   i->ctime = e->i_ctime;
   i->mtime = e->i_mtime;
   i->dtime = e->i_dtime;
-  i->gid = e->i_gid;
   i->links_count = e->i_links_count;
   i->blocks = e->i_blocks;
-  i->flags = e->i_flags;
   memcpy(i->block, e->i_block, sizeof(u32) * 15);
 
   return i;
@@ -451,10 +463,10 @@ int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 }
 */
 
-struct inode *ext2_mkcdev(const char *path, int dev) {
+struct inode *ext2_mknod(const char *path, int mode, int dev) {
   char namebuf[DIRENT_NAME_MAX] = {0};
   struct inode *pdir = ext2_path2inode_parent(path, namebuf);
-  return ext2_new_inode(namebuf, pdir, S_IFCHR, dev);
+  return ext2_new_inode(namebuf, pdir, mode, dev);
 }
 
 struct inode *ext2_mkdir(const char *path) {
