@@ -282,7 +282,7 @@ int chdir(char *path) {
   struct inode *ino = path2inode(path);
   if(!ino)
     return -1;
-  if(!isdir(ino))
+  if(!S_ISDIR(ino->mode))
     return -1;
 
   p->cwd = ino;

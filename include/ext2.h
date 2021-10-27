@@ -134,8 +134,9 @@ struct ext2_bg_desc {
   char bg_reserved[12];
 } __attribute__((packed));
 
-struct ext2_inode *ext2_path2inode(char *path);
-void ext2_init(char *img);
-int ext2_read_inode(struct ext2_inode *ino, char *buf, u64 off, u64 size);
+void ext2_init(void);
+struct inode *ext2_path2inode(char *path);
+int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size);
+struct inode *ext2_get_inode(int inum);
 
 #endif

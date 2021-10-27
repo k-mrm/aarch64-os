@@ -10,6 +10,7 @@ struct stat {
   u16 st_mode;
   u32 st_size;
   u32 st_nlink;
+  u32 st_blksize;
 };
 
 #endif

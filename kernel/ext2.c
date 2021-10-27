@@ -8,9 +8,12 @@
 #include "kalloc.h"
 #include "ramdisk.h"
 
-struct superblock sb;
+#define ext2_inode_nblock(i) ((i)->blocks / (2 << 0))
 
-void dump_superblock(struct ext2_superblock *sb) {
+static void *get_block(int bnum);
+static void *get_indirect_block(u32 *map, int bnum);
+
+static void dump_superblock(struct ext2_superblock *sb) {
   printk("superblock dump sb %p\n", sb);
   printk("sizeof *sb %d\n", sizeof(*sb));
   printk("s_inodes_count: %d\n", sb->s_inodes_count);
@@ -29,7 +32,7 @@ void dump_superblock(struct ext2_superblock *sb) {
   printk("s_inodes_per_group %d\n", sb->s_inodes_per_group);
 }
 
-void dump_bg_desc(struct ext2_bg_desc *bg) {
+static void dump_bg_desc(struct ext2_bg_desc *bg) {
   printk("bg_desc dump %p\n", bg);
   printk("sizeof *bg: %d\n", sizeof(*bg));
   printk("bg_block_bitmap: %d\n", bg->bg_block_bitmap);
@@ -40,7 +43,7 @@ void dump_bg_desc(struct ext2_bg_desc *bg) {
   printk("bg_used_dirs_count: %d\n", bg->bg_used_dirs_count);
 }
 
-void dump_inode(struct ext2_inode *i) {
+static void dump_inode(struct ext2_inode *i) {
   printk("inode dump: %p\n", i);
   printk("sizeof *i: %d\n", sizeof(*i));
   printk("i_mode: %p\n", i->i_mode);
@@ -50,7 +53,7 @@ void dump_inode(struct ext2_inode *i) {
     printk("i_block[%d]: %p\n", b, i->i_block[b]);
 }
 
-void dump_dirent(struct dirent *d) {
+static void dump_dirent(struct dirent *d) {
   printk("dirent dump: %p\n", d);
   printk("sizeof *d: %d\n", sizeof(*d));
   printk("inode: %d\n", d->inode);
@@ -60,6 +63,15 @@ void dump_dirent(struct dirent *d) {
   printk("name: %s\n", d->name);
 }
 
+static struct ext2_superblock *ext2_get_sb() {
+  return (struct ext2_superblock *)diskread(0x400);
+}
+
+static struct ext2_bg_desc *ext2_get_bg() {
+  return (struct ext2_bg_desc *)diskread(0x800);
+}
+
+/* for debug */
 void dump_dirent_block(char *blk) {
   struct dirent *d = (struct dirent *)blk;
   char *blk_end = blk + sb.bsize;
@@ -93,18 +105,10 @@ int search_dirent_block(char *blk, char *path) {
   return -1;
 }
 
-static inline char *block_bitmap() {
-  return sb.block_bitmap;
-}
-
-static inline char *inode_bitmap() {
-  return sb.inode_bitmap;
-}
-
-static int find_free_ino(struct superblock *sb, char *bitmap) {
+static int find_free_ino(char *bitmap) {
   char chunk = 0xff;
   int inum = 1;
-  for(int i = 0; i < sb->block_size; i++) {
+  for(int i = 0; i < sb.bsize; i++) {
     if((chunk = bitmap[i]) != 0xff)
       break;
     inum += 8;
@@ -117,6 +121,15 @@ static int find_free_ino(struct superblock *sb, char *bitmap) {
     inum++;
 
   return inum;
+}
+
+static void *get_block(int bnum) {
+  return diskread((u64)bnum * sb.bsize);
+}
+
+static void *get_indirect_block(u32 *map, int bnum) {
+  int idx = bnum - 12;
+  return get_block(map[idx]);
 }
 
 static int find_free_block(char *bitmap) {
@@ -161,25 +174,80 @@ found:
   return 0;
 }
 
-struct ext2_inode *ext2_get_inode(int inum) {
+static int bbmp_write_bit(char *bitmap, int bn, int val) {
+  int bitn = bn;
+  int chunkn;
+  char c;
+  for(chunkn = 0; chunkn < sb.bsize; chunkn++) {
+    if(bitn < 8)
+      goto found;
+    bitn -= 8;
+  }
+
+  /* invalid inode number */
+  return -1;
+
+found:
+  c = bitmap[chunkn];
+  if(val)
+    c |= 1 << bitn;
+  else
+    c &= ~(char)(1 << bitn);
+  bitmap[chunkn] = c;
+
+  return 0;
+}
+
+struct ext2_inode *ext2_raw_inode(int inum) {
   return (struct ext2_inode *)(sb.inode_table + (inum - 1) * sizeof(struct ext2_inode));
 }
 
-struct int ext2_alloc_inum() {
-  int inum = find_free_ino(inode_bitmap());
+char *ext2_inode_block(struct inode *ino, int bi) {
+  if(bi < 12)
+    return get_block(ino->block[bi]);
+  else
+    return get_indirect_block((u32 *)get_block(ino->block[12]), bi);
+
+  return NULL;
+}
+
+static int ext2_alloc_inum() {
+  char *ibmp = sb.inode_bitmap;
+
+  int inum = find_free_ino(ibmp);
   if(inum < 0)
     return -1;
 
-  ibmp_write_bit(inode_bitmap(), inum, 1);
+  ibmp_write_bit(ibmp, inum, 1);
 
   return inum;
 }
 
-static int dirlink(struct inode *pdir, char *pname, struct inode *ino) {
+static int dirlink(struct inode *pdir, char *name, struct inode *ino) {
 }
 
-static struct inode *new_inode(char *path, struct inode *dir, int mode, int major, int minor) {
-  struct inode *ino = alloc_inode(mode, major, minor);
+struct inode *ext2_get_inode(int inum) {
+  struct inode *i = find_inode(inum);
+  struct ext2_inode *e = ext2_raw_inode(inum);
+
+  i->mode = e->i_mode;
+  i->uid = e->i_uid;
+  i->size = e->i_size;
+  i->atime = e->i_atime;
+  i->ctime = e->i_ctime;
+  i->mtime = e->i_mtime;
+  i->dtime = e->i_dtime;
+  i->gid = e->i_gid;
+  i->links_count = e->i_links_count;
+  i->blocks = e->i_blocks;
+  i->flags = e->i_flags;
+  memcpy(i->block, e->i_block, sizeof(u32) * 15);
+
+  return i;
+}
+
+static struct inode *ext2_new_inode(char *path, struct inode *dir, int mode, int major, int minor) {
+  struct inode *ino = alloc_inode();
   if(!ino)
     return NULL;
 
@@ -190,66 +258,39 @@ static struct inode *new_inode(char *path, struct inode *dir, int mode, int majo
   return ino;
 }
 
-static struct inode *ext2_mkreg(char *path, struct inode *cwd) {
-  struct inode *ino = new_inode(path, cwd, EXT2_S_IFREG, 0, 0);
-}
-
-static struct inode *ext2_mkdir(char *path, struct inode *cwd) {
-  struct inode *ino = new_inode(path, cwd, EXT2_S_IFDIR, 0, 0);
-}
-
-static struct inode *ext2_mkcdev(char *path, struct inode *cwd, int major, int minor) {
-  struct inode *ino = new_inode(path, cwd, EXT2_S_IFCHR, major, minor);
-}
-
-static struct inode *ext2_mkbdev(char *path, struct inode *cwd, int major, int minor) {
-  struct inode *ino = new_inode(path, cwd, EXT2_S_IFBLK, major, minor);
-}
-
-static void *ext2_get_block(int bnum) {
-  return diskread((u64)bnum * sb.bsize);
-}
-
-static void *get_indirect_block(u32 *map, int bnum) {
-  char idx = bnum - 12;
-  return get_block(map[idx]);
-}
-
-void w_inode_block(struct inode *ino, int bi, char *blk) {
-}
-
-void ls_inode(struct inode *ino) {
+/* for debug */
+static void ls_inode(struct inode *ino) {
   if(ino == NULL) {
     printk("null inode\n");
     return;
   }
-  if((ino->i_mode & EXT2_S_IFDIR) == 0) {
+  if(!S_ISDIR(ino->mode)) {
     printk("invalid inode: directory\n");
     return;
   }
 
-  for(int i = 0; i < inode_nblock(ino); i++) {
-    char *d = inode_block(ino, i);
+  for(int i = 0; i < ext2_inode_nblock(ino); i++) {
+    char *d = ext2_inode_block(ino, i);
     dump_dirent_block(d);
   }
 }
 
-int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
+int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   // printk("readinode %p %d %d\n", buf, off, size);
   u32 bsize = sb.bsize;
   char *base = buf;
 
-  if(off > ino->i_size)
+  if(off > ino->size)
     return -1;
-  if(off + size > ino->i_size)
-    size = ino->i_size - off;
+  if(off + size > ino->size)
+    size = ino->size - off;
 
   u32 offblk = off / bsize;
   u32 lastblk = (size + off) / bsize;
   u32 offblkoff = off % bsize;
 
-  for(int i = offblk; i < inode_nblock(ino) && i <= lastblk; i++) {
-    char *d = inode_block(ino, i);
+  for(int i = offblk; i < ext2_inode_nblock(ino) && i <= lastblk; i++) {
+    char *d = ext2_inode_block(ino, i);
     u64 cpsize = min(size, bsize);
     if(offblkoff + cpsize > bsize)
       cpsize = bsize - offblkoff;
@@ -264,8 +305,9 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   return buf - base;
 }
 
+/*
 int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
-  u32 bsize = ino->sb->bsize;
+  u32 bsize = sb.bsize;
   char *base = buf;
 
   if(off > ino->i_size)
@@ -277,8 +319,8 @@ int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   u32 lastblk = (size + off) / bsize;
   u32 offblkoff = off % bsize;
 
-  for(int i = offblk; i < inode_nblock(ino) && i <= lastblk; i++) {
-    char *d = inode_block(ino, i);
+  for(int i = offblk; i < ext2_inode_nblock(ino) && i <= lastblk; i++) {
+    char *d = ext2_inode_block(ino, i);
     u64 cpsize = min(size, bsize);
     if(offblkoff + cpsize > bsize)
       cpsize = bsize - offblkoff;
@@ -290,6 +332,7 @@ int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
     offblkoff = 0;
   }
 }
+*/
 
 static char *skippath(char *path, char *name, int *err) {
   /* skip '/' ("////aaa/bbb" -> "aaa/bbb") */
@@ -312,20 +355,20 @@ static char *skippath(char *path, char *name, int *err) {
   return path;
 }
 
-static struct ext2_inode *traverse_inode(struct ext2_inode *pi, char *path, char *name) {
+static struct inode *ext2_traverse_inode(struct inode *pi, char *path, char *name) {
   int err = 0;
   path = skippath(path, name, &err);
   if(err)
     return NULL;
   if(*path == 0 && *name == 0)
     return pi;
-  if((pi->i_mode & EXT2_S_IFDIR) == 0)
+  if(!S_ISDIR(pi->mode))
     return pi;
 
   int inum = -1;
 
-  for(int i = 0; i < inode_nblock(pi); i++) {
-    char *db = inode_block(pi, i);
+  for(int i = 0; i < ext2_inode_nblock(pi); i++) {
+    char *db = ext2_inode_block(pi, i);
     if((inum = search_dirent_block(db, name)) > 0)
       break;
   }
@@ -335,11 +378,11 @@ static struct ext2_inode *traverse_inode(struct ext2_inode *pi, char *path, char
 
   memset(name, 0, DIRENT_NAME_MAX);
 
-  return traverse_inode(ext2_get_inode(inum), path, name);
+  return ext2_traverse_inode(ext2_get_inode(inum), path, name);
 }
 
-struct ext2_inode *ext2_path2inode(char *path) {
-  struct ext2_inode *ino;
+struct inode *ext2_path2inode(char *path) {
+  struct inode *ino;
 
   if(*path == '/')
     ino = ext2_get_inode(EXT2_ROOT_INO);
@@ -347,24 +390,31 @@ struct ext2_inode *ext2_path2inode(char *path) {
     ino = curproc->cwd;
 
   char name[DIRENT_NAME_MAX] = {0};
-  ino = traverse_inode(ino, path, name);
+  ino = ext2_traverse_inode(ino, path, name);
 
   return ino;
 }
 
 void ext2_init() {
-  char *img = diskread(0);
-  struct ext2_superblock *esb = (struct ext2_superblock *)(img + 0x400);
+  struct ext2_superblock *esb = ext2_get_sb();
   // dump_superblock(sb);
   if(esb->s_magic != 0xef53)
     panic("invalid filesystem");
 
-  sb.block_size = 1024 << esb->s_log_block_size;
+  struct ext2_bg_desc *bg = ext2_get_bg();
 
-  struct ext2_bg_desc *bg = (struct ext2_bg_desc *)(img + 0x800);
+  sb.bsize = 1024 << esb->s_log_block_size;
+  sb.block_bitmap = get_block(bg->bg_block_bitmap);
+  sb.inode_bitmap = get_block(bg->bg_inode_bitmap);
+  sb.inode_table = get_block(bg->bg_inode_table);
 
-  sb.bsize = block_size;
-  sb.block_bitmap = ext2_get_block(bg->bg_block_bitmap);
-  sb.inode_bitmap = ext2_get_block(bg->bg_inode_bitmap);
-  sb.inode_table = ext2_get_block(bg->bg_inode_table);
+  sb.inodes_count = esb->s_inodes_count;
+  sb.blocks_count = esb->s_blocks_count;
+  sb.first_data_block = esb->s_first_data_block;
+  sb.blocks_per_group = esb->s_blocks_per_group;
+  sb.inodes_per_group = esb->s_inodes_per_group;
+  sb.mtime = esb->s_mtime;
+  sb.wtime = esb->s_wtime;
+  sb.first_ino = esb->s_first_ino;
+  sb.inode_size = esb->s_inode_size;
 }

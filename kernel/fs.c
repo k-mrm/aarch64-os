@@ -1,37 +1,14 @@
+#include "kernel.h"
 #include "fs.h"
 #include "dirent.h"
-
-#define inode_nblock(i) ((i)->blocks / (2 << 0))
+#include "string.h"
+#include "ext2.h"
 
 struct inode itable[NINODE];
 
-static struct inode *load_dinode(struct ext2_inode *e, struct inode *i) {
-  i->mode = e->i_mode;
-  i->uid = e->i_uid;
-  i->size = e->i_size;
-  i->atime = e->i_atime;
-  i->ctime = e->i_ctime;
-  i->mtime = e->i_mtime;
-  i->dtime = e->i_dtime;
-  i->gid = e->i_gid;
-  i->links_count = e->i_links_count;
-  i->blocks = e->i_blocks;
-  i->flags = e->i_flags;
-  memcpy(i->block, e->i_block, sizeof(u32) * 15);
+struct superblock sb;
 
-  return i;
-}
-
-char *inode_block(struct inode *ino, int bi) {
-  if(bi < 12)
-    return get_block(ino->block[bi]);
-  else
-    return get_indirect_block((u32 *)get_block(ino->block[12]), bi);
-
-  return NULL;
-}
-
-static struct inode *alloc_inode() {
+struct inode *alloc_inode() {
   struct inode *ino;
   for(int i = 0; i < NINODE; i++) {
     ino = &itable[i];
@@ -46,11 +23,7 @@ static void free_inode(struct inode *ino) {
   memset(ino, 0, sizeof(*ino));
 }
 
-static void sync_inode(struct inode *ino) {
-  ;
-}
-
-static struct inode *get_inode(int inum) {
+struct inode *find_inode(int inum) {
   struct inode *ino;
   for(int i = 0; i < NINODE; i++) {
     ino = &itable[i];
@@ -62,37 +35,30 @@ static struct inode *get_inode(int inum) {
   if(!ino)
     return NULL;
 
-  struct ext2_inode *eino = ext2_get_inode(inum);
-
-  load_dinode(eino, ino, inum);
   ino->inum = inum;
 
   return ino;
+}
+
+struct inode *get_inode(int inum) {
+  return ext2_get_inode(inum);
+}
+
+int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
+  return ext2_read_inode(ino, buf, off, size);
 }
 
 struct inode *new_inode(char *path, struct inode *dir, int mode, int major, int minor) {
-  struct inode *ino = alloc_inode();
-  if(!ino)
-    return NULL;
+  ;
+}
 
-  int inum = ext2_alloc_inum();
-  if(inum < 0)
-    return NULL;
+struct inode *create(char *path, int mode, int major, int minor) {
+  ;
+}
 
-  ino->inum = inum;
-  ino->mode = mode;
-  ino->major = major;
-  ino->minor = minor;
-
+struct inode *path2inode(char *path) {
+  struct inode *ino = ext2_path2inode(path);
   return ino;
-}
-
-bool isdir(struct inode *ino) {
-  return ino->mode & S_IFDIR;
-}
-
-struct inode *path2i(char *path) {
-  struct ext2_inode *eino = ext2_path2inode(path);
 }
 
 void fs_init() {

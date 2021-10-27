@@ -26,6 +26,14 @@
 #define S_IWOTH   0x0002
 #define S_IXOTH   0x0001
 
+#define S_ISSOCK(m) ((m) & S_IFSOCK)
+#define S_ISLNK(m)  ((m) & S_IFLNK)
+#define S_ISREG(m)  ((m) & S_IFREG)
+#define S_ISBLK(m)  ((m) & S_IFBLK)
+#define S_ISDIR(m)  ((m) & S_IFDIR)
+#define S_ISCHR(m)  ((m) & S_IFCHR)
+#define S_ISFIFO(m) ((m) & S_IFIFO)
+
 #define NINODE  256
 
 struct superblock {
@@ -39,11 +47,13 @@ struct superblock {
   u32 first_ino;
   u16 inode_size;
 
-  u32 block_size;
+  u32 bsize;
   char *block_bitmap;
   char *inode_bitmap;
   char *inode_table;
 };
+
+extern struct superblock sb;
 
 /* on memory inode */
 struct inode {
@@ -66,6 +76,8 @@ struct inode {
 };
 
 void fs_init(void);
-bool isdir(struct inode *ino);
+struct inode *find_inode(int inum);
+struct inode *path2inode(char *path);
+struct inode *alloc_inode(void);
 
 #endif

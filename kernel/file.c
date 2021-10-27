@@ -1,6 +1,6 @@
 #include "kernel.h"
 #include "file.h"
-#include "ext2.h"
+#include "fs.h"
 #include "proc.h"
 #include "stat.h"
 #include "string.h"
@@ -66,10 +66,6 @@ int write(int fd, char *buf, u64 sz) {
   return write_file(f, buf, sz);
 }
 
-int getdents(int fd, struct dirent *dir, u64 count) {
-  ;
-}
-
 int fstat(int fd, struct stat *st) {
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];
@@ -80,6 +76,7 @@ int fstat(int fd, struct stat *st) {
   st->st_mode = ino->mode;
   st->st_size = ino->size;
   st->st_nlink = ino->links_count;
+  st->st_blksize = sb.bsize;
 }
 
 int open(char *path, int flags) {
@@ -106,7 +103,7 @@ int open(char *path, int flags) {
       break; 
   }
 
-  if((flags & O_DIRECTORY) && !isdir(ino))
+  if((flags & O_DIRECTORY) && !S_ISDIR(ino->mode))
     return -1;
 
   int fd;
