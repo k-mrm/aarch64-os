@@ -138,5 +138,7 @@ void ext2_init(void);
 struct inode *ext2_path2inode(char *path);
 int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size);
 struct inode *ext2_get_inode(int inum);
+struct inode *ext2_mkdir(char *path);
+struct inode *ext2_mknod(char *path, int mode, int dev);
 
 #endif

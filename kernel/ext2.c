@@ -353,6 +353,22 @@ static void inode_sync(struct inode *i) {
   memcpy(e->i_block, i->block, sizeof(u32) * 15);
 }
 
+static u8 itype_dtype_table[15] = {
+  [1] = DT_FIFO,
+  [2] = DT_CHR,
+  [4] = DT_DIR,
+  [6] = DT_BLK,
+  [8] = DT_REG,
+  [10] = DT_LNK,
+  [12] = DT_IFSOCK,
+};
+
+static u8 imode2dtype(int mode) {
+  int ftype = (mode & S_IFMT) >> 12;
+
+  return itype_dtype_table[ftype];
+}
+
 static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int dev) {
   char buf[1024];
   struct inode *ino = ext2_alloc_inode();
@@ -375,7 +391,7 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
     ino->size = sb.bsize;
   }
 
-  make_dirent(ino->inum, name, DT_DIR, (struct dirent *)buf);
+  make_dirent(ino->inum, name, imode2dtype(ino->imode), (struct dirent *)buf);
   if(ext2_dirlink(dir, (struct dirent *)buf) < 0)   /* dirlink new inode to dir */
     return NULL;
 
@@ -478,13 +494,13 @@ int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 }
 */
 
-struct inode *ext2_mknod(const char *path, int mode, int dev) {
+struct inode *ext2_mknod(char *path, int mode, int dev) {
   char namebuf[DIRENT_NAME_MAX] = {0};
   struct inode *pdir = ext2_path2inode_parent(path, namebuf);
   return ext2_new_inode(namebuf, pdir, mode, dev);
 }
 
-struct inode *ext2_mkdir(const char *path) {
+struct inode *ext2_mkdir(char *path) {
   char namebuf[DIRENT_NAME_MAX] = {0};
   struct inode *pdir = ext2_path2inode_parent(path, namebuf);
   return ext2_new_inode(namebuf, pdir, S_IFDIR, 0);

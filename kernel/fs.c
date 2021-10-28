@@ -53,7 +53,7 @@ int write_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 }
 
 struct inode *fs_mknod(char *path, int mode, int dev) {
-  ;
+  return ext2_mknod(path, mode, dev);
 }
 
 struct inode *fs_mkdir(char *path) {
