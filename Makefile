@@ -85,6 +85,6 @@ raspi: kernel8.img fs.img
 
 clean:
 	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) usr/initcode.o usr/initcode.elf usr/initcode kernel8.elf kernel8.img fs.img fs.img.o
-	rmdir rootfs
+	rm -rf rootfs
 
 .PHONY: qemu gdb clean dts raspi

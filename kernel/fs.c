@@ -70,3 +70,15 @@ void fs_init() {
 
   memset(itable, 0, sizeof(struct inode) * NINODE);
 }
+
+void dump_inode(struct inode *i) {
+  printk("inode dump: %p\n", i);
+  printk("sizeof *i: %d\n", sizeof(*i));
+  printk("inum: %d\n", i->inum);
+  printk("i_mode: %p\n", i->mode);
+  printk("i_links_count: %p\n", i->links_count);
+  printk("i_size: %d\n", i->size);
+  printk("i_blocks: %d\n", i->blocks);
+  for(int b = 0; b < 15; b++)
+    printk("i_block[%d]: %d\n", b, i->block[b]);
+}

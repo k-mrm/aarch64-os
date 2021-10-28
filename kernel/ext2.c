@@ -56,7 +56,7 @@ static void dump_bg_desc(struct ext2_bg_desc *bg) {
 }
 
 static void dump_ext2_inode(struct ext2_inode *i) {
-  printk("inode dump: %p\n", i);
+  printk("ext2_inode dump: %p\n", i);
   printk("sizeof *i: %d\n", sizeof(*i));
   printk("i_mode: %p\n", i->i_mode);
   printk("i_size: %d\n", i->i_size);
@@ -360,12 +360,15 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
     ext2_dirlink(ino, (struct dirent *)buf);  /* dirlink "." */
     make_dirent(dir->inum, "..", DT_DIR, (struct dirent *)buf);
     ext2_dirlink(ino, (struct dirent *)buf);  /* dirlink ".." */
+
+    ino->size = 1024;
   }
 
   make_dirent(ino->inum, name, DT_DIR, (struct dirent *)buf);
   ext2_dirlink(dir, (struct dirent *)buf);  /* dirlink new inode to dir */
 
   inode_sync(ino);
+  inode_sync(dir);
 
   return ino;
 }
@@ -617,6 +620,6 @@ void ext2_init() {
   sb.inode_size = esb->s_inode_size;
 
   ext2_mkdir("/fuck");
-  ls_inode(ext2_path2inode("/"));
-  ls_inode(ext2_path2inode("/fuck"));
+  dump_inode(ext2_path2inode("/"));
+  dump_inode(ext2_path2inode("/fuck"));
 }
