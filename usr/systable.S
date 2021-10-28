@@ -19,3 +19,4 @@ SYSCALL close, SYS_close
 SYSCALL fstat, SYS_fstat
 SYSCALL uname, SYS_uname
 SYSCALL chdir, SYS_chdir
+SYSCALL mkdir, SYS_mkdir

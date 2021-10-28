@@ -133,12 +133,16 @@ int close(int fd) {
   return 0;
 }
 
-int mknod(const char *path, int dev) {
+int mknod(char *path, int mode, int dev) {
   ;
 }
 
-int mkdir(const char *path) {
-  ;
+int mkdir(char *path) {
+  struct inode *ino = fs_mkdir(path);
+  if(!ino)
+    return -1;
+
+  return 0;
 }
 
 void file_init() {

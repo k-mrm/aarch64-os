@@ -26,8 +26,10 @@ int builtincmd(int argc, char **argv) {
       if(chdir("/") < 0)
         return -1;
     } else if(argc == 2) {
-      if(chdir(argv[1]) < 0)
+      if(chdir(argv[1]) < 0) {
+        puts("cd: failed");
         return -1;
+      }
     } else {
       puts("too many args");
       return -1;

@@ -25,6 +25,8 @@ static void inode_sync(struct inode *i);
 struct inode *ext2_path2inode(char *path);
 struct inode *ext2_path2inode_parent(char *path, char *namebuf);
 
+static int ext2_search_dir(struct inode *dir, char *name);
+
 static void dump_superblock(struct ext2_superblock *sb) {
   printk("superblock dump sb %p\n", sb);
   printk("sizeof *sb %d\n", sizeof(*sb));
@@ -275,7 +277,12 @@ static int ext2_dirlink(struct inode *pdir, struct dirent *de) {
   char *bend;
   char *dend;
   char *debegin;
-  /* find last block */
+
+  /* already exist? */
+  if(ext2_search_dir(pdir, de->name) > 0)
+    return -1;
+
+  /* find free space */
   for(int i = 0; i < ext2_inode_nblock(pdir); i++) {
     b = ext2_inode_block(pdir, i);
     d = (struct dirent *)b;
@@ -349,6 +356,8 @@ static void inode_sync(struct inode *i) {
 static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int dev) {
   char buf[1024];
   struct inode *ino = ext2_alloc_inode();
+  if(!ino)
+    return NULL;
 
   ino->mode = mode;
   ino->major = dev;
@@ -357,15 +366,18 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
   if(S_ISDIR(mode)) {
     dir->links_count++;
     make_dirent(ino->inum, ".", DT_DIR, (struct dirent *)buf);
-    ext2_dirlink(ino, (struct dirent *)buf);  /* dirlink "." */
+    if(ext2_dirlink(ino, (struct dirent *)buf) < 0)   /* dirlink "." */
+      return NULL;
     make_dirent(dir->inum, "..", DT_DIR, (struct dirent *)buf);
-    ext2_dirlink(ino, (struct dirent *)buf);  /* dirlink ".." */
+    if(ext2_dirlink(ino, (struct dirent *)buf) < 0)   /* dirlink ".." */
+      return NULL;
 
-    ino->size = 1024;
+    ino->size = sb.bsize;
   }
 
   make_dirent(ino->inum, name, DT_DIR, (struct dirent *)buf);
-  ext2_dirlink(dir, (struct dirent *)buf);  /* dirlink new inode to dir */
+  if(ext2_dirlink(dir, (struct dirent *)buf) < 0)   /* dirlink new inode to dir */
+    return NULL;
 
   inode_sync(ino);
   inode_sync(dir);
@@ -618,8 +630,4 @@ void ext2_init() {
   sb.wtime = esb->s_wtime;
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
-
-  ext2_mkdir("/fuck");
-  dump_inode(ext2_path2inode("/"));
-  dump_inode(ext2_path2inode("/fuck"));
 }
