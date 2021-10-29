@@ -3,6 +3,7 @@
 #include "dirent.h"
 #include "string.h"
 #include "ext2.h"
+#include "printk.h"
 
 struct inode itable[NINODE];
 

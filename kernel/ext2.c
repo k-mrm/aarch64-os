@@ -360,7 +360,7 @@ static u8 itype_dtype_table[15] = {
   [6] = DT_BLK,
   [8] = DT_REG,
   [10] = DT_LNK,
-  [12] = DT_IFSOCK,
+  [12] = DT_SOCK,
 };
 
 static u8 imode2dtype(int mode) {
@@ -391,7 +391,7 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
     ino->size = sb.bsize;
   }
 
-  make_dirent(ino->inum, name, imode2dtype(ino->imode), (struct dirent *)buf);
+  make_dirent(ino->inum, name, imode2dtype(ino->mode), (struct dirent *)buf);
   if(ext2_dirlink(dir, (struct dirent *)buf) < 0)   /* dirlink new inode to dir */
     return NULL;
 

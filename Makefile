@@ -24,7 +24,8 @@ QEMUOPTS += -nographic -kernel kernel8.elf
 KOBJS = kernel/boot.o kernel/vectortable.o kernel/ramdisk.o	kernel/file.o \
 			 kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o kernel/uname.o \
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o kernel/fs.o	\
-			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o
+			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o	\
+			 kernel/cdev.o
 
 DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o
 

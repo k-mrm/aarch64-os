@@ -3,28 +3,12 @@
 #include "font.h"
 #include "console.h"
 #include "driver/uart.h"
+#include "file.h"
+#include "cdev.h"
 
 #define BACKSPACE 127
 
 struct console cons1;
-
-void console_init() {
-#ifdef USE_UART
-  uart_init();
-#else
-  fb_init();
-  font_init();
-  cons1.fb = &display_fb;
-  cons1.font = &default_font;
-  cons1.cur_x = 0;
-  cons1.cur_y = 0;
-  cons1.w = display_fb.w;
-  cons1.h = display_fb.h;
-  cons1.initx = 0;
-  cons1.lineh = 10;
-  cons1.bpl = display_fb.pitch * cons1.lineh;
-#endif
-}
 
 #ifdef USE_UART
 
@@ -119,10 +103,35 @@ void csputs(struct console *cs, char *s) {
 
 #endif
 
-int console_write(char *s, u64 size) {
-  return cswrite(&cons1, s, size);
+int console_write(struct file *f, char *buf, u64 size) {
+  return cswrite(&cons1, buf, size);
 }
 
-int console_read(char *buf, u64 size) {
+int console_read(struct file *f, char *buf, u64 size) {
   return csread(&cons1, buf, size);
+}
+
+struct cdevsw cons_devsw = {
+  .read = console_read,
+  .write = console_write,
+};
+
+void console_init() {
+#ifdef USE_UART
+  uart_init();
+#else
+  fb_init();
+  font_init();
+  cons1.fb = &display_fb;
+  cons1.font = &default_font;
+  cons1.cur_x = 0;
+  cons1.cur_y = 0;
+  cons1.w = display_fb.w;
+  cons1.h = display_fb.h;
+  cons1.initx = 0;
+  cons1.lineh = 10;
+  cons1.bpl = display_fb.pitch * cons1.lineh;
+#endif
+
+  register_cdev(CDEV_CONSOLE, &cons_devsw);
 }

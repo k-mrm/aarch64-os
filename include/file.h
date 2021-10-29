@@ -9,7 +9,7 @@
 enum ftype {
   F_NONE,
   F_INODE,
-  F_DEV,
+  F_CDEV,
 };
 
 struct file {
@@ -22,11 +22,6 @@ struct file {
 };
 
 extern struct file ftable[];
-
-struct cdevsw {
-  int (*read)(void);
-  int (*write)(void);
-};
 
 void file_init(void);
 

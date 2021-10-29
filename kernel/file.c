@@ -6,6 +6,8 @@
 #include "string.h"
 #include "fcntl.h"
 #include "dirent.h"
+#include "cdev.h"
+#include "printk.h"
 
 struct file ftable[NFILE];
 
@@ -28,11 +30,22 @@ int read_file(struct file *f, char *buf, u64 sz) {
   if(!ino)
     return -1;
   
-  int n = read_inode(ino, buf, f->off, sz);
-  if(n < 0)
-    return -1;   
+  int n;
+  switch(ino->mode & S_IFMT) {
+    case S_IFREG:
+    case S_IFDIR:
+      n = read_inode(ino, buf, f->off, sz);
+      if(n < 0)
+        return -1;
 
-  f->off += n;
+      f->off += n;
+      break;
+    case S_IFCHR:
+      n = cdevsw[ino->major].read(f, buf, sz);
+      break;
+    default:
+      panic("unknown ftype");
+  }
 
   return n;
 }
@@ -45,22 +58,29 @@ int write_file(struct file *f, char *buf, u64 sz) {
   if(!ino)
     return -1;
 
-  /* TODO */
+  int n = 0;
+  switch(ino->mode & S_IFMT) {
+    case S_IFREG:
+    case S_IFDIR:
+      n = 0;
+      break;
+    case S_IFCHR:
+      n = cdevsw[ino->major].write(f, buf, sz);
+      break;
+    default:
+      panic("unknown ftype");
+  }
 
-  return 0;
+  return n;
 }
 
 int read(int fd, char *buf, u64 sz) {
-  if(fd < 3)
-    return console_read(buf, sz);
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];
   return read_file(f, buf, sz);
 }
 
 int write(int fd, char *buf, u64 sz) {
-  if(fd < 3)
-    return console_write(buf, sz);
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];
   return write_file(f, buf, sz);
@@ -134,7 +154,11 @@ int close(int fd) {
 }
 
 int mknod(char *path, int mode, int dev) {
-  ;
+  struct inode *ino = fs_mknod(path, mode, dev);
+  if(!ino)
+    return -1;
+
+  return 0;
 }
 
 int mkdir(char *path) {
