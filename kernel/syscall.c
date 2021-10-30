@@ -22,6 +22,7 @@ int uname(struct utsname *u);
 int chdir(char *path);
 int mkdir(char *path);
 int mknod(char *path, int mode, int dev);
+int dup(int fd);
 
 u64 sysarg(int n) {
   switch(n) {
@@ -116,6 +117,11 @@ int sys_mknod(void) {
   return mknod((char *)path, mode, dev);
 }
 
+int sys_dup(void) {
+  int fd = sysarg(0);
+  return dup(fd);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -131,6 +137,7 @@ syscall_t syscall_table[] = {
   sys_chdir,
   sys_mkdir,
   sys_mknod,
+  sys_dup,
 };
 
 void syscall(struct trapframe *tf) {

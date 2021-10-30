@@ -22,6 +22,15 @@ struct file *alloc_file() {
   return NULL;
 }
 
+int allocfd(struct proc *p) {
+  for(int newfd = 0; newfd < NOFILE; newfd++) {
+    if(p->ofile[newfd] == NULL)
+      return newfd;
+  }
+
+  return -1;
+}
+
 int read_file(struct file *f, char *buf, u64 sz) {
   if(!f || !f->readable)
     return -1;
@@ -127,7 +136,7 @@ int open(char *path, int flags) {
     return -1;
 
   int fd;
-  for(fd = 3; fd < NOFILE; fd++) {
+  for(fd = 0; fd < NOFILE; fd++) {
     if(p->ofile[fd] == NULL)
       goto found;
   }
@@ -167,6 +176,18 @@ int mkdir(char *path) {
     return -1;
 
   return 0;
+}
+
+int dup(int fd) {
+  struct proc *p = curproc;
+  int newfd = allocfd(p);
+  if(newfd < 0)
+    return -1;
+
+  struct file *f = p->ofile[newfd] = p->ofile[fd];
+  f->ref++;
+
+  return newfd;
 }
 
 void file_init() {

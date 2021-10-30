@@ -9,6 +9,8 @@ int main() {
   int fd = mknod("tty0", S_IFCHR, CDEV_CONSOLE);
   if(fd < 0)
     exit(0);
+  dup(fd);    /* 1 */
+  dup(fd);    /* 2 */
 
   puts("init");
   puts("starting sh");
