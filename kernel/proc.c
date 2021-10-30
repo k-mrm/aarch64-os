@@ -145,6 +145,11 @@ int fork() {
   new->parent = p;
   new->state = RUNNABLE;
 
+  for(int fd = 0; fd < NOFILE; fd++) {
+    if(p->ofile[fd])
+      new->ofile[fd] = dup_file(p->ofile[fd]);
+  }
+
   return new->pid;
 
 err:

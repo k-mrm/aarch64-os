@@ -2,13 +2,15 @@
 #include "ulib.h"
 #include "cdev.h"
 #include "fs.h"
+#include "fcntl.h"
 
 int main() {
   char *argv[] = {"sh", 0};
 
-  int fd = mknod("tty0", S_IFCHR, CDEV_CONSOLE);
-  if(fd < 0)
-    exit(0);
+  if(mknod("tty0", S_IFCHR, CDEV_CONSOLE) < 0)
+    exit(1);
+
+  int fd = open("tty0", O_RDWR);
   dup(fd);    /* 1 */
   dup(fd);    /* 2 */
 

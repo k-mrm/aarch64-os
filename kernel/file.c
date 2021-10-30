@@ -83,6 +83,11 @@ int write_file(struct file *f, char *buf, u64 sz) {
   return n;
 }
 
+struct file *dup_file(struct file *f) {
+  f->ref++;
+  return f;
+}
+
 int read(int fd, char *buf, u64 sz) {
   struct proc *p = curproc;
   struct file *f = p->ofile[fd];
@@ -181,11 +186,11 @@ int mkdir(char *path) {
 int dup(int fd) {
   struct proc *p = curproc;
   int newfd = allocfd(p);
+  printk("ddddup %d %d\n", fd, newfd);
   if(newfd < 0)
     return -1;
 
-  struct file *f = p->ofile[newfd] = p->ofile[fd];
-  f->ref++;
+  p->ofile[newfd] = dup_file(p->ofile[fd]);
 
   return newfd;
 }

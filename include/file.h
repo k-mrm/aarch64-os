@@ -24,5 +24,6 @@ struct file {
 extern struct file ftable[];
 
 void file_init(void);
+struct file *dup_file(struct file *f);
 
 #endif
