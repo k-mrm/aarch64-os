@@ -19,6 +19,7 @@ int open(char *path, int flags);
 int close(int fd);
 int fstat(int fd, struct stat *st);
 int uname(struct utsname *u);
+int chdir(char *path);
 int mkdir(char *path);
 int mknod(char *path, int mode, int dev);
 
@@ -108,6 +109,13 @@ int sys_mkdir(void) {
   return mkdir((char *)path);
 }
 
+int sys_mknod(void) {
+  u64 path = sysarg(0);
+  int mode = sysarg(1);
+  int dev = sysarg(2);
+  return mknod((char *)path, mode, dev);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -122,6 +130,7 @@ syscall_t syscall_table[] = {
   sys_uname,
   sys_chdir,
   sys_mkdir,
+  sys_mknod,
 };
 
 void syscall(struct trapframe *tf) {

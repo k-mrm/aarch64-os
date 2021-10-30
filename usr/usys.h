@@ -18,6 +18,8 @@ int close(int fd);
 int fstat(int fd, struct stat *st);
 int uname(struct utsname *u);
 int chdir(char *path);
-
+int mkdir(char *path);
+int mknod(char *path, int mode, int dev);
+int dup(int fd);
 
 #endif

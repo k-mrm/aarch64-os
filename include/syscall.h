@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_SYSCALL_H
 #define AARCH64_OS_SYSCALL_H
 
-#define NSYSCALL    13
+#define NSYSCALL    14
 
 #define SYS_getpid  0
 #define SYS_write   1
@@ -16,5 +16,6 @@
 #define SYS_uname   10
 #define SYS_chdir   11
 #define SYS_mkdir   12
+#define SYS_mknod   13
 
 #endif
