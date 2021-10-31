@@ -186,7 +186,6 @@ int mkdir(char *path) {
 int dup(int fd) {
   struct proc *p = curproc;
   int newfd = allocfd(p);
-  printk("ddddup %d %d\n", fd, newfd);
   if(newfd < 0)
     return -1;
 

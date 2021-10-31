@@ -13,11 +13,11 @@
 #include "file.h"
 
 int main(void) {
+  trap_init();
   console_init();
   printk("booting...\n");
   kinfo("kernel main @%p\n", main);
   gicv2_init();
-  trap_init();
   timer_init(200);
   kalloc_init1();
   pgt_init();

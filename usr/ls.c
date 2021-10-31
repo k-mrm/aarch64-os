@@ -15,9 +15,9 @@ int ls(char *path) {
   struct stat st;
   fstat(fd, &st);
 
-  if(st.st_mode & S_IFREG) {
+  if(S_ISREG(st.st_mode) || S_ISCHR(st.st_mode)) {
     puts(path);
-  } else if(st.st_mode & S_IFDIR) {
+  } else if(S_ISDIR(st.st_mode)) {
     while(read(fd, buf, sizeof(buf)) == sizeof(buf)) {
       struct dirent *d = (struct dirent *)buf;
       char *bend = buf + sizeof(buf);
