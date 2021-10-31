@@ -11,6 +11,10 @@
 #define FR_TXFF (1 << 5)  /* transmit fifo full */
 #define FR_RXFF (1 << 6)  /* recieve fifo full */
 #define FR_TXFE (1 << 7)  /* transmit fifo empty */
+#define RXFE    (REG(UART_FR) & FR_RXFE)
+#define TXFF    (REG(UART_FR) & FR_TXFF)
+#define RXFF    (REG(UART_FR) & FR_RXFF)
+#define TXFE    (REG(UART_FR) & FR_TXFE)
 #define UART_IBRD (UARTBASE + 0x24)
 #define UART_FBRD (UARTBASE + 0x28)
 #define UART_LCRH (UARTBASE + 0x2c)
@@ -27,6 +31,9 @@ void disable_uart() {
 }
 
 void uartintr() {
+  if(!RXFE) {
+  }
+
   REG(UART_ICR) = 1 << 4 | 1 << 5;  /* clear interrupt */
 }
 

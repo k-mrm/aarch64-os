@@ -7,6 +7,7 @@
 #include "cdev.h"
 
 #define BACKSPACE 127
+#define C(x)  ((x)-'@')
 
 struct console cons1;
 
@@ -52,8 +53,9 @@ int csread(struct console *cs, char *buf, u64 size) {
         buf--;
       else
         continue;
-    }
-    else {
+    } else if(c == C('D')) {
+      return 0;
+    } else {
       *buf++ = c;
     }
 
