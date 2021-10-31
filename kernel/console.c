@@ -54,7 +54,7 @@ int csread(struct console *cs, char *buf, u64 size) {
       else
         continue;
     } else if(c == C('D')) {
-      return 0;
+      break;
     } else {
       *buf++ = c;
     }
