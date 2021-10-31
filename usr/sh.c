@@ -3,6 +3,9 @@
 
 int parse(char *cmd, char **argv) {
   static const char *ws = " \n\t";
+  while(strchr(ws, *cmd))
+    cmd++;
+
   int argc = 0;
   argv[argc++] = strtok(cmd, ws);
   char *tok;
@@ -10,6 +13,9 @@ int parse(char *cmd, char **argv) {
     argv[argc++] = tok;
   }
   argv[argc] = 0;
+
+  if(argv[0] == NULL)
+    return -1;
 
   return argc;
 }
@@ -47,6 +53,8 @@ int main(void) {
   for(;;) {
     read_cmd(buf);
     int argc = parse(buf, argv);
+    if(argc < 0)
+      continue;
 
     if(builtincmd(argc, argv))
       continue;
