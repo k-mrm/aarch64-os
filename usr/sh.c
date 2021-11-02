@@ -42,6 +42,9 @@ int builtincmd(int argc, char **argv) {
     }
 
     return 1;
+  } else if(strcmp(argv[0], "exit") == 0) {
+    exit(0);
+    return 1;
   }
 
   return 0;
