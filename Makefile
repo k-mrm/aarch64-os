@@ -17,6 +17,7 @@ NCPU = 1
 
 QCPU = cortex-a72
 QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
+QEMUOPTS += -global virtio-mmio.force-legacy=false
 QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=d0
 QEMUOPTS += -device virtio-blk-device,drive=d0,bus=virtio-mmio-bus.0
 QEMUOPTS += -nographic -kernel kernel8.elf
