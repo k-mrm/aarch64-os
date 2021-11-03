@@ -17,8 +17,8 @@ NCPU = 1
 
 QCPU = cortex-a72
 QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
-#QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=d0
-#QEMUOPTS += -device virtio-blk-device,drive=d0
+QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=d0
+QEMUOPTS += -device virtio-blk-device,drive=d0,bus=virtio-mmio-bus.0
 QEMUOPTS += -nographic -kernel kernel8.elf
 
 KOBJS = kernel/boot.o kernel/vectortable.o kernel/ramdisk.o	kernel/file.o \
@@ -27,7 +27,7 @@ KOBJS = kernel/boot.o kernel/vectortable.o kernel/ramdisk.o	kernel/file.o \
 			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o	\
 			 kernel/cdev.o
 
-DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o
+DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o kernel/driver/virtio.o
 
 VIRTDRV = $(DRIVER) kernel/driver/virt/uart.o
 

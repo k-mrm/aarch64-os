@@ -29,5 +29,6 @@
 
 #define GICV2_BASE  P2V(PGICV2_BASE)
 #define UARTBASE    P2V(PUARTBASE)
+#define VIRTIO0     P2V(PVIRTIO0)
 
 #endif

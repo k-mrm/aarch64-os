@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "driver/gicv2.h"
 #include "driver/timer.h"
+#include "driver/virtio.h"
 #include "log.h"
 #include "kalloc.h"
 #include "ramdisk.h"
@@ -19,6 +20,7 @@ int main(void) {
   kinfo("kernel main @%p\n", main);
   gicv2_init();
   timer_init(200);
+  virtio_init();
   kalloc_init1();
   pgt_init();
   kalloc_init2();
