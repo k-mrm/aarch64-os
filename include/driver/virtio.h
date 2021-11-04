@@ -30,6 +30,14 @@
 #define VIRTIO_REG_CONFIG_GENERATION    (VIRTIO0 + 0xfc)
 #define VIRTIO_REG_CONFIG               (VIRTIO0 + 0x100)
 
+#define DEV_STATUS_ACKNOWLEDGE    1
+#define DEV_STATUS_DRIVER   2
+#define DEV_STATUS_FAILED   128
+#define DEV_STATUS_FEATURES_OK    8
+#define DEV_STATUS_DRIVER_OK    4
+#define DEV_STATUS_NEEDS_RESET    64
+
+
 struct virtq_desc {
   u64 addr;
   u32 len;
