@@ -15,10 +15,12 @@ void virtio_init() {
     panic("no block device");
   }
 
+  REG(VIRTIO_REG_STATUS) = 0;
   REG(VIRTIO_REG_STATUS) |= DEV_STATUS_ACKNOWLEDGE;
   REG(VIRTIO_REG_STATUS) |= DEV_STATUS_DRIVER;
 
-  u32 features = REG(VIRTIO_REG_DEVICE_FEATURES);
-
   REG(VIRTIO_REG_STATUS) |= DEV_STATUS_FEATURES_OK;
+
+  if(!(REG(VIRTIO_REG_STATUS) & DEV_STATUS_FEATURES_OK))
+    panic("virtio-blk err");
 }

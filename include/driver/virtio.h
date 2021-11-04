@@ -30,19 +30,46 @@
 #define VIRTIO_REG_CONFIG_GENERATION    (VIRTIO0 + 0xfc)
 #define VIRTIO_REG_CONFIG               (VIRTIO0 + 0x100)
 
-#define DEV_STATUS_ACKNOWLEDGE    1
-#define DEV_STATUS_DRIVER   2
-#define DEV_STATUS_FAILED   128
-#define DEV_STATUS_FEATURES_OK    8
-#define DEV_STATUS_DRIVER_OK    4
-#define DEV_STATUS_NEEDS_RESET    64
+#define DEV_STATUS_ACKNOWLEDGE  1
+#define DEV_STATUS_DRIVER 2
+#define DEV_STATUS_FAILED 128
+#define DEV_STATUS_FEATURES_OK  8
+#define DEV_STATUS_DRIVER_OK  4
+#define DEV_STATUS_NEEDS_RESET  64
 
+#define VIRTIO_BLK_F_SIZE_MAX 1
+#define VIRTIO_BLK_F_SEG_MAX  2
+#define VIRTIO_BLK_F_GEOMETRY 4
+#define VIRTIO_BLK_F_RO 5
+#define VIRTIO_BLK_F_BLK_SIZE 6
+#define VIRTIO_BLK_F_FLUSH  9
+#define VIRTIO_BLK_F_TOPOLOGY 10
+#define VIRTIO_BLK_F_CONFIG_WCE 11
+#define VIRTIO_BLK_F_DISCARD  13
+#define VIRTIO_BLK_F_WRITE_ZEROES 14
+
+#define VIRTIO_BLK_T_IN 0
+#define VIRTIO_BLK_T_OUT  1
+#define VIRTIO_BLK_T_FLUSH  4
+#define VIRTIO_BLK_T_DISCARD  11
+#define VIRTIO_BLK_T_WRITE_ZEROES 13
+
+#define VIRTIO_BLK_S_OK 0
+#define VIRTIO_BLK_S_IOERR  1
+#define VIRTIO_BLK_S_UNSUPP 2
 
 struct virtq_desc {
   u64 addr;
   u32 len;
   u16 flags;
   u16 next;
+};
+
+struct virtq_avail {
+  u16 flags;
+  u16 idx;
+  u16 ring[8];
+  u16 used_event;
 };
 
 struct virtq_used_elem {
@@ -55,6 +82,12 @@ struct virtq_used {
   u16 idx;
   struct virtq_used_elem ring[8];
   u16 avail_event;
+};
+
+struct virtio_blk_req {
+  u32 type;
+  u32 reserved;
+  u64 sector;
 };
 
 #endif
