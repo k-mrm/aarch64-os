@@ -2,8 +2,11 @@
 #define AARCH64_VIRTIO_H
 
 #include "kernel.h"
+#include "mm.h"
 
 #define PVIRTIO0  0xa000000
+
+#define NQUEUE  8
 
 #define VIRTIO_REG_MAGICVALUE           (VIRTIO0 + 0x00)
 #define VIRTIO_REG_VERSION              (VIRTIO0 + 0x04)
@@ -58,6 +61,9 @@
 #define VIRTIO_BLK_S_IOERR  1
 #define VIRTIO_BLK_S_UNSUPP 2
 
+#define VIRTQ_DESC_F_NEXT 1
+#define VIRTQ_DESC_F_WRITE  2 
+#define VIRTQ_DESC_F_INDIRECT 4
 struct virtq_desc {
   u64 addr;
   u32 len;
@@ -65,10 +71,11 @@ struct virtq_desc {
   u16 next;
 };
 
+#define VIRTQ_AVAIL_F_NO_INTERRUPT  1
 struct virtq_avail {
   u16 flags;
   u16 idx;
-  u16 ring[8];
+  u16 ring[NQUEUE];
   u16 used_event;
 };
 
@@ -77,17 +84,29 @@ struct virtq_used_elem {
   u32 len;
 };
 
+#define VIRTQ_USED_F_NO_NOTIFY  1
 struct virtq_used {
   u16 flags;
   u16 idx;
-  struct virtq_used_elem ring[8];
+  struct virtq_used_elem ring[NQUEUE];
   u16 avail_event;
 };
+
+struct virtq {
+  struct virtq_desc desc[NQUEUE];
+  struct virtq_avail *avail;
+  struct virtq_used *used;
+} __attribute__((aligned(PAGESIZE)));
 
 struct virtio_blk_req {
   u32 type;
   u32 reserved;
   u64 sector;
+  u8 data[512];
+  u8 status;
+};
+
+struct virtio_blk {
 };
 
 #endif
