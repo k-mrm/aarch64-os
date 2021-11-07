@@ -4,6 +4,25 @@
 
 #define VIRTIO_MAGIC  0x74726976
 
+struct virtq *disk;
+
+int virtio_blk_rw(char *buf, int op) {
+  ;
+}
+
+int alloc_desc(struct virtq *virtq) {
+  for(int i = 0; i < NQUEUE; i++) {
+    if(virtq->desc[i].addr == 0)
+      return i;
+  }
+
+  return -1;
+}
+
+int virtq_init() {
+  ;
+}
+
 void virtio_init() {
   printk("magicval %p\n", REG(VIRTIO_REG_MAGICVALUE));
   printk("version %p\n", REG(VIRTIO_REG_VERSION));
@@ -30,6 +49,8 @@ void virtio_init() {
 
   if(!(REG(VIRTIO_REG_STATUS) & DEV_STATUS_FEATURES_OK))
     panic("virtio-blk err");
+
+  virtq_init();
 
   REG(VIRTIO_REG_STATUS) |= DEV_STATUS_DRIVER_OK;
 }

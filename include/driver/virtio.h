@@ -51,12 +51,6 @@
 #define VIRTIO_BLK_F_DISCARD  13
 #define VIRTIO_BLK_F_WRITE_ZEROES 14
 
-#define VIRTIO_BLK_T_IN 0
-#define VIRTIO_BLK_T_OUT  1
-#define VIRTIO_BLK_T_FLUSH  4
-#define VIRTIO_BLK_T_DISCARD  11
-#define VIRTIO_BLK_T_WRITE_ZEROES 13
-
 #define VIRTIO_BLK_S_OK 0
 #define VIRTIO_BLK_S_IOERR  1
 #define VIRTIO_BLK_S_UNSUPP 2
@@ -98,12 +92,15 @@ struct virtq {
   struct virtq_used *used;
 } __attribute__((aligned(PAGESIZE)));
 
-struct virtio_blk_req {
+#define VIRTIO_BLK_T_IN 0
+#define VIRTIO_BLK_T_OUT  1
+#define VIRTIO_BLK_T_FLUSH  4
+#define VIRTIO_BLK_T_DISCARD  11
+#define VIRTIO_BLK_T_WRITE_ZEROES 13
+struct virtio_blk_req_hdr {
   u32 type;
   u32 reserved;
   u64 sector;
-  u8 data[512];
-  u8 status;
 };
 
 struct virtio_blk {
