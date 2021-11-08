@@ -88,8 +88,10 @@ struct virtq_used {
 
 struct virtq {
   struct virtq_desc desc[NQUEUE];
-  struct virtq_avail *avail;
-  struct virtq_used *used;
+  struct virtq_avail avail;
+  struct virtq_used used;
+  u16 free_head;
+  u16 last_used_idx;
 } __attribute__((aligned(PAGESIZE)));
 
 #define VIRTIO_BLK_T_IN 0
@@ -101,9 +103,6 @@ struct virtio_blk_req_hdr {
   u32 type;
   u32 reserved;
   u64 sector;
-};
-
-struct virtio_blk {
 };
 
 #endif
