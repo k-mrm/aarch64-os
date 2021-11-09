@@ -7,11 +7,7 @@
 
 struct virtq disk;
 
-int virtio_blk_rw(char *buf, int op) {
-  ;
-}
-
-int alloc_desc(struct virtq *virtq) {
+static int alloc_desc(struct virtq *virtq) {
   for(int i = 0; i < NQUEUE; i++) {
     if(virtq->desc[i].addr == 0)
       return i;
@@ -20,8 +16,57 @@ int alloc_desc(struct virtq *virtq) {
   return -1;
 }
 
-int virtq_init() {
-  memset(&disk, 0, sizeof(disk));
+static void free_desc(struct virtq *virtq, int n) {
+  virtq->desc[n].addr = 0;
+  virtq->desc[n].len = 0;
+
+  if(virtq->desc[n].flags & VIRTQ_DESC_F_NEXT) {
+    free_desc(virtq, virtq->desc[n].next);
+  }
+
+  virtq->desc[n].flags = 0;
+  virtq->desc[n].next = 0;
+}
+
+int virtio_blk_rw(u64 sector, char *buf, int op) {
+  struct virtio_blk_req_hdr hdr;
+
+  hdr.type = op;
+  hdr.reserved = 0;
+  hdr.sector = sector;
+
+  int d0 = alloc_desc(&disk);
+  if(d0 < 0)
+    return -1;
+  disk.desc[d0].addr = (u64)&hdr;
+  disk.desc[d0].len = sizeof(hdr);
+  disk.desc[d0].flags = VIRTQ_DESC_F_NEXT;
+
+  int d1 = alloc_desc(&disk);
+  if(d1 < 0)
+    return -1;
+  disk.desc[d0].next = d1;
+  disk.desc[d1].addr = (u64)buf;
+  disk.desc[d1].len = 1024;
+  disk.desc[d1].flags |= VIRTQ_DESC_F_NEXT;
+  if(op == VIRTIO_BLK_T_OUT)
+    disk.desc[d1].flags |= VIRTQ_DESC_F_WRITE;
+
+  char status;
+  int d2 = alloc_desc(&disk);
+  if(d2 < 0)
+    return -1;
+  disk.desc[d1].next = d2;
+  disk.desc[d2].addr = &status;
+  disk.desc[d2].len = sizeof(status);
+  disk.desc[d2].flags = VIRTQ_DESC_F_WRITE;
+  disk.desc[d2].next = 0;
+
+  return 0;
+}
+
+static int virtq_init(struct virtq *vq) {
+  memset(vq, 0, sizeof(*vq));
 }
 
 void virtio_init() {
@@ -55,13 +100,12 @@ void virtio_init() {
   /* Set the FEATURES_OK status bit. */
   REG(VIRTIO_REG_STATUS) |= DEV_STATUS_FEATURES_OK;
 
-
   /* Re-read device status to ensure the FEATURES_OK bit is still set: otherwise, the device does not support our subset of features and the device is unusable. */
   if(!(REG(VIRTIO_REG_STATUS) & DEV_STATUS_FEATURES_OK))
     panic("virtio-blk err");
 
   /* Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup, reading and possibly writing the device's virtio configuration space, and population of virtqueues. */
-  virtq_init();
+  virtq_init(&disk);
 
   /* Set the DRIVER_OK status bit. */
   REG(VIRTIO_REG_STATUS) |= DEV_STATUS_DRIVER_OK;

@@ -20,12 +20,11 @@ int main(void) {
   kinfo("kernel main @%p\n", main);
   gicv2_init();
   timer_init(200);
-  virtio_init();
   kalloc_init1();
   pgt_init();
   kalloc_init2();
+  virtio_init();
   proc_init();
-  ramdisk_init();
   fs_init();
   file_init();
 
