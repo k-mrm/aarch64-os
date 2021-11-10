@@ -5,6 +5,7 @@
 
 #define TIMER_IRQ   27
 #define UART_IRQ    33
+#define VIRTIO_BLK_IRQ  48
 
 struct trapframe {
   u64 x0;

@@ -6,7 +6,7 @@
 #include "string.h"
 #include "proc.h"
 #include "kalloc.h"
-#include "ramdisk.h"
+#include "driver/virtio.h"
 
 #define ext2_inode_nblock(i) ((i)->blocks / (2 << 0))
 
@@ -76,12 +76,12 @@ static void dump_dirent(struct dirent *d) {
   printk("name: %s\n", d->name);
 }
 
-static struct ext2_superblock *ext2_get_sb() {
-  return (struct ext2_superblock *)diskread(0x400);
+static void ext2_get_sb(struct ext2_superblock *buf) {
+  virtio_blk_rw(1, (char *)buf, DREAD);
 }
 
-static struct ext2_bg_desc *ext2_get_bg() {
-  return (struct ext2_bg_desc *)diskread(0x800);
+static void ext2_get_bg(struct ext2_bg_desc *buf) {
+  virtio_blk_rw(2, (char *)buf, DREAD);
 }
 
 /* for debug */
@@ -625,25 +625,28 @@ struct inode *ext2_path2inode_parent(char *path, char *namebuf) {
 }
 
 void ext2_init() {
-  struct ext2_superblock *esb = ext2_get_sb();
-  // dump_superblock(sb);
-  if(esb->s_magic != 0xef53)
+  struct ext2_superblock esb;
+  ext2_get_sb(&esb);
+  dump_superblock(&esb);
+
+  if(esb.s_magic != 0xef53)
     panic("invalid filesystem");
 
-  struct ext2_bg_desc *bg = ext2_get_bg();
+  struct ext2_bg_desc bg;
+  ext2_get_bg(&bg);
 
-  sb.bsize = 1024 << esb->s_log_block_size;
-  sb.block_bitmap = get_block(bg->bg_block_bitmap);
-  sb.inode_bitmap = get_block(bg->bg_inode_bitmap);
-  sb.inode_table = get_block(bg->bg_inode_table);
+  sb.bsize = 1024 << esb.s_log_block_size;
+  sb.block_bitmap = get_block(bg.bg_block_bitmap);
+  sb.inode_bitmap = get_block(bg.bg_inode_bitmap);
+  sb.inode_table = get_block(bg.bg_inode_table);
 
-  sb.inodes_count = esb->s_inodes_count;
-  sb.blocks_count = esb->s_blocks_count;
-  sb.first_data_block = esb->s_first_data_block;
-  sb.blocks_per_group = esb->s_blocks_per_group;
-  sb.inodes_per_group = esb->s_inodes_per_group;
-  sb.mtime = esb->s_mtime;
-  sb.wtime = esb->s_wtime;
-  sb.first_ino = esb->s_first_ino;
-  sb.inode_size = esb->s_inode_size;
+  sb.inodes_count = esb.s_inodes_count;
+  sb.blocks_count = esb.s_blocks_count;
+  sb.first_data_block = esb.s_first_data_block;
+  sb.blocks_per_group = esb.s_blocks_per_group;
+  sb.inodes_per_group = esb.s_inodes_per_group;
+  sb.mtime = esb.s_mtime;
+  sb.wtime = esb.s_wtime;
+  sb.first_ino = esb.s_first_ino;
+  sb.inode_size = esb.s_inode_size;
 }

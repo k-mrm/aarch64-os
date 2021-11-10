@@ -2,6 +2,7 @@
 #include "printk.h"
 #include "memmap.h"
 #include "string.h"
+#include "trap.h"
 
 #define VIRTIO_MAGIC  0x74726976
 
@@ -28,10 +29,16 @@ static void free_desc(struct virtq *virtq, int n) {
   virtq->desc[n].next = 0;
 }
 
-int virtio_blk_rw(u64 sector, char *buf, int op) {
+int virtio_blk_rw(u64 bno, char *buf, enum diskop op) {
+  u64 sector = bno * 2;
   struct virtio_blk_req_hdr hdr;
 
-  hdr.type = op;
+  if(op == DREAD)
+    hdr.type = VIRTIO_BLK_T_IN;
+  else if(op == DWRITE)
+    hdr.type = VIRTIO_BLK_T_OUT;
+  else
+    return -1;
   hdr.reserved = 0;
   hdr.sector = sector;
 
@@ -57,16 +64,29 @@ int virtio_blk_rw(u64 sector, char *buf, int op) {
   if(d2 < 0)
     return -1;
   disk.desc[d1].next = d2;
-  disk.desc[d2].addr = &status;
+  disk.desc[d2].addr = (u64)&status;
   disk.desc[d2].len = sizeof(status);
   disk.desc[d2].flags = VIRTQ_DESC_F_WRITE;
   disk.desc[d2].next = 0;
+
+  disk.avail.ring[disk.avail.idx % NQUEUE] = d0;
+  disk.avail.idx++;
+
+  REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
+
+  for(;;);
+
+  free_desc(&disk, d0);
 
   return 0;
 }
 
 static int virtq_init(struct virtq *vq) {
   memset(vq, 0, sizeof(*vq));
+}
+
+static void virtio_blk_intr() {
+  printk("virtio int\n");
 }
 
 void virtio_init() {
@@ -107,6 +127,10 @@ void virtio_init() {
   /* Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup, reading and possibly writing the device's virtio configuration space, and population of virtqueues. */
   virtq_init(&disk);
 
+  REG(VIRTIO_REG_QUEUE_NUM) = NQUEUE;
+
   /* Set the DRIVER_OK status bit. */
   REG(VIRTIO_REG_STATUS) |= DEV_STATUS_DRIVER_OK;
+
+  new_irq(VIRTIO_BLK_IRQ, virtio_blk_intr);
 }

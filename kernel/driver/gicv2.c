@@ -104,6 +104,7 @@ void gicv2_init() {
 
   gic_setup_ppi(TIMER_IRQ, GICD_CFG_EDGE, 0, 0);
   gic_setup_spi(UART_IRQ, GICD_CFG_LEVEL, 0);
+  gic_setup_spi(VIRTIO_BLK_IRQ, GICD_CFG_LEVEL, 0);
 
   gic_enable();
 

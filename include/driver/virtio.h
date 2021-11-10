@@ -105,4 +105,12 @@ struct virtio_blk_req_hdr {
   u64 sector;
 };
 
+enum diskop {
+  DREAD,
+  DWRITE,
+};
+
+int virtio_blk_rw(u64 bno, char *buf, enum diskop op);
+void virtio_init(void);
+
 #endif
