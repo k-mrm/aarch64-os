@@ -63,7 +63,7 @@ struct virtq_desc {
   u32 len;
   u16 flags;
   u16 next;
-};
+} __attribute__((aligned(16)));
 
 #define VIRTQ_AVAIL_F_NO_INTERRUPT  1
 struct virtq_avail {
@@ -71,7 +71,7 @@ struct virtq_avail {
   u16 idx;
   u16 ring[NQUEUE];
   u16 used_event;
-};
+} __attribute__((aligned(2)));
 
 struct virtq_used_elem {
   u32 id;
@@ -84,7 +84,7 @@ struct virtq_used {
   u16 idx;
   struct virtq_used_elem ring[NQUEUE];
   u16 avail_event;
-};
+} __attribute__((aligned(4)));
 
 struct virtq {
   struct virtq_desc desc[NQUEUE];

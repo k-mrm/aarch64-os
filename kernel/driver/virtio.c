@@ -45,7 +45,7 @@ int virtio_blk_rw(u64 bno, char *buf, enum diskop op) {
   int d0 = alloc_desc(&disk);
   if(d0 < 0)
     return -1;
-  disk.desc[d0].addr = (u64)&hdr;
+  disk.desc[d0].addr = (u64)V2P(&hdr);
   disk.desc[d0].len = sizeof(hdr);
   disk.desc[d0].flags = VIRTQ_DESC_F_NEXT;
 
@@ -53,28 +53,28 @@ int virtio_blk_rw(u64 bno, char *buf, enum diskop op) {
   if(d1 < 0)
     return -1;
   disk.desc[d0].next = d1;
-  disk.desc[d1].addr = (u64)buf;
+  disk.desc[d1].addr = (u64)V2P(buf);
   disk.desc[d1].len = 1024;
   disk.desc[d1].flags |= VIRTQ_DESC_F_NEXT;
-  if(op == VIRTIO_BLK_T_OUT)
+  if(op == DWRITE)
     disk.desc[d1].flags |= VIRTQ_DESC_F_WRITE;
 
-  char status;
+  u8 status;
   int d2 = alloc_desc(&disk);
   if(d2 < 0)
     return -1;
   disk.desc[d1].next = d2;
-  disk.desc[d2].addr = (u64)&status;
+  disk.desc[d2].addr = (u64)V2P(&status);
   disk.desc[d2].len = sizeof(status);
   disk.desc[d2].flags = VIRTQ_DESC_F_WRITE;
   disk.desc[d2].next = 0;
+
+  printk("d0 %d d1 %d d2 %d\n", d0, d1, d2);
 
   disk.avail.ring[disk.avail.idx % NQUEUE] = d0;
   disk.avail.idx++;
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
-
-  for(;;);
 
   free_desc(&disk, d0);
 
@@ -88,6 +88,9 @@ static int virtq_init(struct virtq *vq) {
 static void virtio_blk_intr() {
   printk("virtio int\n");
 }
+
+#define LO(addr)  (u32)((addr) & 0xffffffff)
+#define HI(addr)  (u32)(((addr) >> 32) & 0xffffffff)
 
 void virtio_init() {
   printk("magicval %p\n", REG(VIRTIO_REG_MAGICVALUE));
@@ -127,10 +130,26 @@ void virtio_init() {
   /* Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup, reading and possibly writing the device's virtio configuration space, and population of virtqueues. */
   virtq_init(&disk);
 
+  REG(VIRTIO_REG_QUEUE_SEL) = 0;
   REG(VIRTIO_REG_QUEUE_NUM) = NQUEUE;
+
+  u64 phy_desc = V2P(&disk.desc);
+  printk("%p %p %p\n", phy_desc, LO(phy_desc), HI(phy_desc));
+  REG(VIRTIO_REG_QUEUE_DESC_LOW) = LO(phy_desc);
+  REG(VIRTIO_REG_QUEUE_DESC_HIGH) = HI(phy_desc);
+  u64 phy_avail = V2P(&disk.avail);
+  REG(VIRTIO_REG_QUEUE_DRIVER_LOW) = LO(phy_avail);
+  REG(VIRTIO_REG_QUEUE_DRIVER_HIGH) = HI(phy_avail);
+  u64 phy_used = V2P(&disk.used);
+  REG(VIRTIO_REG_QUEUE_DEVICE_LOW) = LO(phy_used);
+  REG(VIRTIO_REG_QUEUE_DEVICE_HIGH) = HI(phy_used);
+
+  REG(VIRTIO_REG_QUEUE_READY) = 1;
 
   /* Set the DRIVER_OK status bit. */
   REG(VIRTIO_REG_STATUS) |= DEV_STATUS_DRIVER_OK;
 
   new_irq(VIRTIO_BLK_IRQ, virtio_blk_intr);
+
+  printk("virtio_init done\n");
 }
