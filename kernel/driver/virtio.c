@@ -71,13 +71,12 @@ int virtio_blk_rw(u64 bno, char *buf, enum diskop op) {
   if(op == DREAD)
     disk.desc[d1].flags |= VIRTQ_DESC_F_WRITE;
 
-  u8 status;
   int d2 = alloc_desc(&disk);
   if(d2 < 0)
     return -1;
   disk.desc[d1].next = d2;
-  disk.desc[d2].addr = (u64)V2P(&status);
-  disk.desc[d2].len = sizeof(status);
+  disk.desc[d2].addr = (u64)V2P(&disk.info[d0].status);
+  disk.desc[d2].len = sizeof(disk.info[d0].status);
   disk.desc[d2].flags = VIRTQ_DESC_F_WRITE;
   disk.desc[d2].next = 0;
 
@@ -93,10 +92,6 @@ int virtio_blk_rw(u64 bno, char *buf, enum diskop op) {
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
 
-  descdump(&disk);
-
-  free_desc(&disk, d0);
-
   return 0;
 }
 
@@ -111,7 +106,21 @@ static int virtq_init(struct virtq *vq) {
 }
 
 static void virtio_blk_intr() {
-  printk("virtio int\n");
+  REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
+
+  int d0;
+  while(disk.last_used_idx != disk.used->idx) {
+    d0 = disk.used->ring[disk.used->idx % NQUEUE].id;
+
+    if(disk.info[d0].status != 0)
+      panic("disk error");
+
+    disk.info[d0].done = 1;
+
+    disk.last_used_idx++;
+  }
+
+  free_desc(&disk, d0);
 }
 
 #define LO(addr)  (u32)((addr) & 0xffffffff)
@@ -194,8 +203,6 @@ void virtio_init() {
   /* Set the DRIVER_OK status bit. */
   status |= DEV_STATUS_DRIVER_OK;
   REG(VIRTIO_REG_STATUS) = status;
-
-  kinfo("cc %p %p %p %p %d\n", phy_desc, phy_avail, phy_used, status, VIRTIO_BLK_IRQ);
 
   new_irq(VIRTIO_BLK_IRQ, virtio_blk_intr);
 

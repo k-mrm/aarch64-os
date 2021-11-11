@@ -92,6 +92,11 @@ struct virtq {
   struct virtq_used *used;
   u16 free_head;
   u16 last_used_idx;
+
+  struct {
+    u8 status;
+    u8 done;
+  } info[NQUEUE];
 };
 
 #define VIRTIO_BLK_T_IN 0
