@@ -68,7 +68,7 @@ int virtio_blk_rw(u64 bno, char *buf, enum diskop op) {
   disk.desc[d1].addr = (u64)V2P(buf);
   disk.desc[d1].len = 1024;
   disk.desc[d1].flags |= VIRTQ_DESC_F_NEXT;
-  if(op == DWRITE)
+  if(op == DREAD)
     disk.desc[d1].flags |= VIRTQ_DESC_F_WRITE;
 
   u8 status;
@@ -85,17 +85,16 @@ int virtio_blk_rw(u64 bno, char *buf, enum diskop op) {
 
   disk.avail->ring[disk.avail->idx % NQUEUE] = d0;
 
-  isb();
+  dsb();
 
   disk.avail->idx++;
 
-  isb();
+  dsb();
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
 
   descdump(&disk);
 
-  // for(;;);
   free_desc(&disk, d0);
 
   return 0;
@@ -147,9 +146,11 @@ void virtio_init() {
   REG(VIRTIO_REG_DRIVER_FEATURES_SEL) = 0;
 
   u32 features = REG(VIRTIO_REG_DEVICE_FEATURES);
-  features &= ~(1 << VIRTIO_BLK_F_RO);
+  features &= ~(1 << VIRTIO_BLK_F_SEG_MAX);
   features &= ~(1 << VIRTIO_BLK_F_GEOMETRY);
+  features &= ~(1 << VIRTIO_BLK_F_RO);
   features &= ~(1 << VIRTIO_BLK_F_BLK_SIZE);
+  features &= ~(1 << VIRTIO_BLK_F_FLUSH);
   features &= ~(1 << VIRTIO_BLK_F_TOPOLOGY);
   features &= ~(1 << VIRTIO_BLK_F_CONFIG_WCE);
   features &= ~(1 << VIRTIO_F_ANY_LAYOUT);
@@ -163,6 +164,7 @@ void virtio_init() {
 
   /* Re-read device status to ensure the FEATURES_OK bit is still set: otherwise, the device does not support our subset of features and the device is unusable. */
   status = REG(VIRTIO_REG_STATUS);
+  dsb();
   if(!(status & DEV_STATUS_FEATURES_OK))
     panic("virtio-blk err");
 
@@ -184,13 +186,16 @@ void virtio_init() {
   u64 phy_used = V2P(disk.used);
   REG(VIRTIO_REG_QUEUE_DEVICE_LOW) = LO(phy_used);
   REG(VIRTIO_REG_QUEUE_DEVICE_HIGH) = HI(phy_used);
-  kinfo("%p %p %p\n", phy_desc, phy_avail, phy_used);
+
+  dsb();
 
   REG(VIRTIO_REG_QUEUE_READY) = 1;
 
   /* Set the DRIVER_OK status bit. */
   status |= DEV_STATUS_DRIVER_OK;
   REG(VIRTIO_REG_STATUS) = status;
+
+  kinfo("cc %p %p %p %p %d\n", phy_desc, phy_avail, phy_used, status, VIRTIO_BLK_IRQ);
 
   new_irq(VIRTIO_BLK_IRQ, virtio_blk_intr);
 

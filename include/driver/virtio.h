@@ -3,8 +3,7 @@
 
 #include "kernel.h"
 #include "mm.h"
-
-#define PVIRTIO0  0xa000000
+#include "memmap.h"
 
 #define NQUEUE  8
 

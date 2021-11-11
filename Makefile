@@ -5,7 +5,7 @@ OBJCOPY = $(PREFIX)objcopy
 
 CPU = cortex-a72+nofp
 
-CFLAGS = -Wall -O2 -g -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
+CFLAGS = -Wall -Og -g -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
 CFLAGS += -DOS_DEBUG
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
@@ -23,7 +23,7 @@ QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=d0
 QEMUOPTS += -device virtio-blk-device,drive=d0,bus=virtio-mmio-bus.0
 QEMUOPTS += -nographic -kernel kernel8.elf
 
-KOBJS = kernel/boot.o kernel/vectortable.o kernel/ramdisk.o	kernel/file.o \
+KOBJS = kernel/boot.o kernel/vectortable.o kernel/file.o \
 			 kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o kernel/uname.o \
 			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o kernel/fs.o	\
 			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o	\
@@ -64,18 +64,17 @@ fs.img: $(UPROGS)
 	dd if=/dev/zero of=fs.img count=10000
 	mkfs -t ext2 -d rootfs/ -v fs.img -b 1024
 
-kernel8.elf: $(OBJS) kernel/kernel.ld fs.img usr/initcode
-	$(LD) -r -b binary fs.img -o fs.img.o
+kernel8.elf: $(OBJS) kernel/kernel.ld usr/initcode
 	$(LD) -r -b binary usr/initcode -o usr/initcode.o
-	$(LD) $(LDFLAGS) -T kernel/kernel.ld -o $@ $(OBJS) fs.img.o usr/initcode.o
+	$(LD) $(LDFLAGS) -T kernel/kernel.ld -o $@ $(OBJS) usr/initcode.o
 
 kernel8.img: kernel8.elf
 	$(OBJCOPY) -O binary $^ $@
 
-qemu: kernel8.img
+qemu: kernel8.img fs.img
 	$(QEMU) $(QEMUOPTS)
 
-gdb: kernel8.img
+gdb: kernel8.img fs.img
 	$(QEMU) -S -gdb tcp::1234 $(QEMUOPTS)
 
 dts:
@@ -87,7 +86,7 @@ raspi: kernel8.img fs.img
 	cp kernel8.img $(SDPATH)
 
 clean:
-	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) usr/initcode.o usr/initcode.elf usr/initcode kernel8.elf kernel8.img fs.img fs.img.o
+	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) usr/initcode.o usr/initcode.elf usr/initcode kernel8.elf kernel8.img fs.img
 	rm -rf rootfs
 
 .PHONY: qemu gdb clean dts raspi

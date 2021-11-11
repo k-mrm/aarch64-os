@@ -33,6 +33,10 @@ static inline void isb() {
   asm volatile("isb");
 }
 
+static inline void dsb() {
+  asm volatile("dsb sy");
+}
+
 static inline void dsb_ish() {
   asm volatile("dsb ish");
 }

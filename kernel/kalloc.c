@@ -37,7 +37,7 @@ void kfree(void *va) {
   if((u64)va % PAGESIZE != 0)
     panic("bad va");
 
-  memset(va, 1, PAGESIZE);
+  memset(va, 0, PAGESIZE);
 
   struct header *p = (struct header *)va;
   p->next = freelist;
