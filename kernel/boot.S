@@ -164,7 +164,7 @@ l2pgt_loop1:
   ldr x1, =__kstack
   mov sp, x1
 
-  ldr x2, =main
+  ldr x2, =clearbss
 
   /* enable paging */
   mrs x0, sctlr_el1
@@ -175,7 +175,7 @@ l2pgt_loop1:
 
   br x2
 
-  /* clear bss */
+clearbss:
   ldr x1, =__bss_start
   ldr w2, =__bss_size
 1:
@@ -185,6 +185,7 @@ l2pgt_loop1:
   b 1b
 2:
 
+  b main
 
 .global hang
 hang:
