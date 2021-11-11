@@ -143,6 +143,9 @@ void virtio_init() {
   REG(VIRTIO_REG_STATUS) = status;
 
   /* Read device feature bits, and write the subset of feature bits understood by the OS and driver to the device. */
+  REG(VIRTIO_REG_DEVICE_FEATURES_SEL) = 0;
+  REG(VIRTIO_REG_DRIVER_FEATURES_SEL) = 0;
+
   u32 features = REG(VIRTIO_REG_DEVICE_FEATURES);
   features &= ~(1 << VIRTIO_BLK_F_RO);
   features &= ~(1 << VIRTIO_BLK_F_GEOMETRY);
