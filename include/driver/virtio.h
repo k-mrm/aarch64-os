@@ -50,6 +50,9 @@
 #define VIRTIO_BLK_F_CONFIG_WCE 11
 #define VIRTIO_BLK_F_DISCARD  13
 #define VIRTIO_BLK_F_WRITE_ZEROES 14
+#define VIRTIO_F_ANY_LAYOUT 27
+#define VIRTIO_RING_F_INDIRECT_DESC 28
+#define VIRTIO_RING_F_EVENT_IDX 29
 
 #define VIRTIO_BLK_S_OK 0
 #define VIRTIO_BLK_S_IOERR  1
@@ -63,36 +66,34 @@ struct virtq_desc {
   u32 len;
   u16 flags;
   u16 next;
-} __attribute__((aligned(16)));
+} __attribute__((packed, aligned(16)));
 
 #define VIRTQ_AVAIL_F_NO_INTERRUPT  1
 struct virtq_avail {
   u16 flags;
   u16 idx;
   u16 ring[NQUEUE];
-  u16 used_event;
-} __attribute__((aligned(2)));
+} __attribute__((packed, aligned(2)));
 
 struct virtq_used_elem {
   u32 id;
   u32 len;
-};
+} __attribute__((packed));
 
 #define VIRTQ_USED_F_NO_NOTIFY  1
 struct virtq_used {
   u16 flags;
   u16 idx;
   struct virtq_used_elem ring[NQUEUE];
-  u16 avail_event;
-} __attribute__((aligned(4)));
+} __attribute__((packed, aligned(4)));
 
 struct virtq {
-  struct virtq_desc desc[NQUEUE];
-  struct virtq_avail avail;
-  struct virtq_used used;
+  struct virtq_desc *desc;
+  struct virtq_avail *avail;
+  struct virtq_used *used;
   u16 free_head;
   u16 last_used_idx;
-} __attribute__((aligned(PAGESIZE)));
+};
 
 #define VIRTIO_BLK_T_IN 0
 #define VIRTIO_BLK_T_OUT  1
