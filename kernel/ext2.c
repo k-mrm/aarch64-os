@@ -117,7 +117,7 @@ static int find_free_ino(char *bitmap) {
 }
 
 static void *get_block(int bnum) {
-  return NULL;  /* TODO */
+  return NULL;
 }
 
 static void *get_indirect_block(u32 *map, int bnum) {
