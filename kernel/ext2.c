@@ -6,7 +6,7 @@
 #include "string.h"
 #include "proc.h"
 #include "kalloc.h"
-#include "driver/virtio.h"
+#include "buf.h"
 
 #define ext2_inode_nblock(i) ((i)->blocks / (2 << 0))
 
@@ -76,12 +76,16 @@ static void dump_dirent(struct dirent *d) {
   printk("name: %s\n", d->name);
 }
 
-static void ext2_get_sb(struct ext2_superblock *buf) {
-  virtio_blk_rw(1, (char *)buf, DREAD);
+static struct ext2_superblock *ext2_get_sb() {
+  struct buf *b = bio_read(1);
+
+  return (struct ext2_superblock *)b->data;
 }
 
-static void ext2_get_bg(struct ext2_bg_desc *buf) {
-  virtio_blk_rw(2, (char *)buf, DREAD);
+static struct ext2_bg_desc *ext2_get_bg() {
+  struct buf *b = bio_read(2);
+
+  return (struct ext2_bg_desc *)b->data;
 }
 
 /* for debug */
@@ -98,10 +102,11 @@ void dump_dirent_block(char *blk) {
   }
 }
 
-static int find_free_ino(char *bitmap) {
+static int find_free_ino(struct superblock *sb) {
+  struct buf *bitmap = bio_read(sb->inode_bitmap);
   char chunk = 0xff;
   int inum = 1;
-  for(int i = 0; i < sb.bsize; i++) {
+  for(int i = 0; i < sb->bsize; i++) {
     if((chunk = bitmap[i]) != 0xff)
       break;
     inum += 8;
@@ -116,19 +121,16 @@ static int find_free_ino(char *bitmap) {
   return inum;
 }
 
-static void *get_block(int bnum) {
-  return NULL;
-}
-
 static void *get_indirect_block(u32 *map, int bnum) {
   int idx = bnum - 12;
-  return get_block(map[idx]);
+  return bio_read(map[idx]);
 }
 
-static int find_free_block(char *bitmap) {
+static int find_free_block(struct superblock *sb) {
+  struct buf *bitmap = bio_read(sb->block_bitmap);
   char chunk = 0xff;
   int bnum = 0;
-  for(int i = 0; i < sb.bsize; i++) {
+  for(int i = 0; i < sb->bsize; i++) {
     if((chunk = bitmap[i]) != 0xff)
       break;
     bnum += 8;
@@ -143,11 +145,12 @@ static int find_free_block(char *bitmap) {
   return bnum;
 }
 
-static int ibmp_write_bit(char *bitmap, int ino, int val) {
+static int ibmp_write_bit(struct superblock *sb, int ino, int val) {
+  struct buf *bitmap = bio_read(sb->inode_bitmap);
   int bitn = ino - 1;
   int chunkn;
   char c;
-  for(chunkn = 0; chunkn < sb.bsize; chunkn++) {
+  for(chunkn = 0; chunkn < sb->bsize; chunkn++) {
     if(bitn < 8)
       goto found;
     bitn -= 8;
@@ -157,21 +160,24 @@ static int ibmp_write_bit(char *bitmap, int ino, int val) {
   return -1;
 
 found:
-  c = bitmap[chunkn];
+  c = bitmap->data[chunkn];
   if(val)
     c |= 1 << bitn;
   else
     c &= ~(char)(1 << bitn);
-  bitmap[chunkn] = c;
+  bitmap->data[chunkn] = c;
+
+  bio_write(bitmap);
 
   return 0;
 }
 
-static int bbmp_write_bit(char *bitmap, int bn, int val) {
+static int bbmp_write_bit(struct superblock *sb, int bn, int val) {
+  struct buf *bitmap = bio_read(sb->block_bitmap);
   int bitn = bn;
   int chunkn;
   char c;
-  for(chunkn = 0; chunkn < sb.bsize; chunkn++) {
+  for(chunkn = 0; chunkn < sb->bsize; chunkn++) {
     if(bitn < 8)
       goto found;
     bitn -= 8;
@@ -181,30 +187,32 @@ static int bbmp_write_bit(char *bitmap, int bn, int val) {
   return -1;
 
 found:
-  c = bitmap[chunkn];
+  c = bitmap->data[chunkn];
   if(val)
     c |= 1 << bitn;
   else
     c &= ~(char)(1 << bitn);
-  bitmap[chunkn] = c;
+  bitmap->data[chunkn] = c;
+
+  bio_write(bitmap);
 
   return 0;
 }
 
 static int ext2_alloc_block() {
-  char *bbmp = sb.block_bitmap;
-
-  int bn = find_free_block(bbmp);
+  int bn = find_free_block(sb);
   if(bn < 0)
     return -1;
 
-  bbmp_write_bit(bbmp, bn, 1);
+  bbmp_write_bit(sb, bn, 1);
 
   return bn;
 }
 
-struct ext2_inode *ext2_raw_inode(int inum) {
-  return (struct ext2_inode *)(sb.inode_table + (inum - 1) * sizeof(struct ext2_inode));
+static struct ext2_inode *ext2_raw_inode(struct superblock *sb, int inum) {
+  struct buf *itable = bio_read(sb->inode_table);
+
+  return (struct ext2_inode *)(itable + (inum - 1) * sizeof(struct ext2_inode));
 }
 
 char *ext2_inode_block(struct inode *ino, int bi) {
@@ -338,7 +346,7 @@ found:
   return 0;
 }
 
-/* synchronize @ino with disk inode */
+/* synchronize @i with disk inode */
 static void inode_sync(struct inode *i) {
   struct ext2_inode *e = ext2_raw_inode(i->inum);
   
@@ -625,28 +633,26 @@ struct inode *ext2_path2inode_parent(char *path, char *namebuf) {
 }
 
 void ext2_init() {
-  struct ext2_superblock esb;
-  ext2_get_sb(&esb);
-  dump_superblock(&esb);
+  struct ext2_superblock *esb = ext2_get_sb();
+  dump_superblock(esb);
 
-  if(esb.s_magic != 0xef53)
+  if(esb->s_magic != 0xef53)
     panic("invalid filesystem");
 
-  struct ext2_bg_desc bg;
-  ext2_get_bg(&bg);
+  struct ext2_bg_desc *bg = ext2_get_bg();
 
-  sb.bsize = 1024 << esb.s_log_block_size;
-  sb.block_bitmap = get_block(bg.bg_block_bitmap);
-  sb.inode_bitmap = get_block(bg.bg_inode_bitmap);
-  sb.inode_table = get_block(bg.bg_inode_table);
+  sb.bsize = 1024 << esb->s_log_block_size;
+  sb.block_bitmap = bg->bg_block_bitmap;
+  sb.inode_bitmap = bg->bg_inode_bitmap;
+  sb.inode_table = bg->bg_inode_table;
 
-  sb.inodes_count = esb.s_inodes_count;
-  sb.blocks_count = esb.s_blocks_count;
-  sb.first_data_block = esb.s_first_data_block;
-  sb.blocks_per_group = esb.s_blocks_per_group;
-  sb.inodes_per_group = esb.s_inodes_per_group;
-  sb.mtime = esb.s_mtime;
-  sb.wtime = esb.s_wtime;
-  sb.first_ino = esb.s_first_ino;
-  sb.inode_size = esb.s_inode_size;
+  sb.inodes_count = esb->s_inodes_count;
+  sb.blocks_count = esb->s_blocks_count;
+  sb.first_data_block = esb->s_first_data_block;
+  sb.blocks_per_group = esb->s_blocks_per_group;
+  sb.inodes_per_group = esb->s_inodes_per_group;
+  sb.mtime = esb->s_mtime;
+  sb.wtime = esb->s_wtime;
+  sb.first_ino = esb->s_first_ino;
+  sb.inode_size = esb->s_inode_size;
 }

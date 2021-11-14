@@ -13,10 +13,16 @@ void buf_init() {
   }
 }
 
-static struct buf *alloc_buf() {
+static struct buf *get_buf(u32 bno) {
+  for(int i = 0; i < NBUF; i++) {
+    if(bcache[i].bno == bno)
+      return &bcache[i];
+  }
+
   for(int i = 0; i < NBUF; i++) {
     if(bcache[i].free) {
       bcache[i].free = 0;
+      bcache[i].bno = bno;
       return &bcache[i];
     }
   }
@@ -25,10 +31,17 @@ static struct buf *alloc_buf() {
 }
 
 struct buf *bio_read(u32 bno) {
-  struct buf *b = alloc_buf();
+  struct buf *b = get_buf(bno);
 
-  virtio_blk_rw(bno, b->data, DREAD);
-  b->bno = bno;
+  if(!b->valid) {
+    virtio_blk_rw(bno, b->data, DREAD);
+    b->valid = 1;
+  }
 
   return b;
+}
+
+void bio_write(struct buf *b) {
+  virtio_blk_rw(b->bno, b->data, DWRITE);
+  b->valid = 1;
 }

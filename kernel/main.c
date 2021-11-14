@@ -12,6 +12,7 @@
 #include "ramdisk.h"
 #include "fs.h"
 #include "file.h"
+#include "buf.h"
 
 int main(void) {
   trap_init();
@@ -23,6 +24,7 @@ int main(void) {
   kalloc_init1();
   pgt_init();
   kalloc_init2();
+  buf_init();
   virtio_init();
   proc_init();
   fs_init();

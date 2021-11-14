@@ -51,9 +51,9 @@ struct superblock {
   u16 inode_size;
 
   u32 bsize;
-  char *block_bitmap;
-  char *inode_bitmap;
-  char *inode_table;
+  u32 block_bitmap;
+  u32 inode_bitmap;
+  u32 inode_table;
 };
 
 extern struct superblock sb;
