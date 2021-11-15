@@ -8,8 +8,8 @@ void buf_init() {
     struct buf *b = &bcache[i];
     memset(b, 0, 1024);
     b->bno = 0;
-    b->dirty = 0;
     b->free = 1;
+    b->valid = 0;
   }
 }
 
@@ -32,9 +32,11 @@ static struct buf *get_buf(u32 bno) {
 
 struct buf *bio_read(u32 bno) {
   struct buf *b = get_buf(bno);
+  if(!b)
+    return NULL;
 
   if(!b->valid) {
-    virtio_blk_rw(bno, b->data, DREAD);
+    virtio_blk_op(bno, b->data, DREAD);
     b->valid = 1;
   }
 
@@ -42,6 +44,6 @@ struct buf *bio_read(u32 bno) {
 }
 
 void bio_write(struct buf *b) {
-  virtio_blk_rw(b->bno, b->data, DWRITE);
+  virtio_blk_op(b->bno, b->data, DWRITE);
   b->valid = 1;
 }

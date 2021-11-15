@@ -115,7 +115,7 @@ enum diskop {
   DWRITE,
 };
 
-int virtio_blk_rw(u64 bno, char *buf, enum diskop op);
+int virtio_blk_op(u64 bno, char *buf, enum diskop op);
 void virtio_init(void);
 
 #endif

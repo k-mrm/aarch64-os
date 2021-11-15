@@ -10,9 +10,6 @@
 
 #define ext2_inode_nblock(i) ((i)->blocks / (2 << 0))
 
-static void *get_block(int bnum);
-static void *get_indirect_block(u32 *map, int bnum);
-
 #define __unused __attribute__((unused))
 
 static void dump_superblock(struct ext2_superblock *sb) __unused;
@@ -102,12 +99,11 @@ void dump_dirent_block(char *blk) {
   }
 }
 
-static int find_free_ino(struct superblock *sb) {
-  struct buf *bitmap = bio_read(sb->inode_bitmap);
+static int find_free_ino(struct buf *bitmap) {
   char chunk = 0xff;
   int inum = 1;
-  for(int i = 0; i < sb->bsize; i++) {
-    if((chunk = bitmap[i]) != 0xff)
+  for(int i = 0; i < sb.bsize; i++) {
+    if((chunk = bitmap->data[i]) != 0xff)
       break;
     inum += 8;
   }
@@ -121,17 +117,11 @@ static int find_free_ino(struct superblock *sb) {
   return inum;
 }
 
-static void *get_indirect_block(u32 *map, int bnum) {
-  int idx = bnum - 12;
-  return bio_read(map[idx]);
-}
-
-static int find_free_block(struct superblock *sb) {
-  struct buf *bitmap = bio_read(sb->block_bitmap);
+static int find_free_block(struct buf *bitmap) {
   char chunk = 0xff;
   int bnum = 0;
-  for(int i = 0; i < sb->bsize; i++) {
-    if((chunk = bitmap[i]) != 0xff)
+  for(int i = 0; i < sb.bsize; i++) {
+    if((chunk = bitmap->data[i]) != 0xff)
       break;
     bnum += 8;
   }
@@ -145,12 +135,16 @@ static int find_free_block(struct superblock *sb) {
   return bnum;
 }
 
-static int ibmp_write_bit(struct superblock *sb, int ino, int val) {
-  struct buf *bitmap = bio_read(sb->inode_bitmap);
+static struct buf *read_indirect_block(u32 *map, int bnum) {
+  int idx = bnum - 12;
+  return bio_read(map[idx]);
+}
+
+static int ibmp_write_bit(struct buf *bitmap, int ino, int val) {
   int bitn = ino - 1;
   int chunkn;
   char c;
-  for(chunkn = 0; chunkn < sb->bsize; chunkn++) {
+  for(chunkn = 0; chunkn < sb.bsize; chunkn++) {
     if(bitn < 8)
       goto found;
     bitn -= 8;
@@ -172,12 +166,11 @@ found:
   return 0;
 }
 
-static int bbmp_write_bit(struct superblock *sb, int bn, int val) {
-  struct buf *bitmap = bio_read(sb->block_bitmap);
+static int bbmp_write_bit(struct buf *bitmap, int bn, int val) {
   int bitn = bn;
   int chunkn;
   char c;
-  for(chunkn = 0; chunkn < sb->bsize; chunkn++) {
+  for(chunkn = 0; chunkn < sb.bsize; chunkn++) {
     if(bitn < 8)
       goto found;
     bitn -= 8;
@@ -200,26 +193,31 @@ found:
 }
 
 static int ext2_alloc_block() {
-  int bn = find_free_block(sb);
+  struct buf *bitmap = bio_read(sb.block_bitmap);
+  int bn = find_free_block(bitmap);
   if(bn < 0)
     return -1;
 
-  bbmp_write_bit(sb, bn, 1);
+  bbmp_write_bit(bitmap, bn, 1);
 
   return bn;
 }
 
-static struct ext2_inode *ext2_raw_inode(struct superblock *sb, int inum) {
-  struct buf *itable = bio_read(sb->inode_table);
+static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
+  u32 bgrp = (inum - 1) / sb.inodes_per_group;
+  u64 offset = ((inum - 1) % sb.inodes_per_group) * sizeof(struct ext2_inode);
+  struct buf *itable = bio_read(bgrp);
+  if(b)
+    *b = itable;
 
-  return (struct ext2_inode *)(itable + (inum - 1) * sizeof(struct ext2_inode));
+  return (struct ext2_inode *)(itable->data + offset);
 }
 
-char *ext2_inode_block(struct inode *ino, int bi) {
+struct buf *ext2_inode_block(struct inode *ino, int bi) {
   if(bi < 12)
-    return get_block(ino->block[bi]);
+    return bio_read(ino->block[bi]);
   else
-    return get_indirect_block((u32 *)get_block(ino->block[12]), bi);
+    return read_indirect_block((u32 *)bio_read(ino->block[12]), bi);
 
   return NULL;
 }
@@ -281,7 +279,7 @@ static void make_dirent(u32 inode, char *name, u8 file_type, struct dirent *buf)
 
 static int ext2_dirlink(struct inode *pdir, struct dirent *de) {
   struct dirent *d;
-  char *b; 
+  struct buf *b; 
   char *bend;
   char *dend;
   char *debegin;
@@ -293,11 +291,11 @@ static int ext2_dirlink(struct inode *pdir, struct dirent *de) {
   /* find free space */
   for(int i = 0; i < ext2_inode_nblock(pdir); i++) {
     b = ext2_inode_block(pdir, i);
-    d = (struct dirent *)b;
-    bend = b + sb.bsize;
+    d = (struct dirent *)b->data;
+    bend = b->data + sb.bsize;
 
     for(u64 bpos = 0; bpos < sb.bsize; ) {
-      d = (struct dirent *)(b + bpos);
+      d = (struct dirent *)(b->data + bpos);
       if(d->rec_len == 0) /* empty block */
         goto empty_block;
       bpos += d->rec_len;
@@ -311,8 +309,8 @@ static int ext2_dirlink(struct inode *pdir, struct dirent *de) {
   if(ext2_inode_nblock(pdir) == 0) {
     int bn = ext2_alloc_block();
     ext2_append_inode_block(pdir, bn);
-    b = get_block(bn);
-    d = (struct dirent *)b;
+    b = bio_read(bn);
+    d = (struct dirent *)b->data;
     goto empty_block;
   }
 
@@ -348,7 +346,8 @@ found:
 
 /* synchronize @i with disk inode */
 static void inode_sync(struct inode *i) {
-  struct ext2_inode *e = ext2_raw_inode(i->inum);
+  struct buf *b;
+  struct ext2_inode *e = ext2_raw_inode(i->inum, &b);
   
   e->i_mode = i->mode;
   e->i_size = i->size;
@@ -359,6 +358,8 @@ static void inode_sync(struct inode *i) {
   e->i_links_count = i->links_count;
   e->i_blocks = i->blocks;
   memcpy(e->i_block, i->block, sizeof(u32) * 15);
+
+  bio_write(b);
 }
 
 static u8 itype_dtype_table[15] = {
@@ -411,7 +412,7 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
 
 struct inode *ext2_get_inode(int inum) {
   struct inode *i = find_inode(inum);
-  struct ext2_inode *e = ext2_raw_inode(inum);
+  struct ext2_inode *e = ext2_raw_inode(inum, NULL);
 
   i->mode = e->i_mode;
   i->size = e->i_size;
@@ -438,8 +439,8 @@ static void ls_inode(struct inode *ino) {
   }
 
   for(int i = 0; i < ext2_inode_nblock(ino); i++) {
-    char *d = ext2_inode_block(ino, i);
-    dump_dirent_block(d);
+    struct buf *dent = ext2_inode_block(ino, i);
+    dump_dirent_block(dent->data);
   }
 }
 
@@ -458,12 +459,12 @@ int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   u32 offblkoff = off % bsize;
 
   for(int i = offblk; i < ext2_inode_nblock(ino) && i <= lastblk; i++) {
-    char *d = ext2_inode_block(ino, i);
+    struct buf *d = ext2_inode_block(ino, i);
     u64 cpsize = min(size, bsize);
     if(offblkoff + cpsize > bsize)
       cpsize = bsize - offblkoff;
 
-    memcpy(buf, d + offblkoff, cpsize);
+    memcpy(buf, d->data + offblkoff, cpsize);
 
     buf += cpsize;
     size = size > bsize? size - bsize : 0;
@@ -556,8 +557,8 @@ static int search_dirent_block(char *blk, char *path) {
 static int ext2_search_dir(struct inode *dir, char *name) {
   int inum;
   for(int i = 0; i < ext2_inode_nblock(dir); i++) {
-    char *db = ext2_inode_block(dir, i);
-    if((inum = search_dirent_block(db, name)) > 0)
+    struct buf *db = ext2_inode_block(dir, i);
+    if((inum = search_dirent_block(db->data, name)) > 0)
       return inum;
   }
 

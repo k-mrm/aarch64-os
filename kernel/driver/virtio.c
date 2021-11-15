@@ -41,7 +41,7 @@ static void free_desc(struct virtq *virtq, int n) {
   virtq->desc[n].next = 0;
 }
 
-int virtio_blk_rw(u64 bno, char *buf, enum diskop op) {
+int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
   u64 sector = bno * 2;
   struct virtio_blk_req_hdr hdr;
 
