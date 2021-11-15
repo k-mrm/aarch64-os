@@ -92,6 +92,8 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
 
+  free_desc(&disk, d0);
+
   return 0;
 }
 
@@ -106,6 +108,7 @@ static int virtq_init(struct virtq *vq) {
 }
 
 static void virtio_blk_intr() {
+  printk("!!!!!!!!!!!!! virtio intr\n");
   REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
 
   int d0;

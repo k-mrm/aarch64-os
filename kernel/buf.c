@@ -27,16 +27,19 @@ static struct buf *get_buf(u32 bno) {
     }
   }
 
-  return NULL;
+  panic("buf");
 }
 
 struct buf *bio_read(u32 bno) {
+  printk("bno %d\n", bno);
   struct buf *b = get_buf(bno);
   if(!b)
     return NULL;
 
   if(!b->valid) {
-    virtio_blk_op(bno, b->data, DREAD);
+    printk("bno %d read blk\n", bno);
+    if(virtio_blk_op(bno, b->data, DREAD) < 0)
+      panic("disk read failed");
     b->valid = 1;
   }
 

@@ -85,7 +85,7 @@ void sync_handler(struct trapframe *tf) {
 }
 
 void kirq_handler(struct trapframe *tf) {
-  kinfo("irq handler: elr %p EL%d\n", tf->elr, cur_el());
+  // kinfo("kirq handler: elr %p EL%d\n", tf->elr, cur_el());
 
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
@@ -101,7 +101,7 @@ void kirq_handler(struct trapframe *tf) {
 }
 
 void uirq_handler(struct trapframe *tf) {
-  kinfo("irq handler: elr %p EL%d\n", tf->elr, cur_el());
+  // kinfo("uirq handler: elr %p EL%d\n", tf->elr, cur_el());
 
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;

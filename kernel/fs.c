@@ -20,7 +20,7 @@ struct inode *alloc_inode() {
   return NULL;
 }
 
-static void free_inode(struct inode *ino) {
+void free_inode(struct inode *ino) {
   memset(ino, 0, sizeof(*ino));
 }
 
@@ -70,6 +70,8 @@ void fs_init() {
   ext2_init();
 
   memset(itable, 0, sizeof(struct inode) * NINODE);
+
+  dump_inode(path2inode("/"));
 }
 
 void dump_inode(struct inode *i) {

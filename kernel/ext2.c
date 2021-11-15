@@ -99,6 +99,11 @@ void dump_dirent_block(char *blk) {
   }
 }
 
+static struct buf *read_indirect_block(u32 *map, int bnum) {
+  int idx = bnum - 12;
+  return bio_read(map[idx]);
+}
+
 static int find_free_ino(struct buf *bitmap) {
   char chunk = 0xff;
   int inum = 1;
@@ -133,11 +138,6 @@ static int find_free_block(struct buf *bitmap) {
     bnum++;
 
   return bnum;
-}
-
-static struct buf *read_indirect_block(u32 *map, int bnum) {
-  int idx = bnum - 12;
-  return bio_read(map[idx]);
 }
 
 static int ibmp_write_bit(struct buf *bitmap, int ino, int val) {
@@ -204,9 +204,10 @@ static int ext2_alloc_block() {
 }
 
 static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
-  u32 bgrp = (inum - 1) / sb.inodes_per_group;
-  u64 offset = ((inum - 1) % sb.inodes_per_group) * sizeof(struct ext2_inode);
-  struct buf *itable = bio_read(bgrp);
+  u32 bgrp = (inum - 1) / (sb.bsize / sizeof(struct ext2_inode));
+  u64 offset = ((inum - 1) % (sb.bsize / sizeof(struct ext2_inode))) * sizeof(struct ext2_inode);
+  printk("num %d %d %d\n", inum, bgrp, offset);
+  struct buf *itable = bio_read(sb.inode_table + bgrp);
   if(b)
     *b = itable;
 
@@ -242,7 +243,7 @@ found_free:
 }
 
 static int ext2_alloc_inum() {
-  char *ibmp = sb.inode_bitmap;
+  struct buf *ibmp = bio_read(sb.inode_bitmap);
 
   int inum = find_free_ino(ibmp);
   if(inum < 0)
@@ -255,6 +256,8 @@ static int ext2_alloc_inum() {
 
 static struct inode *ext2_alloc_inode() {
   int inum = ext2_alloc_inum();
+  if(inum < 0)
+    return NULL;
 
   return find_inode(inum);
 }
@@ -413,6 +416,7 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
 struct inode *ext2_get_inode(int inum) {
   struct inode *i = find_inode(inum);
   struct ext2_inode *e = ext2_raw_inode(inum, NULL);
+  dump_ext2_inode(e);
 
   i->mode = e->i_mode;
   i->size = e->i_size;
@@ -641,6 +645,7 @@ void ext2_init() {
     panic("invalid filesystem");
 
   struct ext2_bg_desc *bg = ext2_get_bg();
+  dump_bg_desc(bg);
 
   sb.bsize = 1024 << esb->s_log_block_size;
   sb.block_bitmap = bg->bg_block_bitmap;
@@ -656,4 +661,6 @@ void ext2_init() {
   sb.wtime = esb->s_wtime;
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
+
+  printk("ext2 done\n");
 }
