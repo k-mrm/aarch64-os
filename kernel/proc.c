@@ -79,6 +79,7 @@ void userproc_init() {
   map_ustack(p->pgt);
 
   p->cwd = path2inode("/");
+  dump_inode(p->cwd);
   if(!p->cwd)
     panic("no filesystem");
 
@@ -157,10 +158,12 @@ err:
 }
 
 int exec(char *path, char **argv) {
-  kinfo("exec %s\n", path);
+  kinfo("exec %s %p %p\n", path, path, argv);
   struct inode *ino = path2inode(path);
-  if(!ino)
+  if(!ino) {
+    printk("kernel: exec: failed\n");
     return -1;
+  }
 
   struct ehdr eh;
   struct phdr ph;
@@ -298,30 +301,6 @@ int chdir(char *path) {
 void dump_proc(struct proc *p) {
   ;
 }
-
-/*
-static void init_firstproc() {
-  struct proc *first = &proctable[1];
-  first->pid = 1;
-  memset(&first->context, 0, sizeof(first->context));
-
-  char *kstack = kalloc();
-
-  char *sp = kstack + PAGESIZE;
-  sp -= sizeof(struct trapframe);
-  first->tf = (struct trapframe *)sp;
-  memset(first->tf, 0, sizeof(struct trapframe));
-
-  first->tf->elr = 0x0; // FIXME
-  first->tf->spsr = 0x0;  // switch to EL0
-
-  first->kstack = kstack;
-  first->context.lr = (u64)forkret;
-  first->context.sp = (u64)sp;
-
-  first->state = RUNNABLE;
-}
-*/
 
 void proc_init() {
   memset(&kproc, 0, sizeof(kproc));

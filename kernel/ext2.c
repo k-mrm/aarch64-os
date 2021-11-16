@@ -206,7 +206,7 @@ static int ext2_alloc_block() {
 static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
   u32 bgrp = (inum - 1) / (sb.bsize / sizeof(struct ext2_inode));
   u64 offset = ((inum - 1) % (sb.bsize / sizeof(struct ext2_inode))) * sizeof(struct ext2_inode);
-  printk("num %d %d %d\n", inum, bgrp, offset);
+  printk("inode num %d %d %d %d\n", inum, bgrp, offset, sb.inode_table + bgrp);
   struct buf *itable = bio_read(sb.inode_table + bgrp);
   if(b)
     *b = itable;
@@ -416,7 +416,7 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
 struct inode *ext2_get_inode(int inum) {
   struct inode *i = find_inode(inum);
   struct ext2_inode *e = ext2_raw_inode(inum, NULL);
-  dump_ext2_inode(e);
+  // dump_ext2_inode(e);
 
   i->mode = e->i_mode;
   i->size = e->i_size;
@@ -433,6 +433,7 @@ struct inode *ext2_get_inode(int inum) {
 
 /* for debug */
 static void ls_inode(struct inode *ino) {
+  printk("ls inode %d nblock: %d\n", ino->inum, ext2_inode_nblock(ino));
   if(ino == NULL) {
     printk("null inode\n");
     return;
@@ -449,7 +450,7 @@ static void ls_inode(struct inode *ino) {
 }
 
 int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
-  // printk("readinode %p %d %d\n", buf, off, size);
+  printk("readinode %p %d %d\n", buf, off, size);
   u32 bsize = sb.bsize;
   char *base = buf;
 
@@ -639,13 +640,11 @@ struct inode *ext2_path2inode_parent(char *path, char *namebuf) {
 
 void ext2_init() {
   struct ext2_superblock *esb = ext2_get_sb();
-  dump_superblock(esb);
 
   if(esb->s_magic != 0xef53)
     panic("invalid filesystem");
 
   struct ext2_bg_desc *bg = ext2_get_bg();
-  dump_bg_desc(bg);
 
   sb.bsize = 1024 << esb->s_log_block_size;
   sb.block_bitmap = bg->bg_block_bitmap;
@@ -661,6 +660,10 @@ void ext2_init() {
   sb.wtime = esb->s_wtime;
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
+
+  // struct inode *r = ext2_path2inode("/");
+  // dump_inode(r);
+  // ls_inode(r);
 
   printk("ext2 done\n");
 }

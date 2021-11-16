@@ -66,22 +66,24 @@ struct inode *path2inode(char *path) {
   return ino;
 }
 
-void fs_init() {
-  ext2_init();
-
-  memset(itable, 0, sizeof(struct inode) * NINODE);
-
-  dump_inode(path2inode("/"));
-}
-
 void dump_inode(struct inode *i) {
+  if(!i)
+    printk("dump inode???????????????\n");
+
   printk("inode dump: %p\n", i);
-  printk("sizeof *i: %d\n", sizeof(*i));
+  printk("sizeof inode: %d\n", sizeof(*i));
   printk("inum: %d\n", i->inum);
   printk("i_mode: %p\n", i->mode);
   printk("i_links_count: %p\n", i->links_count);
   printk("i_size: %d\n", i->size);
   printk("i_blocks: %d\n", i->blocks);
   for(int b = 0; b < 15; b++)
-    printk("i_block[%d]: %d\n", b, i->block[b]);
+    printk("i_block[%d]: %x\n", b, i->block[b]);
 }
+
+void fs_init() {
+  ext2_init();
+
+  memset(itable, 0, sizeof(struct inode) * NINODE);
+}
+

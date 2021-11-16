@@ -92,6 +92,11 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
 
+  enable_irq(); /* ??? */
+  while(!disk.info[d0].done) {
+    wfi();
+  }
+
   free_desc(&disk, d0);
 
   return 0;
@@ -108,7 +113,6 @@ static int virtq_init(struct virtq *vq) {
 }
 
 static void virtio_blk_intr() {
-  printk("!!!!!!!!!!!!! virtio intr\n");
   REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
 
   int d0;
@@ -122,8 +126,6 @@ static void virtio_blk_intr() {
 
     disk.last_used_idx++;
   }
-
-  free_desc(&disk, d0);
 }
 
 #define LO(addr)  (u32)((addr) & 0xffffffff)

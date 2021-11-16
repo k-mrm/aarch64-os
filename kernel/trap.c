@@ -35,16 +35,19 @@ void fault_die(char *reason) {
   exit(1);
 }
 
-void handle_data_abort(int el, u64 esr) {
+void handle_data_abort(struct trapframe *tf, int el, u64 esr) {
   u64 dfsc = esr & 0x3f;
 
   /* TODO */
 
   printk("elr %p far %p\n", elr_el1(), far_el1());
-  if(el == 0)
+  if(el == 0) {
+    dump_tf(tf);
     fault_die("data abort EL0");
-  else
+  }
+  else {
     panic("data abort EL1");
+  }
 }
 
 void handle_inst_abort(int el, u64 esr) {
@@ -59,9 +62,10 @@ void sync_handler(struct trapframe *tf) {
   u64 ec = (esr >> 26) & 0x3f;
   switch(ec) {
     case 0b100101:
-      handle_data_abort(1, esr);
+      handle_data_abort(tf, 1, esr);
       return;
     case 0b010101:  /* svc */
+      dump_tf(tf);
       syscall(tf);
       return;
     case 0b000111:
@@ -69,7 +73,7 @@ void sync_handler(struct trapframe *tf) {
     case 0b100110:
       panic("sp alignment fault");
     case 0b100100:
-      handle_data_abort(0, esr);
+      handle_data_abort(tf, 0, esr);
       return;
     case 0b100000:
       handle_inst_abort(0, esr);
