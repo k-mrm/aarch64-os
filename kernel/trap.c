@@ -65,7 +65,7 @@ void sync_handler(struct trapframe *tf) {
       handle_data_abort(tf, 1, esr);
       return;
     case 0b010101:  /* svc */
-      dump_tf(tf);
+      curproc->tf = tf;
       syscall(tf);
       return;
     case 0b000111:
@@ -126,7 +126,7 @@ void unknownint(int arg) {
 }
 
 void dump_tf(struct trapframe *tf) {
-  printk("trapframe dump:\n");
+  printk("trapframe dump: %p\n", tf);
   printk("x0 %p x1 %p x2 %p x3 %p\n", tf->x0, tf->x1, tf->x2, tf->x3);
   printk("x4 %p x5 %p x6 %p x7 %p\n", tf->x4, tf->x5, tf->x6, tf->x7);
   printk("x8 %p x9 %p x10 %p x11 %p\n", tf->x8, tf->x9, tf->x10, tf->x11);

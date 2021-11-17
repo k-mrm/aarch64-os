@@ -215,6 +215,7 @@ static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
 }
 
 struct buf *ext2_inode_block(struct inode *ino, int bi) {
+  printk("ext2_inode_block read: %d\n", ino->block[bi]);
   if(bi < 12)
     return bio_read(ino->block[bi]);
   else
@@ -661,9 +662,8 @@ void ext2_init() {
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
 
-  // struct inode *r = ext2_path2inode("/");
-  // dump_inode(r);
-  // ls_inode(r);
+  struct inode *r = ext2_path2inode("/");
+  ls_inode(r);
 
   printk("ext2 done\n");
 }

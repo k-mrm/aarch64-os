@@ -108,6 +108,8 @@ void schedule() {
         kinfo("sp %p elr %p\n", p->tf->sp, p->tf->elr);
 
         curproc = p;
+
+        kinfo("curproc %p\n", p);
         
         cswitch(&kproc.context, &p->context);
 
@@ -160,21 +162,23 @@ err:
 int exec(char *path, char **argv) {
   kinfo("exec %s %p %p\n", path, path, argv);
   struct inode *ino = path2inode(path);
-  if(!ino) {
-    printk("kernel: exec: failed\n");
-    return -1;
-  }
+  dump_inode(ino);
+  if(!ino)
+    goto fail;
+  kinfo("exec: path2inode\n");
 
   struct ehdr eh;
   struct phdr ph;
   int memsize = 0;
 
   if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
-    return -1;
+    goto fail;
   if(!is_elf(&eh))
-    return -1;
+    goto fail;
   if(eh.e_type != ET_EXEC)
-    return -1;
+    goto fail;
+
+  kinfo("exec: elf check\n");
 
   u64 *pgt = kalloc();
   if(!pgt)
@@ -184,7 +188,7 @@ int exec(char *path, char **argv) {
   u64 off = eh.e_phoff;
   for(; i < eh.e_phnum; i++, off += sizeof(ph)) {
     if(read_inode(ino, (char *)&ph, off, sizeof(ph)) != sizeof(ph))
-      return -1;
+      goto fail;
     if(ph.p_type != PT_LOAD)
       continue;
     memsize += alloc_userspace(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_memsz);
@@ -200,9 +204,9 @@ int exec(char *path, char **argv) {
     sp -= strlen(argv[argc]) + 1;
     sp = (char *)((u64)sp & ~(0xf));
     if(argc >= 8)
-      return -1;
+      goto fail;
     if(sp < stackbase)
-      return -1;
+      goto fail;
     memcpy(sp, argv[argc], strlen(argv[argc]));
     ustack[argc] = USTACKTOP - (top - sp);
   }
@@ -211,7 +215,7 @@ int exec(char *path, char **argv) {
   sp -= sizeof(ustack[0]) * (argc + 1);
   sp = (char *)((u64)sp & ~(0xf));
   if(sp < stackbase)
-    return -1;
+    goto fail;
   memcpy(sp, ustack, sizeof(ustack[0]) * (argc + 1));
 
   struct proc *p = curproc;
@@ -228,6 +232,17 @@ int exec(char *path, char **argv) {
   load_userspace(p->pgt);
 
   return argc;  /* p->tf->x0 */
+
+fail:
+  printk("kernel exec failed\n");
+  return -1;
+}
+
+void sleep(struct proc *p) {
+  kinfo("sleeep\n");
+  p->state = SLEEPING;
+
+  cswitch(&p->context, &kproc.context);
 }
 
 int wait(int *status) {
@@ -252,13 +267,6 @@ int wait(int *status) {
 
     sleep(p);
   }
-}
-
-void sleep(struct proc *p) {
-  kinfo("sleeep\n");
-  p->state = SLEEPING;
-  
-  cswitch(&p->context, &kproc.context);
 }
 
 void wakeup(struct proc *proc) {
