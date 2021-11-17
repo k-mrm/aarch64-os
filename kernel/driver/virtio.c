@@ -39,6 +39,8 @@ static void free_desc(struct virtq *virtq, int n) {
 
   virtq->desc[n].flags = 0;
   virtq->desc[n].next = 0;
+  virtq->info[n].status = 0;
+  virtq->info[n].done = 0;
 }
 
 int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
@@ -108,16 +110,17 @@ static int virtq_init(struct virtq *vq) {
   vq->desc = kalloc();
   vq->avail = kalloc();
   vq->used = kalloc();
+  if(!vq->desc || !vq->avail || !vq->used)
+    panic("virtq init failed");
 
   return 0;
 }
 
 static void virtio_blk_intr() {
-  REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
-
-  int d0;
+  printk("virtio block interrupt\n");
+  
   while(disk.last_used_idx != disk.used->idx) {
-    d0 = disk.used->ring[disk.used->idx % NQUEUE].id;
+    int d0 = disk.used->ring[disk.used->idx % NQUEUE].id;
 
     if(disk.info[d0].status != 0)
       panic("disk error");
@@ -126,6 +129,8 @@ static void virtio_blk_intr() {
 
     disk.last_used_idx++;
   }
+
+  REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
 }
 
 #define LO(addr)  (u32)((addr) & 0xffffffff)

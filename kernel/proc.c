@@ -109,8 +109,6 @@ void schedule() {
 
         curproc = p;
 
-        kinfo("curproc %p\n", p);
-        
         cswitch(&kproc.context, &p->context);
 
         forget_userspace();
@@ -194,6 +192,8 @@ int exec(char *path, char **argv) {
     memsize += alloc_userspace(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_memsz);
   }
 
+  kinfo("exec: userspace setup\n");
+
   u64 ustack[9];
   char *stackbase = map_ustack(pgt);
   char *sp = stackbase + PAGESIZE;
@@ -230,6 +230,8 @@ int exec(char *path, char **argv) {
   p->pgt = pgt;
 
   load_userspace(p->pgt);
+
+  kinfo("exec complete!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
   return argc;  /* p->tf->x0 */
 

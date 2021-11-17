@@ -662,8 +662,5 @@ void ext2_init() {
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
 
-  struct inode *r = ext2_path2inode("/");
-  ls_inode(r);
-
   printk("ext2 done\n");
 }

@@ -26,9 +26,9 @@ int main(void) {
   kalloc_init2();
   buf_init();
   virtio_init();
-  proc_init();
   fs_init();
   file_init();
+  proc_init();
 
   kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
   kinfo("current EL: %d\n", cur_el());
