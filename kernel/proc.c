@@ -79,7 +79,6 @@ void userproc_init() {
   map_ustack(p->pgt);
 
   p->cwd = path2inode("/");
-  dump_inode(p->cwd);
   if(!p->cwd)
     panic("no filesystem");
 
@@ -105,7 +104,9 @@ void schedule() {
         p->state = RUNNING;
         kinfo("load userspace %p\n", p->pgt);
         kinfo("enter proc %d\n", p->pid);
+        kinfo("tf %p\n", p->tf);
         kinfo("sp %p elr %p\n", p->tf->sp, p->tf->elr);
+        kinfo("procname %s\n", p->name);
 
         curproc = p;
 
@@ -160,7 +161,6 @@ err:
 int exec(char *path, char **argv) {
   kinfo("exec %s %p %p\n", path, path, argv);
   struct inode *ino = path2inode(path);
-  dump_inode(ino);
   if(!ino)
     goto fail;
   kinfo("exec: path2inode\n");
@@ -230,6 +230,8 @@ int exec(char *path, char **argv) {
   p->pgt = pgt;
 
   load_userspace(p->pgt);
+
+  memcpy(p->name, path, strlen(path));
 
   kinfo("exec complete!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 

@@ -31,6 +31,7 @@ void disable_uart() {
 }
 
 void uartintr() {
+  printk("uartintr");
   if(!RXFE) {
   }
 
@@ -68,5 +69,5 @@ void uart_init() {
   REG(UART_LCRH) = LCRH_FEN | LCRH_WLEN_8BIT;
   REG(UART_CR) = 0x301;  /* RXE, TXE, UARTEN */
 
-  enable_uartintr();
+  // enable_uartintr();
 }

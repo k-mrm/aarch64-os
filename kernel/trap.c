@@ -26,6 +26,7 @@ void trap_init() {
 }
 
 void new_irq(int intid, handler_t handler) {
+  kinfo("new irq: %d\n", intid);
   irqhandler[intid] = handler;
 }
 
@@ -56,16 +57,17 @@ void handle_inst_abort(int el, u64 esr) {
 }
 
 void sync_handler(struct trapframe *tf) {
-  // kinfo("sync handler: elr %p\n", tf->elr);
+  kinfo("!!!!!sync handler: tf %p elr %p curproc tf %p\n", tf, tf->elr, curproc->tf);
+  dump_tf(tf);
 
   u64 esr = esr_el1();
   u64 ec = (esr >> 26) & 0x3f;
+
   switch(ec) {
     case 0b100101:
       handle_data_abort(tf, 1, esr);
       return;
     case 0b010101:  /* svc */
-      curproc->tf = tf;
       syscall(tf);
       return;
     case 0b000111:
@@ -89,7 +91,7 @@ void sync_handler(struct trapframe *tf) {
 }
 
 void kirq_handler(struct trapframe *tf) {
-  // kinfo("kirq handler: elr %p EL%d\n", tf->elr, cur_el());
+  kinfo("kirq handler: elr %p\n", tf->elr);
 
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
@@ -121,8 +123,12 @@ void uirq_handler(struct trapframe *tf) {
 }
 
 void unknownint(int arg) {
-  printk("elr: %p arg: %d\n", elr_el1());
-  panic("unknown interrupt: arg: %d", arg);
+  panic("unknown interrupt: elr: %p arg: %d", elr_el1(), arg);
+}
+
+void debug_trap(struct trapframe *tf) {
+  dump_tf(tf);
+  panic("debug trap");
 }
 
 void dump_tf(struct trapframe *tf) {

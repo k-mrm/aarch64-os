@@ -95,7 +95,7 @@ vectortable:
 /* Lower EL using aarch32 */
 .balign 0x80
   mov x0, 10
-  b unknownint
+  b debugtrap
 .balign 0x80
   mov x0, 11
   b unknownint
@@ -105,6 +105,16 @@ vectortable:
 .balign 0x80
   mov x0, 13
   b unknownint
+
+debugtrap:
+  savereg
+
+  mov x0, sp
+  bl debug_trap
+
+  restorereg
+
+  eret
 
 cur_sp_elx_sync:
   savereg

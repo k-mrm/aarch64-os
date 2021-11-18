@@ -20,12 +20,14 @@ static int alloc_desc(struct virtq *virtq) {
   return -1;
 }
 
+static void descdump(struct virtq *virtq) __attribute__((unused));
+
 static void descdump(struct virtq *virtq) {
   for(int i = 0; i < NQUEUE; i++) {
     if(virtq->desc[i].addr == 0)
       continue;
 
-    kinfo("ddd %p %d %p %d\n", virtq->desc[i].addr, virtq->desc[i].len, virtq->desc[i].flags, virtq->desc[i].next);
+    printk("ddd %p %d %p %d\n", virtq->desc[i].addr, virtq->desc[i].len, virtq->desc[i].flags, virtq->desc[i].next);
   }
 }
 
@@ -117,13 +119,11 @@ static int virtq_init(struct virtq *vq) {
 }
 
 static void virtio_blk_intr() {
-  printk("virtio block interrupt\n");
-  
   while(disk.last_used_idx != disk.used->idx) {
     int d0 = disk.used->ring[disk.used->idx % NQUEUE].id;
 
     if(disk.info[d0].status != 0)
-      panic("disk error");
+      panic("disk op error");
 
     disk.info[d0].done = 1;
 

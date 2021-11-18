@@ -24,5 +24,6 @@ int main() {
     int status;
     wait(&status);
   }
+
   exit(0);
 }

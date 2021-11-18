@@ -142,7 +142,7 @@ syscall_t syscall_table[] = {
 
 void syscall(struct trapframe *tf) {
   int n = tf->x6;
-  printk("curproc %p tf %p", curproc, curproc->tf);
+  printk(" syscall %d\n", n);
 
   if(n < NSYSCALL && syscall_table[n]) {
     tf->x0 = syscall_table[n]();

@@ -85,8 +85,5 @@ void fs_init() {
   ext2_init();
 
   memset(itable, 0, sizeof(struct inode) * NINODE);
-
-  struct inode *i = path2inode("/init");
-  dump_inode(i);
 }
 
