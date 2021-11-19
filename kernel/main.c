@@ -24,8 +24,8 @@ int main(void) {
   kalloc_init1();
   pgt_init();
   kalloc_init2();
-  buf_init();
   virtio_init();
+  buf_init();
   fs_init();
   file_init();
   proc_init();

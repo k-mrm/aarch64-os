@@ -3,7 +3,7 @@
 #include "syscall.h"
 #include "printk.h"
 
-typedef int (*syscall_t)(void);
+typedef int (*syscall_t)(struct trapframe *tf);
 
 struct stat;
 struct utsname;
@@ -24,7 +24,7 @@ int mkdir(char *path);
 int mknod(char *path, int mode, int dev);
 int dup(int fd);
 
-u64 sysarg(int n) {
+u64 sysarg(struct trapframe *tf, int n) {
   switch(n) {
     case 0:
       return curproc->tf->x0;
@@ -36,89 +36,89 @@ u64 sysarg(int n) {
       return curproc->tf->x3;
   }
 
-  return 0;
+  panic("invalid sysarg");
 }
 
-int sys_getpid(void) {
+int sys_getpid(struct trapframe *tf) {
   return getpid();
 }
 
-int sys_write(void) {
-  int fd = sysarg(0);
-  u64 str = sysarg(1);
-  u64 size = sysarg(2);
+int sys_write(struct trapframe *tf) {
+  int fd = sysarg(tf, 0);
+  u64 str = sysarg(tf, 1);
+  u64 size = sysarg(tf, 2);
   return write(fd, (char *)str, size);
 }
 
-int sys_read(void) {
-  int fd = sysarg(0);
-  u64 buf = sysarg(1);
-  u64 size = sysarg(2);
+int sys_read(struct trapframe *tf) {
+  int fd = sysarg(tf, 0);
+  u64 buf = sysarg(tf, 1);
+  u64 size = sysarg(tf, 2);
   return read(fd, (char *)buf, size);
 }
 
-int sys_exit(void) {
-  int ret = sysarg(0);
+int sys_exit(struct trapframe *tf) {
+  int ret = sysarg(tf, 0);
   exit(ret);
   return 0; /* unreachable */
 }
 
-int sys_fork(void) {
+int sys_fork(struct trapframe *tf) {
   return fork();
 }
 
-int sys_wait(void) {
-  u64 addr = sysarg(0);
+int sys_wait(struct trapframe *tf) {
+  u64 addr = sysarg(tf, 0);
   return wait((int *)addr);
 }
 
-int sys_exec(void) {
-  u64 path = sysarg(0);
-  u64 argv = sysarg(1);
+int sys_exec(struct trapframe *tf) {
+  u64 path = sysarg(tf, 0);
+  u64 argv = sysarg(tf, 1);
   return exec((char *)path, (char **)argv);
 }
 
-int sys_open(void) {
-  u64 path = sysarg(0);
-  int flags = sysarg(1);
+int sys_open(struct trapframe *tf) {
+  u64 path = sysarg(tf, 0);
+  int flags = sysarg(tf, 1);
   return open((char *)path, flags);
 }
 
-int sys_close(void) {
-  int fd = sysarg(0);
+int sys_close(struct trapframe *tf) {
+  int fd = sysarg(tf, 0);
   return close(fd);
 }
 
-int sys_fstat(void) {
-  int fd = sysarg(0);
-  struct stat *addr = (struct stat *)sysarg(1);
+int sys_fstat(struct trapframe *tf) {
+  int fd = sysarg(tf, 0);
+  struct stat *addr = (struct stat *)sysarg(tf, 1);
   return fstat(fd, addr);
 }
 
-int sys_uname(void) {
-  struct utsname *addr = (struct utsname *)sysarg(0);
+int sys_uname(struct trapframe *tf) {
+  struct utsname *addr = (struct utsname *)sysarg(tf, 0);
   return uname(addr);
 }
 
-int sys_chdir(void) {
-  u64 path = sysarg(0);
+int sys_chdir(struct trapframe *tf) {
+  u64 path = sysarg(tf, 0);
   return chdir((char *)path);
 }
 
-int sys_mkdir(void) {
-  u64 path = sysarg(0);
+int sys_mkdir(struct trapframe *tf) {
+  u64 path = sysarg(tf, 0);
   return mkdir((char *)path);
 }
 
-int sys_mknod(void) {
-  u64 path = sysarg(0);
-  int mode = sysarg(1);
-  int dev = sysarg(2);
+int sys_mknod(struct trapframe *tf) {
+  u64 path = sysarg(tf, 0);
+  int mode = sysarg(tf, 1);
+  int dev = sysarg(tf, 2);
   return mknod((char *)path, mode, dev);
 }
 
-int sys_dup(void) {
-  int fd = sysarg(0);
+int sys_dup(struct trapframe *tf) {
+  int fd = sysarg(tf, 0);
   return dup(fd);
 }
 
@@ -142,10 +142,9 @@ syscall_t syscall_table[] = {
 
 void syscall(struct trapframe *tf) {
   int n = tf->x6;
-  printk(" syscall %d\n", n);
 
   if(n < NSYSCALL && syscall_table[n]) {
-    tf->x0 = syscall_table[n]();
+    tf->x0 = syscall_table[n](tf);
   } else {
     panic("unknown syscall");
     tf->x0 = -1;

@@ -12,7 +12,6 @@
 #include "fs.h"
 
 struct proc proctable[NPROC];
-/* proctable[0] == kernel proc */
 
 struct proc *curproc = NULL;
 struct proc kproc;
@@ -24,10 +23,10 @@ void forkret() {
 }
 
 struct proc *newproc() {
-  static pid_t pid = 1;
+  static pid_t pid = 0;
   struct proc *p;
 
-  for(int i = 1; i < NPROC; i++) {
+  for(int i = 0; i < NPROC; i++) {
     p = &proctable[i];
     if(p->state == UNUSED)
       goto found;
@@ -47,12 +46,13 @@ found:
   sp -= sizeof(struct trapframe);
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(*p->tf));
+  // printk("newproc: p->tf %p p->kstack %p\n", p->tf, p->kstack);
 
   p->pgt = kalloc();
   if(!p->pgt)
     return NULL;
 
-  p->context.lr = (u64)forkret;
+  p->context.lr = (u64)trapret;
   p->context.sp = (u64)sp;    /* == p->tf */
 
   return p;
@@ -78,6 +78,8 @@ void userproc_init() {
 
   map_ustack(p->pgt);
 
+  memcpy(p->name, "proc0", 6);
+
   p->cwd = path2inode("/");
   if(!p->cwd)
     panic("no filesystem");
@@ -95,7 +97,7 @@ int getpid(void) {
 
 void schedule() {
   for(;;) {
-    for(int i = 1; i < NPROC; i++) {
+    for(int i = 0; i < NPROC; i++) {
       enable_irq();
       struct proc *p = &proctable[i];
 
@@ -105,11 +107,11 @@ void schedule() {
         kinfo("load userspace %p\n", p->pgt);
         kinfo("enter proc %d\n", p->pid);
         kinfo("tf %p\n", p->tf);
-        kinfo("sp %p elr %p\n", p->tf->sp, p->tf->elr);
-        kinfo("procname %s\n", p->name);
+        kinfo("tf->sp %p tf->elr %p\n", p->tf->sp, p->tf->elr);
 
         curproc = p;
 
+        kinfo("swtch uproc %s\n", p->name);
         cswitch(&kproc.context, &p->context);
 
         forget_userspace();
@@ -231,7 +233,7 @@ int exec(char *path, char **argv) {
 
   load_userspace(p->pgt);
 
-  memcpy(p->name, path, strlen(path));
+  memcpy(p->name, path, strlen(path)+1);
 
   kinfo("exec complete!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
@@ -253,7 +255,7 @@ int wait(int *status) {
   struct proc *p = curproc;
 
   for(;;) {
-    for(int i = 1; i < NPROC; i++) {
+    for(int i = 0; i < NPROC; i++) {
       struct proc *cp = &proctable[i];
       if(cp->parent != p)
         continue;
@@ -276,7 +278,7 @@ int wait(int *status) {
 void wakeup(struct proc *proc) {
   kinfo("wakeup\n");
 
-  for(int i = 1; i < NPROC; i++) {
+  for(int i = 0; i < NPROC; i++) {
     struct proc *p = &proctable[i];
     if(p->state == SLEEPING && p == proc)
       p->state = RUNNABLE;
@@ -314,10 +316,14 @@ void dump_proc(struct proc *p) {
   ;
 }
 
+void dump_kstack(struct proc *p) {
+  for(int i = 0; i < PAGESIZE; i++) {
+    printk("%x ", p->kstack[i]);
+  }
+}
+
 void proc_init() {
   memset(&kproc, 0, sizeof(kproc));
   kproc.state = RUNNABLE;
-  proctable[0] = kproc;
   curproc = &kproc;
 }
-

@@ -43,10 +43,8 @@ void handle_data_abort(struct trapframe *tf, int el, u64 esr) {
 
   printk("elr %p far %p\n", elr_el1(), far_el1());
   if(el == 0) {
-    dump_tf(tf);
     fault_die("data abort EL0");
-  }
-  else {
+  } else {
     panic("data abort EL1");
   }
 }
@@ -56,9 +54,8 @@ void handle_inst_abort(int el, u64 esr) {
   panic("instruction abort");
 }
 
-void sync_handler(struct trapframe *tf) {
-  kinfo("!!!!!sync handler: tf %p elr %p curproc tf %p\n", tf, tf->elr, curproc->tf);
-  dump_tf(tf);
+void ksync_handler(struct trapframe *tf) {
+  kinfo("kkkkkksync handler: tf %p elr %p sp %p\n", tf, tf->elr, tf->sp);
 
   u64 esr = esr_el1();
   u64 ec = (esr >> 26) & 0x3f;
@@ -66,9 +63,6 @@ void sync_handler(struct trapframe *tf) {
   switch(ec) {
     case 0b100101:
       handle_data_abort(tf, 1, esr);
-      return;
-    case 0b010101:  /* svc */
-      syscall(tf);
       return;
     case 0b000111:
       return;
@@ -82,6 +76,34 @@ void sync_handler(struct trapframe *tf) {
       return;
     case 0b100001:
       handle_inst_abort(1, esr);
+      return;
+    default:
+      printk("elr: %p far: %p\n", elr_el1(), far_el1());
+      dump_tf(tf);
+      panic("unknown ec: %d", ec);
+  }
+}
+
+void usync_handler(struct trapframe *tf) {
+  kinfo("uuuuuusync handler: tf %p elr %p proctf %p\n", tf, tf->elr, curproc->tf);
+
+  u64 esr = esr_el1();
+  u64 ec = (esr >> 26) & 0x3f;
+
+  switch(ec) {
+    case 0b010101:  /* svc */
+      // curproc->tf = tf;
+      syscall(tf);
+      return;
+    case 0b000111:
+      return;
+    case 0b100110:
+      panic("sp alignment fault");
+    case 0b100100:
+      handle_data_abort(tf, 0, esr);
+      return;
+    case 0b100000:
+      handle_inst_abort(0, esr);
       return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());

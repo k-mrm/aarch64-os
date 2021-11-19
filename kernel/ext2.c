@@ -206,7 +206,6 @@ static int ext2_alloc_block() {
 static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
   u32 bgrp = (inum - 1) / (sb.bsize / sizeof(struct ext2_inode));
   u64 offset = ((inum - 1) % (sb.bsize / sizeof(struct ext2_inode))) * sizeof(struct ext2_inode);
-  printk("inode num %d %d %d %d\n", inum, bgrp, offset, sb.inode_table + bgrp);
   struct buf *itable = bio_read(sb.inode_table + bgrp);
   if(b)
     *b = itable;
@@ -215,7 +214,6 @@ static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
 }
 
 struct buf *ext2_inode_block(struct inode *ino, int bi) {
-  printk("ext2_inode_block read: %d\n", ino->block[bi]);
   if(bi < 12)
     return bio_read(ino->block[bi]);
   else
@@ -451,7 +449,6 @@ static void ls_inode(struct inode *ino) {
 }
 
 int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
-  printk("readinode %p %d %d\n", buf, off, size);
   u32 bsize = sb.bsize;
   char *base = buf;
 
@@ -661,6 +658,4 @@ void ext2_init() {
   sb.wtime = esb->s_wtime;
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
-
-  printk("ext2 done\n");
 }

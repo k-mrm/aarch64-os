@@ -80,6 +80,20 @@ static inline u64 far_el1() {
   return far;
 }
 
+static inline u64 sp_el0() {
+  u64 sp;
+  asm volatile("mrs %0, sp_el0" : "=r"(sp));
+
+  return sp;
+}
+
+static inline u64 sp_el1() {
+  u64 sp;
+  asm volatile("mrs %0, sp_el1" : "=r"(sp));
+
+  return sp;
+}
+
 static inline void enable_irq() {
   asm volatile("msr daifclr, #2");
 }

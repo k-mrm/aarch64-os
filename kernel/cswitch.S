@@ -36,4 +36,4 @@ cswitch: /* cswitch(struct context *old, struct context *new) */
 
   mov sp, x10
   
-  ret // lr(x30) == forkret
+  ret /* lr(x30) == forkret */

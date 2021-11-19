@@ -3,6 +3,7 @@
 #include "string.h"
 #include "driver/virtio.h"
 #include "printk.h"
+#include "log.h"
 
 void buf_init() {
   for(int i = 0; i < NBUF; i++) {
@@ -32,13 +33,11 @@ static struct buf *get_buf(u32 bno) {
 }
 
 struct buf *bio_read(u32 bno) {
-  printk("bno reeeeeeeead %d\n", bno);
   struct buf *b = get_buf(bno);
   if(!b)
     return NULL;
 
   if(!b->valid) {
-    printk("bno %d read blk from disk\n", bno);
     if(virtio_blk_op(bno, b->data, DREAD) < 0)
       panic("disk read failed");
     b->valid = 1;
