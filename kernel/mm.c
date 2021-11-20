@@ -82,7 +82,8 @@ void free_table(u64 *pgt) {
 
 int init_userspace(u64 *pgt, char *code, u64 size) {
   u64 pgsize = PAGEROUNDUP(size);
-  for(u64 va = 0; va < pgsize; va += PAGESIZE) {
+  u64 va = 0x1000;
+  for(u64 p = 0; p < pgsize; p += PAGESIZE, va += PAGESIZE) {
     char *upage = kalloc();
     if(!upage)
       panic("init_userspace");
@@ -95,8 +96,7 @@ int init_userspace(u64 *pgt, char *code, u64 size) {
 
 int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
   u64 pgsize = PAGEROUNDUP(size);
-  u64 bva = va;
-  for(; va < pgsize + bva; va += PAGESIZE) {
+  for(u64 p = 0; p < pgsize; p += PAGESIZE, va += PAGESIZE) {
     char *upage = kalloc();
     if(!upage)
       return -1;
@@ -130,8 +130,9 @@ void dump_ustack(u64 *pgt) {
 int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
   u64 *pte;
   u64 pa;
+  u64 va = 0x1000;
 
-  for(u64 va = 0; va < size; va += PAGESIZE) {
+  for(u64 p = 0; p < size; p += PAGESIZE, va += PAGESIZE) {
     pte = pagewalk(oldpgt, va);
     pa = PTE_PA(*pte);
     char *page = kalloc();
@@ -158,7 +159,7 @@ int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
 void free_userspace(u64 *pgt, u64 size) {
   kinfo("free userspace pgt %p size %d\n", pgt, size);
 
-  pageunmap(pgt, 0, size);
+  pageunmap(pgt, 0x1000, size);
   pageunmap(pgt, USTACKBOTTOM, PAGESIZE);
 
   free_table(pgt);

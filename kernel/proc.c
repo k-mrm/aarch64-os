@@ -84,7 +84,7 @@ void userproc_init() {
   if(!p->cwd)
     panic("no filesystem");
 
-  p->tf->elr = 0x0;  /* `eret` jump to elr */
+  p->tf->elr = 0x1000;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
   p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
 
@@ -233,7 +233,7 @@ int exec(char *path, char **argv) {
 
   load_userspace(p->pgt);
 
-  memcpy(p->name, path, strlen(path)+1);
+  strcpy(p->name, path);
 
   kinfo("exec complete!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 

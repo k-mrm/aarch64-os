@@ -422,7 +422,6 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
 struct inode *ext2_get_inode(int inum) {
   struct inode *i = find_inode(inum);
   struct ext2_inode *e = ext2_raw_inode(inum, NULL);
-  // dump_ext2_inode(e);
 
   i->mode = e->i_mode;
   i->size = e->i_size;

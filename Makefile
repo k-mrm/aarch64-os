@@ -41,7 +41,7 @@ SDPATH = /media/k-mrm/09D0-F0A8
 
 usr/initcode: usr/initcode.S
 	$(CC) $(CFLAGS) -c usr/initcode.S -o usr/initcode.o
-	$(LD) $(LDFLAGS) -N -e initcode -Ttext 0 -o usr/initcode.elf usr/initcode.o
+	$(LD) $(LDFLAGS) -N -e initcode -Ttext 0x1000 -o usr/initcode.elf usr/initcode.o
 	$(OBJCOPY) -S -O binary usr/initcode.elf usr/initcode
 
 %.o: %.c
@@ -57,7 +57,7 @@ UPROGS = rootfs/init rootfs/sh rootfs/cat rootfs/echo rootfs/ls rootfs/uname roo
 
 rootfs/%: usr/%.o $(ULIBS)
 	@mkdir -p rootfs
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0x1000 -o $@ $^
 	cp README.md rootfs/
 
 fs.img: $(UPROGS)
