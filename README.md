@@ -9,7 +9,9 @@ a simple OS for aarch64(qemu virt board)
 - preemptive multi tasking
 - process scheduler
   - round-robin
-- file system(ramfs)
+- block device
+  - virtio-blk
+- file system
   - ext2
 - UNIX-like syscalls
 - isolation of address space by MMU
