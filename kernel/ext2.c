@@ -327,6 +327,8 @@ empty_block:
   d->file_type = de->file_type;
   memcpy(d->name, de->name, de->name_len + 1);
 
+  bio_write(b);
+
   return 0;
 
 found:
@@ -342,6 +344,8 @@ found:
   newd->name_len = de->name_len;
   newd->file_type = de->file_type;
   memcpy(newd->name, de->name, de->name_len + 1);
+
+  bio_write(b);
 
   return 0;
 }
@@ -400,6 +404,9 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
       return NULL;
 
     ino->size = sb.bsize;
+  } else if(S_ISCHR(mode)) {
+    kinfo("new chardev\n");
+    ino->size = 0;
   }
 
   make_dirent(ino->inum, name, imode2dtype(ino->mode), (struct dirent *)buf);
@@ -462,12 +469,12 @@ int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   u32 offblkoff = off % bsize;
 
   for(int i = offblk; i < ext2_inode_nblock(ino) && i <= lastblk; i++) {
-    struct buf *d = ext2_inode_block(ino, i);
+    struct buf *b = ext2_inode_block(ino, i);
     u64 cpsize = min(size, bsize);
     if(offblkoff + cpsize > bsize)
       cpsize = bsize - offblkoff;
 
-    memcpy(buf, d->data + offblkoff, cpsize);
+    memcpy(buf, b->data + offblkoff, cpsize);
 
     buf += cpsize;
     size = size > bsize? size - bsize : 0;

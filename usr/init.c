@@ -6,11 +6,14 @@
 
 int main() {
   char *argv[] = {"sh", 0};
+  int fd;
 
-  if(mknod("tty0", S_IFCHR, CDEV_CONSOLE) < 0)
-    exit(1);
+  if((fd = open("tty0", O_RDWR)) < 0) {
+    if(mknod("tty0", S_IFCHR, CDEV_CONSOLE) < 0)
+      exit(1);
+    fd = open("tty0", O_RDWR);
+  }
 
-  int fd = open("tty0", O_RDWR);
   dup(fd);    /* 1 */
   dup(fd);    /* 2 */
 

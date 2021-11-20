@@ -31,6 +31,10 @@ void *memset(void *dst, int c, u64 n) {
   return dst;
 }
 
+char *strcpy(char *dst, const char *src) {
+  return memcpy(dst, src, strlen(src)+1);
+}
+
 int strcmp(const char *s1, const char *s2) {
   while(*s1 && *s1 == *s2) {
     s1++;
