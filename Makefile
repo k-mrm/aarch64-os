@@ -24,12 +24,13 @@ QEMUOPTS += -device virtio-blk-device,drive=d0,bus=virtio-mmio-bus.0
 QEMUOPTS += -nographic -kernel kernel8.elf
 
 KOBJS = kernel/boot.o kernel/vectortable.o kernel/file.o kernel/buf.o \
-			 kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o kernel/uname.o \
-			 kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o kernel/fs.o	\
-			 kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o	\
-			 kernel/cdev.o
+				kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o kernel/uname.o \
+				kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o kernel/fs.o	\
+				kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o	\
+				kernel/cdev.o
 
-DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o kernel/driver/virtio.o
+DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o kernel/driver/virtio.o	\
+				 kernel/driver/psci-if.o kernel/driver/psci.o
 
 VIRTDRV = $(DRIVER) kernel/driver/virt/uart.o
 
@@ -81,7 +82,7 @@ gdb: kernel8.img fs.img
 dts:
 	$(QEMU) -S -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC),dumpdtb=virt.dtb -smp $(NCPU) -nographic
 	dtc -I dtb -O dts -o virt.dts virt.dtb
-	rm virt.dtb
+	$(RM) virt.dtb
 
 raspi: kernel8.img fs.img
 	cp kernel8.img $(SDPATH)
