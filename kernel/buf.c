@@ -8,10 +8,7 @@
 void buf_init() {
   for(int i = 0; i < NBUF; i++) {
     struct buf *b = &bcache[i];
-    memset(b, 0, 1024);
-    b->bno = 0;
-    b->free = 1;
-    b->valid = 0;
+    memset(b, 0, sizeof(*b));
   }
 }
 
@@ -22,8 +19,8 @@ static struct buf *get_buf(u32 bno) {
   }
 
   for(int i = 0; i < NBUF; i++) {
-    if(bcache[i].free) {
-      bcache[i].free = 0;
+    if(bcache[i].ref == 0) {
+      bcache[i].ref = 1;
       bcache[i].bno = bno;
       return &bcache[i];
     }
@@ -49,4 +46,20 @@ struct buf *bio_read(u32 bno) {
 void bio_write(struct buf *b) {
   virtio_blk_op(b->bno, b->data, DWRITE);
   b->valid = 1;
+}
+
+struct buf *bio_dup(struct buf *b) {
+  b->ref++;
+  return b;
+}
+
+void bio_free(struct buf *b) {
+  if(b->ref == 0)
+    panic("bio_free");
+
+  b->ref--;
+
+  if(b->ref == 0) {
+    memset(b, 0, sizeof(*b));
+  }
 }

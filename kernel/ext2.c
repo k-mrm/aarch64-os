@@ -73,16 +73,12 @@ static void dump_dirent(struct dirent *d) {
   printk("name: %s\n", d->name);
 }
 
-static struct ext2_superblock *ext2_get_sb() {
-  struct buf *b = bio_read(1);
-
-  return (struct ext2_superblock *)b->data;
+static struct buf *ext2_get_sb() {
+  return bio_read(1);
 }
 
-static struct ext2_bg_desc *ext2_get_bg() {
-  struct buf *b = bio_read(2);
-
-  return (struct ext2_bg_desc *)b->data;
+static struct buf *ext2_get_bg() {
+  return bio_read(2);
 }
 
 /* for debug */
@@ -200,6 +196,8 @@ static int ext2_alloc_block() {
 
   bbmp_write_bit(bitmap, bn, 1);
 
+  bio_free(bitmap);
+
   return bn;
 }
 
@@ -214,10 +212,15 @@ static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
 }
 
 struct buf *ext2_inode_block(struct inode *ino, int bi) {
-  if(bi < 12)
+  if(bi < 12) {
     return bio_read(ino->block[bi]);
-  else
-    return read_indirect_block((u32 *)bio_read(ino->block[12]), bi);
+  }
+  else {
+    struct buf *map = (u32 *)bio_read(ino->block[12]);
+    struct buf *b = read_indirect_block(map, bi);
+    bio_free(map);
+    return b;
+  }
 
   return NULL;
 }
@@ -249,6 +252,8 @@ static int ext2_alloc_inum() {
     return -1;
 
   ibmp_write_bit(ibmp, inum, 1);
+
+  bio_free(ibmp);
 
   return inum;
 }
@@ -328,6 +333,7 @@ empty_block:
   memcpy(d->name, de->name, de->name_len + 1);
 
   bio_write(b);
+  bio_free(b);
 
   return 0;
 
@@ -346,6 +352,7 @@ found:
   memcpy(newd->name, de->name, de->name_len + 1);
 
   bio_write(b);
+  bio_free(b);
 
   return 0;
 }
@@ -366,6 +373,7 @@ static void inode_sync(struct inode *i) {
   memcpy(e->i_block, i->block, sizeof(u32) * 15);
 
   bio_write(b);
+  bio_free(b);
 }
 
 static u8 itype_dtype_table[15] = {
@@ -419,9 +427,14 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
   return ino;
 }
 
+static int ext2_rm_inode(char *name, struct inode *pdir) {
+  ;
+}
+
 struct inode *ext2_get_inode(int inum) {
   struct inode *i = find_inode(inum);
-  struct ext2_inode *e = ext2_raw_inode(inum, NULL);
+  struct buf *b;
+  struct ext2_inode *e = ext2_raw_inode(inum, &b);
 
   i->mode = e->i_mode;
   i->size = e->i_size;
@@ -432,6 +445,8 @@ struct inode *ext2_get_inode(int inum) {
   i->links_count = e->i_links_count;
   i->blocks = e->i_blocks;
   memcpy(i->block, e->i_block, sizeof(u32) * 15);
+
+  bio_free(b);
 
   return i;
 }
@@ -451,6 +466,7 @@ static void ls_inode(struct inode *ino) {
   for(int i = 0; i < ext2_inode_nblock(ino); i++) {
     struct buf *dent = ext2_inode_block(ino, i);
     dump_dirent_block(dent->data);
+    bio_free(dent);
   }
 }
 
@@ -478,6 +494,8 @@ int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
     buf += cpsize;
     size = size > bsize? size - bsize : 0;
     offblkoff = 0;
+
+    bio_free(b);
   }
 
   return buf - base;
@@ -512,15 +530,30 @@ int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 }
 */
 
+int ext2_rm(char *path) {
+  char namebuf[DIRENT_NAME_MAX] = {0};
+  struct inode *pdir = ext2_path2inode_parent(path, namebuf);
+  if(!pdir)
+    return -1;
+
+  return ext2_rm_inode(namebuf, pdir);
+}
+
 struct inode *ext2_mknod(char *path, int mode, int dev) {
   char namebuf[DIRENT_NAME_MAX] = {0};
   struct inode *pdir = ext2_path2inode_parent(path, namebuf);
+  if(!pdir)
+    return NULL;
+
   return ext2_new_inode(namebuf, pdir, mode, dev);
 }
 
 struct inode *ext2_mkdir(char *path) {
   char namebuf[DIRENT_NAME_MAX] = {0};
   struct inode *pdir = ext2_path2inode_parent(path, namebuf);
+  if(!pdir)
+    return NULL;
+
   return ext2_new_inode(namebuf, pdir, S_IFDIR, 0);
 }
 
@@ -567,8 +600,11 @@ static int ext2_search_dir(struct inode *dir, char *name) {
   int inum;
   for(int i = 0; i < ext2_inode_nblock(dir); i++) {
     struct buf *db = ext2_inode_block(dir, i);
-    if((inum = search_dirent_block(db->data, name)) > 0)
+    if((inum = search_dirent_block(db->data, name)) > 0) {
+      bio_free(db);
       return inum;
+    }
+    bio_free(db);
   }
 
   return -1;
@@ -643,12 +679,14 @@ struct inode *ext2_path2inode_parent(char *path, char *namebuf) {
 }
 
 void ext2_init() {
-  struct ext2_superblock *esb = ext2_get_sb();
+  struct buf *b_esb = ext2_get_sb();
+  struct ext2_superblock *esb = (struct ext2_superblock *)b_esb->data;
 
   if(esb->s_magic != 0xef53)
     panic("invalid filesystem");
 
-  struct ext2_bg_desc *bg = ext2_get_bg();
+  struct buf *b_bg = ext2_get_bg();
+  struct ext2_bg_desc *bg = (struct ext2_bg_desc *)b_bg->data;
 
   sb.bsize = 1024 << esb->s_log_block_size;
   sb.block_bitmap = bg->bg_block_bitmap;
@@ -664,4 +702,7 @@ void ext2_init() {
   sb.wtime = esb->s_wtime;
   sb.first_ino = esb->s_first_ino;
   sb.inode_size = esb->s_inode_size;
+
+  bio_free(b_esb);
+  bio_free(b_bg);
 }

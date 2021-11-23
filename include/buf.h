@@ -8,7 +8,7 @@
 struct buf {
   char data[1024];
   u32 bno;
-  u8 free;
+  u32 ref;
   u8 dirty;
   u8 valid;
 };
@@ -17,6 +17,7 @@ struct buf bcache[NBUF];
 
 void buf_init(void);
 struct buf *bio_read(u32 bno);
-void bio_write(struct buf *buf);
+void bio_write(struct buf *b);
+void bio_free(struct buf *b);
 
 #endif
