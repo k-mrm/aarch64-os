@@ -2,11 +2,13 @@
 #define AARCH64_OS_DRIVER_PSCI_H
 
 #define PSCI_SYSTEM_OFF   0x84000008
+#define PSCI_SYSTEM_RESET   0x84000009
 
 #ifndef __ASSEMBLER__
 
 enum PSCI_OP {
   PSCI_OP_SHUTDOWN,
+  PSCI_OP_RESET,
 };
 
 #endif

@@ -7,6 +7,12 @@ int psci_call(enum PSCI_OP op) {
     case PSCI_OP_SHUTDOWN:
       printk("system shutdown...\n");
       psci_shutdown();
-      break;
+      return 0;
+    case PSCI_OP_RESET:
+      printk("system rebooting...\n");
+      psci_reset();
+      return 0;
+    default:
+      return -1;
   }
 }
