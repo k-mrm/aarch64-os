@@ -46,7 +46,6 @@ found:
   sp -= sizeof(struct trapframe);
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(*p->tf));
-  // printk("newproc: p->tf %p p->kstack %p\n", p->tf, p->kstack);
 
   p->pgt = kalloc();
   if(!p->pgt)

@@ -5,7 +5,7 @@ OBJCOPY = $(PREFIX)objcopy
 
 CPU = cortex-a72+nofp
 
-CFLAGS = -Wall -Og -g -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
+CFLAGS = -Wall -Og -g -MD -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
 #CFLAGS += -DOS_DEBUG
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
@@ -50,6 +50,7 @@ usr/initcode: usr/initcode.S
 %.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $@
 
+-include: *.d
 
 ULIBS = usr/systable.o usr/ulib.o
 
@@ -87,6 +88,7 @@ raspi: kernel8.img fs.img
 
 clean:
 	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) usr/initcode.o usr/initcode.elf usr/initcode kernel8.elf kernel8.img fs.img
-	rm -rf rootfs
+	find ./ -name "*.d" | xargs $(RM)
+	$(RM) -rf rootfs
 
 .PHONY: qemu gdb clean dts raspi

@@ -92,7 +92,6 @@ void usync_handler(struct trapframe *tf) {
 
   switch(ec) {
     case 0b010101:  /* svc */
-      // curproc->tf = tf;
       syscall(tf);
       return;
     case 0b000111:
