@@ -159,6 +159,10 @@ err:
   return -1;
 }
 
+int kill(int pid, int sig) {
+  struct proc *p = curproc;
+}
+
 int exec(char *path, char **argv) {
   kinfo("exec %s %p %p\n", path, path, argv);
   struct inode *ino = path2inode(path);

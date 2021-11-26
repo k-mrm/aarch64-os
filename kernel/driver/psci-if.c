@@ -2,17 +2,20 @@
 #include "driver/psci.h"
 #include "printk.h"
 
+void psci_shutdown(void) __attribute__((noreturn));
+void psci_reset(void) __attribute__((noreturn));
+
 int psci_call(enum PSCI_OP op) {
   switch(op) {
     case PSCI_OP_SHUTDOWN:
-      printk("system shutdown...\n");
+      printk("system shutdown\n");
       psci_shutdown();
-      return 0;
     case PSCI_OP_RESET:
-      printk("system rebooting...\n");
+      printk("system reboot\n");
       psci_reset();
-      return 0;
     default:
       return -1;
   }
+
+  panic("unreachable");
 }

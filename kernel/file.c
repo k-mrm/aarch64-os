@@ -71,7 +71,11 @@ int write_file(struct file *f, char *buf, u64 sz) {
   switch(ino->mode & S_IFMT) {
     case S_IFREG:
     case S_IFDIR:
-      n = 0;
+      n = write_inode(ino, buf, f->off, sz);
+      if(n < 0)
+        return -1;
+
+      f->off += n;
       break;
     case S_IFCHR:
       n = cdevsw[ino->major].write(f, buf, sz);

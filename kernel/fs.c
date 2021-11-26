@@ -50,7 +50,7 @@ int read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 }
 
 int write_inode(struct inode *ino, char *buf, u64 off, u64 size) {
-  ;
+  return ext2_w_inode(ino, buf, off, size);
 }
 
 struct inode *fs_mknod(char *path, int mode, int dev) {

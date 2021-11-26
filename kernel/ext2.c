@@ -216,13 +216,35 @@ struct buf *ext2_inode_block(struct inode *ino, int bi) {
     return bio_read(ino->block[bi]);
   }
   else {
-    struct buf *map = (u32 *)bio_read(ino->block[12]);
-    struct buf *b = read_indirect_block(map, bi);
+    struct buf *map = bio_read(ino->block[12]);
+    struct buf *b = read_indirect_block((u32 *)map->data, bi);
     bio_free(map);
     return b;
   }
 
   return NULL;
+}
+
+int ext2_grow_inode_block(struct inode *ino, int nblock) {
+  int n;
+  for(n = 0; n < 12; n++) {
+    if(ino->block[n] == 0)
+      goto found_free;
+  }
+
+  return -1;
+
+found_free:
+  for(int i = 0; i < nblock; i++) {
+    int bn = ext2_alloc_block();
+    ino->block[n + i] = bn;
+  }
+
+  ino->blocks += nblock * (sb.bsize / 512);
+
+  inode_sync(ino);
+
+  return 0;
 }
 
 int ext2_append_inode_block(struct inode *ino, int blockn) {
@@ -501,34 +523,43 @@ int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   return buf - base;
 }
 
-/*
-int w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
+int ext2_w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   u32 bsize = sb.bsize;
+  u64 sz = size;
   char *base = buf;
 
-  if(off > ino->i_size)
+  if(off > ino->size)
     return -1;
-  if(off + size > ino->i_size)
-    size = ino->i_size - off;
+  if(off + size > ino->size)
+    ino->size = off + size;
 
   u32 offblk = off / bsize;
   u32 lastblk = (size + off) / bsize;
   u32 offblkoff = off % bsize;
 
+  if(lastblk > ext2_inode_nblock(ino))
+    ext2_grow_inode_block(ino, lastblk - ext2_inode_nblock(ino));
+
   for(int i = offblk; i < ext2_inode_nblock(ino) && i <= lastblk; i++) {
-    char *d = ext2_inode_block(ino, i);
+    struct buf *b = ext2_inode_block(ino, i);
     u64 cpsize = min(size, bsize);
     if(offblkoff + cpsize > bsize)
       cpsize = bsize - offblkoff;
 
-    memcpy(d + offblkoff, buf, cpsize);
+    memcpy(b->data + offblkoff, buf, cpsize);
+    bio_write(b);
 
     buf += cpsize;
     size = size > bsize? size - bsize : 0;
     offblkoff = 0;
+
+    bio_free(b);
   }
+
+  inode_sync(ino);
+
+  return sz;
 }
-*/
 
 int ext2_rm(char *path) {
   char namebuf[DIRENT_NAME_MAX] = {0};

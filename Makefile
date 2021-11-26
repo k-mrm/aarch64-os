@@ -55,7 +55,7 @@ usr/initcode: usr/initcode.S
 
 ULIBS = usr/systable.o usr/ulib.o
 
-UPROGS = rootfs/init rootfs/sh rootfs/cat rootfs/echo rootfs/ls rootfs/uname rootfs/mkdir rootfs/loop
+UPROGS = rootfs/init rootfs/sh rootfs/cat rootfs/echo rootfs/ls rootfs/uname rootfs/mkdir rootfs/loop rootfs/writetest
 
 rootfs/%: usr/%.o $(ULIBS)
 	@mkdir -p rootfs
