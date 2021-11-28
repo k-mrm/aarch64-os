@@ -110,7 +110,6 @@ void schedule() {
 
         curproc = p;
 
-        kinfo("swtch uproc %s\n", p->name);
         cswitch(&kproc.context, &p->context);
 
         forget_userspace();

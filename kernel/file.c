@@ -110,7 +110,7 @@ int fstat(int fd, struct stat *st) {
   struct inode *ino = f->ino;
 
   st->st_dev = 0; /* TODO */
-  st->st_ino = ino->inum; /* TODO */
+  st->st_ino = ino->inum;
   st->st_mode = ino->mode;
   st->st_size = ino->size;
   st->st_nlink = ino->links_count;

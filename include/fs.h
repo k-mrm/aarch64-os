@@ -80,6 +80,7 @@ struct inode *find_inode(int inum);
 struct inode *path2inode(char *path);
 struct inode *alloc_inode(void);
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size);
+int write_inode(struct inode *ino, char *buf, u64 off, u64 size);
 
 struct inode *fs_mkdir(char *path);
 struct inode *fs_mknod(char *path, int mode, int dev);
