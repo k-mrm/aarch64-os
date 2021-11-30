@@ -112,11 +112,11 @@ void usync_handler(struct trapframe *tf) {
 }
 
 void kirq_handler(struct trapframe *tf) {
-  kinfo("kirq handler: elr %p\n", tf->elr);
-
   u32 iar = gic_iar();
   u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
+
+  kinfo("kirq handler: elr %p %d %d\n", tf->elr, intid, targetcpuid);
 
   irqhandler[intid]();
 

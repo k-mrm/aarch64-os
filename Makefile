@@ -14,7 +14,7 @@ LDFLAGS = -nostdlib -nostartfiles
 QEMU = qemu-system-aarch64
 MACHINE = virt
 MACHINE_GIC = gic-version=2
-NCPU = 1
+NCPU = 2
 
 QCPU = cortex-a72
 QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
@@ -77,6 +77,7 @@ qemu: kernel8.img fs.img
 	$(QEMU) $(QEMUOPTS)
 
 gdb: kernel8.img fs.img
+	@echo "*** target remote localhost:1234"
 	$(QEMU) -S -gdb tcp::1234 $(QEMUOPTS)
 
 dts:

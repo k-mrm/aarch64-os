@@ -96,10 +96,9 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
 
-  enable_irq(); /* ??? */
-  while(!disk.info[d0].done) {
+  enable_irq(); /* TODO: ??? */
+  while(!disk.info[d0].done)
     wfi();
-  }
 
   free_desc(&disk, d0);
 

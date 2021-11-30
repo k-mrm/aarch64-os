@@ -9,6 +9,7 @@ _start:
   mrs x1, mpidr_el1
   and x1, x1, #3
   cbz x1, kernel_start
+  b .
 
 /* switch EL2 to EL1 */
 /*
@@ -161,10 +162,7 @@ l2pgt_loop1:
   ldr x0, =vectortable
   msr vbar_el1, x0
 
-  ldr x1, =__kstack
-  mov sp, x1
-
-  ldr x2, =clearbss
+  ldr x1, =clearbss
 
   /* enable paging */
   mrs x0, sctlr_el1
@@ -173,7 +171,7 @@ l2pgt_loop1:
 
   isb
 
-  br x2
+  br x1
 
 clearbss:
   ldr x1, =__bss_start
@@ -184,6 +182,12 @@ clearbss:
   sub w2, w2, #1
   b 1b
 2:
+
+  b setup_kstack
+
+setup_kstack:
+  ldr x1, =__kstack
+  mov sp, x1
 
   b main
 

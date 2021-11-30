@@ -14,27 +14,31 @@
 #include "file.h"
 #include "buf.h"
 
-int main(void) {
-  trap_init();
-  console_init();
-  printk("booting...\n");
-  kinfo("kernel main @%p\n", main);
-  gicv2_init();
-  timer_init(200);
-  kalloc_init1();
-  pgt_init();
-  kalloc_init2();
-  virtio_init();
-  buf_init();
-  fs_init();
-  file_init();
-  proc_init();
+void _start(void);
 
-  kinfo("cpuid: %d\n", mpidr_el1() & 0xff);
+int main(void) {
+  if(cpuid() == 0) {
+    trap_init();
+    console_init();
+    printk("booting...\n");
+    gicv2_init();
+    timer_init(200);
+    kalloc_init1();
+    pgt_init();
+    kalloc_init2();
+    virtio_init();
+    buf_init();
+    fs_init();
+    file_init();
+    proc_init();
+  }
+
+  kinfo("cpuid: %d\n", cpuid());
   kinfo("current EL: %d\n", cur_el());
   kinfo("vbar_el1: %p\n", vbar_el1());
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
+  printk("Hello\n");
 
   enable_irq();
 

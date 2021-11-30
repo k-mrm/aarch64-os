@@ -31,7 +31,7 @@ void disable_uart() {
 }
 
 void uartintr() {
-  printk("uartintr");
+  // printk("uartintr");
   if(!RXFE) {
   }
 
@@ -44,12 +44,14 @@ static void enable_uartintr() {
 }
 
 void uart_putc(char c) {
-  while(REG(UART_FR) & FR_TXFF) {}
+  while(REG(UART_FR) & FR_TXFF)
+    ;
   REG(UART_DR) = c;
 }
 
 char uart_getc() {
-  while(REG(UART_FR) & FR_RXFE) {}
+  while(REG(UART_FR) & FR_RXFE)
+    ;
   return REG(UART_DR);
 }
 
@@ -69,5 +71,5 @@ void uart_init() {
   REG(UART_LCRH) = LCRH_FEN | LCRH_WLEN_8BIT;
   REG(UART_CR) = 0x301;  /* RXE, TXE, UARTEN */
 
-  // enable_uartintr();
+  enable_uartintr();
 }
