@@ -77,7 +77,7 @@ qemu: kernel8.img fs.img
 	$(QEMU) $(QEMUOPTS)
 
 gdb: kernel8.img fs.img
-	@echo "*** target remote localhost:1234"
+	@echo "*** aarch64-linux-gnu-gdb -x connect.gdb"
 	$(QEMU) -S -gdb tcp::1234 $(QEMUOPTS)
 
 dts:
