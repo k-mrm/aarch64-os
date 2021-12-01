@@ -8,8 +8,8 @@
 _start:
   mrs x1, mpidr_el1
   and x1, x1, #3
-  cbz x1, kernel_start
-  b .
+  cbz x1, kernel_start  /* primary cpu */
+  b secondary_entry     /* secondary cpu */
 
 /* switch EL2 to EL1 */
 /*
@@ -158,10 +158,6 @@ l2pgt_loop1:
 
   isb
 
-  /* setup stack and kernel main */
-  ldr x0, =vectortable
-  msr vbar_el1, x0
-
   ldr x1, =clearbss
 
   /* enable paging */
@@ -183,11 +179,43 @@ clearbss:
   b 1b
 2:
 
-  b setup_kstack
+  b primary_entry
 
-setup_kstack:
-  ldr x1, =__kstack
-  mov sp, x1
+secondary_entry:
+  /* setup ttbr0/1_el1 */
+  adrp x0, l1upgt
+  msr ttbr0_el1, x0
+  adrp x0, l1kpgt
+  msr ttbr1_el1, x0
+
+  /* setup tcr */
+  ldr x0, =(TCR_T0SZ(25) | TCR_T1SZ(25) | TCR_TG0(0) | TCR_TG1(2) | TCR_IPS(0))
+  msr tcr_el1, x0
+
+  /* setup mair */
+  ldr x1, =((AI_DEVICE_nGnRnE << (8 * AI_DEVICE_nGnRnE_IDX)) | (AI_NORMAL_NC << (8 * AI_NORMAL_NC_IDX)))
+  msr mair_el1, x1
+
+  ldr x1, =primary_entry
+
+  /* enable paging */
+  mrs x0, sctlr_el1
+  orr x0, x0, #1
+  msr sctlr_el1, x0
+
+  br x1
+
+primary_entry:
+  ldr x0, =vectortable
+  msr vbar_el1, x0
+
+  mrs x0, mpidr_el1
+  and x0, x0, #0xff     /* current cpuid */
+  mov x1, #PAGESIZE 
+  mul x0, x0, x1
+  ldr x2, =__kstack
+  sub x2, x2, x0
+  mov sp, x2
 
   b main
 

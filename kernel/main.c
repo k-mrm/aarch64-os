@@ -7,6 +7,7 @@
 #include "driver/gicv2.h"
 #include "driver/timer.h"
 #include "driver/virtio.h"
+#include "driver/psci.h"
 #include "log.h"
 #include "kalloc.h"
 #include "ramdisk.h"
@@ -31,6 +32,9 @@ int main(void) {
     fs_init();
     file_init();
     proc_init();
+
+    if(psci_cpu_on(1, V2P(_start)) < 0)
+      panic("cpu1 wakeup failed");
   }
 
   kinfo("cpuid: %d\n", cpuid());
@@ -38,7 +42,6 @@ int main(void) {
   kinfo("vbar_el1: %p\n", vbar_el1());
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
-  printk("Hello\n");
 
   enable_irq();
 
