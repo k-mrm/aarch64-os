@@ -18,13 +18,14 @@
 void _start(void);
 
 int main(void) {
-  if(cpuid() == 0) {
+  if(cpuid() == 0) {  /* primary */
     trap_init();
     console_init();
     printk("booting...\n");
     gicv2_init();
     timer_init(200);
     kalloc_init1();
+    kpgt_init();
     pgt_init();
     kalloc_init2();
     virtio_init();
@@ -33,8 +34,13 @@ int main(void) {
     file_init();
     proc_init();
 
+    isb();
+
     if(psci_cpu_on(1, V2P(_start)) < 0)
       panic("cpu1 wakeup failed");
+  } else {  /* secondary */
+    pgt_init();
+    printk("core%d started\n", cpuid());
   }
 
   kinfo("cpuid: %d\n", cpuid());

@@ -75,6 +75,9 @@ char *map_ustack(u64 *pgt);
 int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size);
 void dump_ustack(u64 *pgt);
 
+void kpgt_init(void);
+void pgt_init(void);
+
 #endif
 
 #endif

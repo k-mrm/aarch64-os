@@ -185,9 +185,6 @@ void kpgt_init() {
 }
 
 void pgt_init() {
-  kpgt_init();
-
-  isb();
-
+  set_ttbr1_el1(V2P(l1kpgt));
   set_ttbr0_el1(0);
 }

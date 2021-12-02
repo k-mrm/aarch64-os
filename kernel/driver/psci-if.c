@@ -18,6 +18,5 @@ int psci_reset() {
 
 int psci_cpu_on(u64 cpuid, u64 ep) {
   int res = psci_fn(PSCI_SYSTEM_CPUON, cpuid, ep, 0);
-  printk("start CPU%d loaded %p %d\n", cpuid, ep, res);
   return res;
 }

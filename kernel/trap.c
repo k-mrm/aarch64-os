@@ -116,7 +116,7 @@ void kirq_handler(struct trapframe *tf) {
   u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
 
-  kinfo("kirq handler: elr %p %d %d\n", tf->elr, intid, targetcpuid);
+  // kinfo("kirq handler: elr %p %d %d\n", tf->elr, intid, targetcpuid);
 
   irqhandler[intid]();
 
