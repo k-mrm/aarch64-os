@@ -10,7 +10,7 @@ void acquire(struct spinlock *lk) {
   if(holding(lk))
     panic("already held");
 
-  /* TODO */
+  /* TODO: don't depend on gcc builtin-function */
   while(__sync_lock_test_and_set(&lk->locked, 1) != 0)
     ;
 
@@ -30,3 +30,7 @@ void release(struct spinlock *lk) {
   asm volatile("str wzr, %0" : "=m"(lk->locked));
 }
 
+void lock_init(struct spinlock *lk) {
+  lk->locked = 0;
+  lk->cpuid = -1;
+}

@@ -36,6 +36,14 @@ struct context {
   u64 lr;  /* x30 */
 } __attribute__((aligned(16)));
 
+#define NCPU 2
+
+struct cpu {
+  struct proc *proc;
+};
+
+struct cpu cpus[NCPU];
+
 enum procstate {
   UNUSED,
   CREATED,

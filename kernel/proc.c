@@ -10,6 +10,20 @@
 #include "log.h"
 #include "elf.h"
 #include "fs.h"
+#include "spinlock.h"
+
+static struct pidallocator {
+  struct spinlock lk;
+  pid_t pid;
+} pidalloc;
+
+static pid_t newpid() {
+  acquire(&pidalloc.lk);
+  pid_t pid = pidalloc.pid++;
+  release(&pidalloc.lk);
+
+  return pid;
+}
 
 struct proc proctable[NPROC];
 
@@ -22,8 +36,12 @@ void forkret() {
   trapret();
 }
 
+struct proc *myproc() {
+  int id = cpuid();
+  return cpus[id].proc;
+}
+
 struct proc *newproc() {
-  static pid_t pid = 0;
   struct proc *p;
 
   for(int i = 0; i < NPROC; i++) {
@@ -36,7 +54,7 @@ struct proc *newproc() {
 
 found:
   p->state = CREATED;
-  p->pid = pid++;
+  p->pid = newpid();
   memset(&p->context, 0, sizeof(p->context));
 
   p->kstack = kalloc();
@@ -325,6 +343,7 @@ void dump_kstack(struct proc *p) {
 }
 
 void proc_init() {
+  lock_init(&pidalloc.lk);
   memset(&kproc, 0, sizeof(kproc));
   kproc.state = RUNNABLE;
   curproc = &kproc;
