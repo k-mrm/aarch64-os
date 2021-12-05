@@ -17,6 +17,8 @@
 
 void _start(void);
 
+volatile int started = 0;
+
 int main(void) {
   if(cpuid() == 0) {  /* primary */
     trap_init();
@@ -37,7 +39,7 @@ int main(void) {
     isb();
 
     if(psci_cpu_on(1, V2P(_start)) < 0)
-      panic("cpu1 wakeup failed");
+      printk("warn: cpu1 wakeup failed\n");
   } else {  /* secondary */
     pgt_init();
     printk("core%d started\n", cpuid());

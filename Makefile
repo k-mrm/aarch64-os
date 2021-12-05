@@ -6,7 +6,7 @@ OBJCOPY = $(PREFIX)objcopy
 CPU = cortex-a72+nofp
 
 CFLAGS = -Wall -Og -g -MD -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
-CFLAGS += -DOS_DEBUG
+#CFLAGS += -DOS_DEBUG
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
 LDFLAGS = -nostdlib -nostartfiles
@@ -14,7 +14,7 @@ LDFLAGS = -nostdlib -nostartfiles
 QEMU = qemu-system-aarch64
 MACHINE = virt
 MACHINE_GIC = gic-version=2
-NCPU = 2
+NCPU = 1
 
 QCPU = cortex-a72
 QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
@@ -27,7 +27,7 @@ KOBJS = kernel/boot.o kernel/vectortable.o kernel/file.o kernel/buf.o \
 				kernel/console.o kernel/trap.o kernel/font.o kernel/ext2.o kernel/uname.o \
 				kernel/main.o kernel/printk.o kernel/proc.o kernel/kalloc.o kernel/fs.o	\
 				kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o	\
-				kernel/cdev.o
+				kernel/cdev.o kernel/spinlock.o
 
 DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o kernel/driver/virtio.o	\
 				 kernel/driver/psci-if.o kernel/driver/psci.o

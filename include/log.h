@@ -5,7 +5,7 @@
 
 #ifdef OS_DEBUG
 
-#define kinfo(...)  printk("[INFO] " __VA_ARGS__)    
+#define kinfo(...)  printk("[INFO] " __VA_ARGS__)
 
 #else
 

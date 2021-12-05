@@ -51,11 +51,6 @@ bool gic_is_pending(u32 intid) {
   return (REG(GICD_ISPENDR(intid / 32)) & (1 << (intid % 32))) != 0;
 }
 
-void gic_enable() {
-  REG(GICC_CTLR) |= 0x1;
-  REG(GICD_CTLR) |= 0x1;
-}
-
 void gic_set_prio(u32 intid, u32 prio) {
   REG(GICD_IPRIORITYR(intid / 4)) &= ~((u32)0xff << (intid % 4 * 8)); // set to 0
   // FIXME
@@ -99,12 +94,17 @@ void gicd_init() {
   REG(GICD_CTLR) = 0;
 }
 
+void gic_enable() {
+  REG(GICC_CTLR) |= 0x1;
+  REG(GICD_CTLR) |= 0x1;
+}
+
 void gicv2_init() {
   gicc_init();
   gicd_init();
 
   gic_setup_ppi(TIMER_IRQ, GICD_CFG_EDGE, 0, 0);
-  // gic_setup_ppi(TIMER_IRQ, GICD_CFG_EDGE, 0, 1);
+  gic_setup_ppi(TIMER_IRQ, GICD_CFG_EDGE, 0, 1);
   gic_setup_spi(UART_IRQ, GICD_CFG_LEVEL, 0);
   gic_setup_spi(VIRTIO_BLK_IRQ, GICD_CFG_LEVEL, 0);
 

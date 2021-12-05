@@ -189,4 +189,10 @@ static inline void set_tcr_el1(u64 t) {
   asm volatile("msr tcr_el1, %0" : : "r"(t));
 }
 
+static u32 casa(u32 w1, u32 w2, u64 x0) {
+  asm volatile("casa %0, %2, [%1]" : "+r"(w1), "+m"(x0) : "r"(w2) : "memory");
+
+  return w1;
+}
+
 #endif
