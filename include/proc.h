@@ -40,6 +40,7 @@ struct context {
 
 struct cpu {
   struct proc *proc;
+  struct context scheduler;
 };
 
 struct cpu cpus[NCPU];
@@ -72,6 +73,9 @@ struct proc {
 
 #define NPROC 256
 
+struct cpu *mycpu(void);
+struct proc *myproc(void);
+
 void proc_init(void);
 void schedule(void);
 struct proc *newproc(void);
@@ -82,7 +86,5 @@ void forkret(void);
 
 void yield(void);
 
-extern struct proc proctable[NPROC];
-extern struct proc *curproc;
 
 #endif

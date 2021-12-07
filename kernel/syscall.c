@@ -27,13 +27,13 @@ int dup(int fd);
 u64 sysarg(struct trapframe *tf, int n) {
   switch(n) {
     case 0:
-      return curproc->tf->x0;
+      return tf->x0;
     case 1:
-      return curproc->tf->x1;
+      return tf->x1;
     case 2:
-      return curproc->tf->x2;
+      return tf->x2;
     case 3:
-      return curproc->tf->x3;
+      return tf->x3;
   }
 
   panic("invalid sysarg");

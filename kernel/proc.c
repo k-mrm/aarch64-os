@@ -17,7 +17,15 @@ static struct pidallocator {
   pid_t pid;
 } pidalloc;
 
+static struct proctable {
+  struct spinlock lk;
+  struct proc procs[NPROC];
+} proctable;
+
+void trapret(void);
+
 static pid_t newpid() {
+  kinfo("newpid\n");
   acquire(&pidalloc.lk);
   pid_t pid = pidalloc.pid++;
   release(&pidalloc.lk);
@@ -25,35 +33,42 @@ static pid_t newpid() {
   return pid;
 }
 
-struct proc proctable[NPROC];
-
-struct proc *curproc = NULL;
-struct proc kproc;
-
-void trapret(void);
-
 void forkret() {
+  release(&proctable.lk);
   trapret();
+  /*
+   *  FIXME: forkret return to trapret
+   */
+}
+
+struct cpu *mycpu() {
+  return &cpus[cpuid()];
 }
 
 struct proc *myproc() {
-  int id = cpuid();
-  return cpus[id].proc;
+  return mycpu()->proc;
 }
 
 struct proc *newproc() {
   struct proc *p;
 
+  kinfo("newproc a\n");
+  acquire(&proctable.lk);
+
   for(int i = 0; i < NPROC; i++) {
-    p = &proctable[i];
+    p = &proctable.procs[i];
     if(p->state == UNUSED)
       goto found;
   }
 
+  release(&proctable.lk);
   return NULL;
 
 found:
   p->state = CREATED;
+
+  release(&proctable.lk);
+
   p->pid = newpid();
   memset(&p->context, 0, sizeof(p->context));
 
@@ -78,7 +93,9 @@ found:
 void free_proc(struct proc *p) {
   kfree(p->kstack);
   memset(p, 0, sizeof(*p));
+  acquire(&proctable.lk);
   p->state = UNUSED;
+  release(&proctable.lk);
 }
 
 extern char _binary_usr_initcode_start[];
@@ -105,50 +122,64 @@ void userproc_init() {
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
   p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
 
+  acquire(&proctable.lk);
   p->state = RUNNABLE;
+  release(&proctable.lk);
 }
 
 int getpid(void) {
-  return curproc->pid;
+  return myproc()->pid;
 }
 
 void schedule() {
   for(;;) {
+    enable_irq();
+
+    struct cpu *cpu = mycpu();
+
+    kinfo("sched a\n");
+    acquire(&proctable.lk);
     for(int i = 0; i < NPROC; i++) {
-      enable_irq();
-      struct proc *p = &proctable[i];
+      struct proc *p = &proctable.procs[i];
 
-      if(p->state == RUNNABLE) {
-        load_userspace(p->pgt);
-        p->state = RUNNING;
-        kinfo("load userspace %p\n", p->pgt);
-        kinfo("enter proc %d\n", p->pid);
-        kinfo("tf %p\n", p->tf);
-        kinfo("tf->sp %p tf->elr %p\n", p->tf->sp, p->tf->elr);
+      if(p->state != RUNNABLE)
+        continue;
 
-        curproc = p;
+      load_userspace(p->pgt);
+      p->state = RUNNING;
 
-        cswitch(&kproc.context, &p->context);
+      printk("sched release ptable lock\n");
+      release(&proctable.lk);
 
-        forget_userspace();
+      kinfo("scheduler cpu %d\n", cpuid());
+      kinfo("load userspace %p\n", p->pgt);
+      kinfo("enter proc %d\n", p->pid);
+      kinfo("tf %p\n", p->tf);
+      kinfo("tf->sp %p tf->elr %p\n", p->tf->sp, p->tf->elr);
 
-        curproc = NULL;
-      }
+      cpu->proc = p;
+
+      cswitch(&cpu->scheduler, &p->context);
+
+      forget_userspace();
+
+      cpu->proc = NULL;
     }
+    release(&proctable.lk);
   }
 }
 
 void yield() {
   kinfo("yield\n");
 
-  struct proc *p = curproc;
+  struct proc *p = myproc();
 
   p->state = RUNNABLE;
-  cswitch(&p->context, &kproc.context);
+  cswitch(&p->context, &mycpu()->scheduler);
 }
 
 int fork() {
-  struct proc *p = curproc;
+  struct proc *p = myproc();
   struct proc *new = newproc();
   if(!new)
     goto err;
@@ -177,7 +208,7 @@ err:
 }
 
 int kill(int pid, int sig) {
-  struct proc *p = curproc;
+  ;
 }
 
 int exec(char *path, char **argv) {
@@ -240,7 +271,7 @@ int exec(char *path, char **argv) {
     goto fail;
   memcpy(sp, ustack, sizeof(ustack[0]) * (argc + 1));
 
-  struct proc *p = curproc;
+  struct proc *p = myproc();
 
   free_userspace(p->pgt, p->size);
 
@@ -268,15 +299,18 @@ void sleep(struct proc *p) {
   kinfo("sleeep\n");
   p->state = SLEEPING;
 
-  cswitch(&p->context, &kproc.context);
+  cswitch(&p->context, &mycpu()->scheduler);
 }
 
 int wait(int *status) {
-  struct proc *p = curproc;
+  kinfo("wait\n");
+  struct proc *p = myproc();
 
   for(;;) {
+    kinfo("waita\n");
+    acquire(&proctable.lk);
     for(int i = 0; i < NPROC; i++) {
-      struct proc *cp = &proctable[i];
+      struct proc *cp = &proctable.procs[i];
       if(cp->parent != p)
         continue;
 
@@ -287,9 +321,13 @@ int wait(int *status) {
 
         free_proc(cp);
 
+        release(&proctable.lk);
+
         return pid;
       }
     }
+
+    release(&proctable.lk);
 
     sleep(p);
   }
@@ -298,16 +336,18 @@ int wait(int *status) {
 void wakeup(struct proc *proc) {
   kinfo("wakeup\n");
 
+  acquire(&proctable.lk);
   for(int i = 0; i < NPROC; i++) {
-    struct proc *p = &proctable[i];
+    struct proc *p = &proctable.procs[i];
     if(p->state == SLEEPING && p == proc)
       p->state = RUNNABLE;
   }
+  release(&proctable.lk);
 }
 
 void exit(int ret) {
   kinfo("exit\n");
-  struct proc *p = curproc;
+  struct proc *p = myproc();
 
   free_userspace(p->pgt, p->size);
 
@@ -316,11 +356,11 @@ void exit(int ret) {
 
   wakeup(p->parent);
 
-  cswitch(&p->context, &kproc.context);
+  cswitch(&p->context, &mycpu()->scheduler);
 }
 
 int chdir(char *path) {
-  struct proc *p = curproc;
+  struct proc *p = myproc();
   struct inode *ino = path2inode(path);
   if(!ino)
     return -1;
@@ -343,8 +383,14 @@ void dump_kstack(struct proc *p) {
 }
 
 void proc_init() {
+  for(int i = 0; i < NCPU; i++) {
+    cpus[i].proc = NULL;
+    memset(&cpus[i].scheduler, 0, sizeof(cpus[i].scheduler));
+  }
+
   lock_init(&pidalloc.lk);
-  memset(&kproc, 0, sizeof(kproc));
-  kproc.state = RUNNABLE;
-  curproc = &kproc;
+  pidalloc.pid = 0;
+
+  lock_init(&proctable.lk);
+  memset(&proctable.procs, 0, sizeof(proctable.procs));
 }

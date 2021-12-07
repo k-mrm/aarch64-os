@@ -93,19 +93,19 @@ struct file *dup_file(struct file *f) {
 }
 
 int read(int fd, char *buf, u64 sz) {
-  struct proc *p = curproc;
+  struct proc *p = myproc();
   struct file *f = p->ofile[fd];
   return read_file(f, buf, sz);
 }
 
 int write(int fd, char *buf, u64 sz) {
-  struct proc *p = curproc;
+  struct proc *p = myproc();
   struct file *f = p->ofile[fd];
   return write_file(f, buf, sz);
 }
 
 int fstat(int fd, struct stat *st) {
-  struct proc *p = curproc;
+  struct proc *p = myproc();
   struct file *f = p->ofile[fd];
   struct inode *ino = f->ino;
 
@@ -123,7 +123,7 @@ int open(char *path, int flags) {
     return -1;
 
   struct file *f = alloc_file();
-  struct proc *p = curproc;
+  struct proc *p = myproc();
 
   f->ino = ino;
   f->off = 0;
@@ -159,7 +159,7 @@ found:
 }
 
 int close(int fd) {
-  struct proc *p = curproc;
+  struct proc *p = myproc();
   struct file *f = p->ofile[fd];
   if(f->ref == 0)
     return -1;
@@ -188,7 +188,7 @@ int mkdir(char *path) {
 }
 
 int dup(int fd) {
-  struct proc *p = curproc;
+  struct proc *p = myproc();
   int newfd = allocfd(p);
   if(newfd < 0)
     return -1;

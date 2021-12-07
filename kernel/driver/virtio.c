@@ -84,7 +84,7 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
   disk.desc[d2].flags = VIRTQ_DESC_F_WRITE;
   disk.desc[d2].next = 0;
 
-  kinfo("d0 %d d1 %d d2 %d\n", d0, d1, d2);
+  // kinfo("d0 %d d1 %d d2 %d\n", d0, d1, d2);
 
   disk.avail->ring[disk.avail->idx % NQUEUE] = d0;
 

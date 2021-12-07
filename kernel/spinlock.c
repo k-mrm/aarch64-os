@@ -7,8 +7,10 @@ bool holding(struct spinlock *lk) {
 }
 
 void acquire(struct spinlock *lk) {
+  disable_irq();
+
   if(holding(lk))
-    panic("already held");
+    panic("already held %d", lk->cpuid);
 
   /* TODO: don't depend on gcc builtin-function */
   while(__sync_lock_test_and_set(&lk->locked, 1) != 0)
@@ -28,6 +30,8 @@ void release(struct spinlock *lk) {
   isb();
 
   asm volatile("str wzr, %0" : "=m"(lk->locked));
+
+  enable_irq();
 }
 
 void lock_init(struct spinlock *lk) {

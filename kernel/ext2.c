@@ -687,7 +687,7 @@ struct inode *ext2_path2inode(char *path) {
   if(*path == '/')
     ino = ext2_get_inode(EXT2_ROOT_INO);
   else
-    ino = curproc->cwd;
+    ino = myproc()->cwd;
 
   char name[DIRENT_NAME_MAX] = {0};
   ino = traverse_inode(ino, path, name);
@@ -702,7 +702,7 @@ struct inode *ext2_path2inode_parent(char *path, char *namebuf) {
   if(*path == '/')
     ino = ext2_get_inode(EXT2_ROOT_INO);
   else
-    ino = curproc->cwd;
+    ino = myproc()->cwd;
 
   ino = traverse_inode_parent(ino, path, namebuf);
 
