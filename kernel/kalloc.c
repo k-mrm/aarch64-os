@@ -6,6 +6,7 @@
 #include "printk.h"
 #include "string.h"
 #include "log.h"
+#include "spinlock.h"
 
 /*
  *  physical memory allocator
@@ -17,14 +18,21 @@ struct header {
   struct header *next;
 };
 
-struct header *freelist = NULL;
+struct kallocator {
+  struct spinlock lk;
+  struct header *freelist;
+} kallocator;
 
 void *kalloc() {
-  struct header *new = freelist;
+  acquire(&kallocator.lk);
+
+  struct header *new = kallocator.freelist;
   if(!new)  /* no memory or uninitialized */
     return NULL;
 
-  freelist = new->next;
+  kallocator.freelist = new->next;
+
+  release(&kallocator.lk);
 
   memset((char *)new, 0, PAGESIZE);
 
@@ -40,8 +48,13 @@ void kfree(void *va) {
   memset(va, 0, PAGESIZE);
 
   struct header *p = (struct header *)va;
-  p->next = freelist;
-  freelist = p;
+
+  acquire(&kallocator.lk);
+
+  p->next = kallocator.freelist;
+  kallocator.freelist = p;
+
+  release(&kallocator.lk);
 }
 
 static inline u64 ksecend() {
@@ -49,6 +62,9 @@ static inline u64 ksecend() {
 }
 
 void kalloc_init1() {
+  lock_init(&kallocator.lk);
+  kallocator.freelist = NULL;
+
   for(char *p = kend; p + PAGESIZE <= (char *)ksecend(); p += PAGESIZE) {
     kfree(p);
   }

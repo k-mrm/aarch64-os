@@ -297,7 +297,10 @@ fail:
 
 void sleep(struct proc *p) {
   kinfo("sleeep\n");
+
+  acquire(&proctable.lk);
   p->state = SLEEPING;
+  release(&proctable.lk);
 
   cswitch(&p->context, &mycpu()->scheduler);
 }
@@ -352,7 +355,10 @@ void exit(int ret) {
   free_userspace(p->pgt, p->size);
 
   p->ret = ret;
+
+  acquire(&proctable.lk);
   p->state = ZOMBIE;
+  release(&proctable.lk);
 
   wakeup(p->parent);
 
