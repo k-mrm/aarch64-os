@@ -90,12 +90,12 @@ found:
   return p;
 }
 
-void free_proc(struct proc *p) {
+/* already hold proctable.lk */
+void freeproc(struct proc *p) {
+  kinfo("freeproc\n");
   kfree(p->kstack);
   memset(p, 0, sizeof(*p));
-  acquire(&proctable.lk);
   p->state = UNUSED;
-  release(&proctable.lk);
 }
 
 extern char _binary_usr_initcode_start[];
@@ -133,33 +133,32 @@ int getpid(void) {
 
 void schedule() {
   for(;;) {
-    enable_irq();
-
     struct cpu *cpu = mycpu();
 
     kinfo("sched a\n");
     acquire(&proctable.lk);
     for(int i = 0; i < NPROC; i++) {
       struct proc *p = &proctable.procs[i];
-
       if(p->state != RUNNABLE)
         continue;
 
-      load_userspace(p->pgt);
       p->state = RUNNING;
 
       printk("sched release ptable lock\n");
       release(&proctable.lk);
+
+      load_userspace(p->pgt);
 
       kinfo("scheduler cpu %d\n", cpuid());
       kinfo("load userspace %p\n", p->pgt);
       kinfo("enter proc %d\n", p->pid);
       kinfo("tf %p\n", p->tf);
       kinfo("tf->sp %p tf->elr %p\n", p->tf->sp, p->tf->elr);
+      kinfo("jump to %p\n", p->context.lr);
 
       cpu->proc = p;
 
-      cswitch(&cpu->scheduler, &p->context);
+      cswitch(&cpu->scheduler, &p->context);  /* acquire proctable.lk */
 
       forget_userspace();
 
@@ -174,8 +173,10 @@ void yield() {
 
   struct proc *p = myproc();
 
+  acquire(&proctable.lk);
+
   p->state = RUNNABLE;
-  cswitch(&p->context, &mycpu()->scheduler);
+  cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
 }
 
 int fork() {
@@ -299,9 +300,8 @@ void sleep(struct proc *p) {
   kinfo("sleeep\n");
 
   acquire(&proctable.lk);
-  p->state = SLEEPING;
-  release(&proctable.lk);
 
+  p->state = SLEEPING;
   cswitch(&p->context, &mycpu()->scheduler);
 }
 
@@ -312,6 +312,7 @@ int wait(int *status) {
   for(;;) {
     kinfo("waita\n");
     acquire(&proctable.lk);
+
     for(int i = 0; i < NPROC; i++) {
       struct proc *cp = &proctable.procs[i];
       if(cp->parent != p)
@@ -322,7 +323,7 @@ int wait(int *status) {
         if(status)
           *status = cp->ret;
 
-        free_proc(cp);
+        freeproc(cp);
 
         release(&proctable.lk);
 
@@ -333,6 +334,7 @@ int wait(int *status) {
     release(&proctable.lk);
 
     sleep(p);
+    kinfo("from sleep\n");
   }
 }
 
@@ -340,11 +342,13 @@ void wakeup(struct proc *proc) {
   kinfo("wakeup\n");
 
   acquire(&proctable.lk);
+
   for(int i = 0; i < NPROC; i++) {
     struct proc *p = &proctable.procs[i];
     if(p->state == SLEEPING && p == proc)
       p->state = RUNNABLE;
   }
+
   release(&proctable.lk);
 }
 
@@ -356,13 +360,14 @@ void exit(int ret) {
 
   p->ret = ret;
 
-  acquire(&proctable.lk);
-  p->state = ZOMBIE;
-  release(&proctable.lk);
-
   wakeup(p->parent);
 
+  acquire(&proctable.lk);
+  p->state = ZOMBIE;
+
   cswitch(&p->context, &mycpu()->scheduler);
+
+  panic("unreachable");
 }
 
 int chdir(char *path) {
@@ -390,8 +395,7 @@ void dump_kstack(struct proc *p) {
 
 void proc_init() {
   for(int i = 0; i < NCPU; i++) {
-    cpus[i].proc = NULL;
-    memset(&cpus[i].scheduler, 0, sizeof(cpus[i].scheduler));
+    memset(&cpus[i], 0, sizeof(cpus[i]));
   }
 
   lock_init(&pidalloc.lk);

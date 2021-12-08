@@ -1,3 +1,7 @@
+/*
+ *  physical memory allocator(4KB)
+ */
+
 #include "kernel.h"
 #include "memmap.h"
 #include "mm.h"
@@ -7,10 +11,6 @@
 #include "string.h"
 #include "log.h"
 #include "spinlock.h"
-
-/*
- *  physical memory allocator
- */
 
 extern char kend[];
 
