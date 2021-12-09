@@ -13,7 +13,7 @@ struct buf {
   u8 valid;
 };
 
-struct buf bcache[NBUF];
+extern struct buf bcache[NBUF];
 
 void buf_init(void);
 struct buf *bio_read(u32 bno);

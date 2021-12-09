@@ -6,10 +6,15 @@
 #include "string.h"
 #include "trap.h"
 #include "log.h"
+#include "spinlock.h"
+#include "proc.h"
 
 #define VIRTIO_MAGIC  0x74726976
 
-struct virtq disk;
+struct disk {
+  struct spinlock lk;
+  struct virtq virtq;
+} disk;
 
 static int alloc_desc(struct virtq *virtq) {
   for(int i = 0; i < NQUEUE; i++) {
@@ -58,49 +63,54 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
   hdr.reserved = 0;
   hdr.sector = sector;
 
-  int d0 = alloc_desc(&disk);
+  acquire(&disk.lk);
+
+  int d0 = alloc_desc(&disk.virtq);
   if(d0 < 0)
     return -1;
-  disk.desc[d0].addr = (u64)V2P(&hdr);
-  disk.desc[d0].len = sizeof(hdr);
-  disk.desc[d0].flags = VIRTQ_DESC_F_NEXT;
+  disk.virtq.desc[d0].addr = (u64)V2P(&hdr);
+  disk.virtq.desc[d0].len = sizeof(hdr);
+  disk.virtq.desc[d0].flags = VIRTQ_DESC_F_NEXT;
 
-  int d1 = alloc_desc(&disk);
+  int d1 = alloc_desc(&disk.virtq);
   if(d1 < 0)
     return -1;
-  disk.desc[d0].next = d1;
-  disk.desc[d1].addr = (u64)V2P(buf);
-  disk.desc[d1].len = 1024;
-  disk.desc[d1].flags |= VIRTQ_DESC_F_NEXT;
+  disk.virtq.desc[d0].next = d1;
+  disk.virtq.desc[d1].addr = (u64)V2P(buf);
+  disk.virtq.desc[d1].len = 1024;
+  disk.virtq.desc[d1].flags |= VIRTQ_DESC_F_NEXT;
   if(op == DREAD)
-    disk.desc[d1].flags |= VIRTQ_DESC_F_WRITE;
+    disk.virtq.desc[d1].flags |= VIRTQ_DESC_F_WRITE;
 
-  int d2 = alloc_desc(&disk);
+  int d2 = alloc_desc(&disk.virtq);
   if(d2 < 0)
     return -1;
-  disk.desc[d1].next = d2;
-  disk.desc[d2].addr = (u64)V2P(&disk.info[d0].status);
-  disk.desc[d2].len = sizeof(disk.info[d0].status);
-  disk.desc[d2].flags = VIRTQ_DESC_F_WRITE;
-  disk.desc[d2].next = 0;
+  disk.virtq.desc[d1].next = d2;
+  disk.virtq.desc[d2].addr = (u64)V2P(&disk.virtq.info[d0].status);
+  disk.virtq.desc[d2].len = sizeof(disk.virtq.info[d0].status);
+  disk.virtq.desc[d2].flags = VIRTQ_DESC_F_WRITE;
+  disk.virtq.desc[d2].next = 0;
 
   // kinfo("d0 %d d1 %d d2 %d\n", d0, d1, d2);
 
-  disk.avail->ring[disk.avail->idx % NQUEUE] = d0;
+  disk.virtq.avail->ring[disk.virtq.avail->idx % NQUEUE] = d0;
 
   dsb();
 
-  disk.avail->idx++;
+  disk.virtq.avail->idx++;
 
   dsb();
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
 
-  enable_irq(); /* TODO: ??? */
-  while(!disk.info[d0].done)
-    wfi();
+  release(&disk.lk);
 
-  free_desc(&disk, d0);
+  while(!disk.virtq.info[d0].done)
+    ;
+
+  acquire(&disk.lk);
+  free_desc(&disk.virtq, d0);
+  release(&disk.lk);
 
   return 0;
 }
@@ -118,18 +128,24 @@ static int virtq_init(struct virtq *vq) {
 }
 
 static void virtio_blk_intr() {
-  while(disk.last_used_idx != disk.used->idx) {
-    int d0 = disk.used->ring[disk.used->idx % NQUEUE].id;
+  kinfo("blkint\n");
 
-    if(disk.info[d0].status != 0)
+  acquire(&disk.lk);
+
+  while(disk.virtq.last_used_idx != disk.virtq.used->idx) {
+    int d0 = disk.virtq.used->ring[disk.virtq.used->idx % NQUEUE].id;
+
+    if(disk.virtq.info[d0].status != 0)
       panic("disk op error");
 
-    disk.info[d0].done = 1;
+    disk.virtq.info[d0].done = 1;
 
-    disk.last_used_idx++;
+    disk.virtq.last_used_idx++;
   }
 
   REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
+
+  release(&disk.lk);
 }
 
 #define LO(addr)  (u32)((addr) & 0xffffffff)
@@ -187,21 +203,22 @@ void virtio_init() {
     panic("virtio-blk err");
 
   /* Perform device-specific setup, including discovery of virtqueues for the device, optional per-bus setup, reading and possibly writing the device's virtio configuration space, and population of virtqueues. */
-  virtq_init(&disk);
+  virtq_init(&disk.virtq);
 
   int qmax = REG(VIRTIO_REG_QUEUE_NUM_MAX);
-  kinfo("queue max %d\n", qmax);
+  if(qmax < NQUEUE)
+    panic("virtqueue");
 
   REG(VIRTIO_REG_QUEUE_SEL) = 0;
   REG(VIRTIO_REG_QUEUE_NUM) = NQUEUE;
 
-  u64 phy_desc = V2P(disk.desc);
+  u64 phy_desc = V2P(disk.virtq.desc);
   REG(VIRTIO_REG_QUEUE_DESC_LOW) = LO(phy_desc);
   REG(VIRTIO_REG_QUEUE_DESC_HIGH) = HI(phy_desc);
-  u64 phy_avail = V2P(disk.avail);
+  u64 phy_avail = V2P(disk.virtq.avail);
   REG(VIRTIO_REG_QUEUE_DRIVER_LOW) = LO(phy_avail);
   REG(VIRTIO_REG_QUEUE_DRIVER_HIGH) = HI(phy_avail);
-  u64 phy_used = V2P(disk.used);
+  u64 phy_used = V2P(disk.virtq.used);
   REG(VIRTIO_REG_QUEUE_DEVICE_LOW) = LO(phy_used);
   REG(VIRTIO_REG_QUEUE_DEVICE_HIGH) = HI(phy_used);
 
@@ -214,6 +231,8 @@ void virtio_init() {
   REG(VIRTIO_REG_STATUS) = status;
 
   new_irq(VIRTIO_BLK_IRQ, virtio_blk_intr);
+
+  lock_init(&disk.lk);
 
   kinfo("virtio_init done\n");
 }

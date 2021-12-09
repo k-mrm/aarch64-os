@@ -4,6 +4,7 @@
 #include "kernel.h"
 #include "fs.h"
 #include "file.h"
+#include "spinlock.h"
 
 typedef int pid_t;
 
@@ -61,6 +62,7 @@ struct proc {
   int ret;
   pid_t pid;
   u64 size;
+  void *chan;
   struct context context;
   struct trapframe *tf;
   struct proc *parent;
@@ -78,7 +80,8 @@ struct proc *myproc(void);
 
 void proc_init(void);
 void schedule(void);
-struct proc *newproc(void);
+void sleep(void *chan, struct spinlock *lk);
+void wakeup(void *chan);
 
 void cswitch(struct context *old, struct context *new);
 

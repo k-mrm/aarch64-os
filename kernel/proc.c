@@ -132,9 +132,9 @@ int getpid(void) {
 }
 
 void schedule() {
-  for(;;) {
-    struct cpu *cpu = mycpu();
+  struct cpu *cpu = mycpu();
 
+  for(;;) {
     kinfo("sched a\n");
     acquire(&proctable.lk);
     for(int i = 0; i < NPROC; i++) {
@@ -144,7 +144,7 @@ void schedule() {
 
       p->state = RUNNING;
 
-      printk("sched release ptable lock\n");
+      kinfo("sched release ptable lock\n");
       release(&proctable.lk);
 
       load_userspace(p->pgt);
@@ -296,13 +296,24 @@ fail:
   return -1;
 }
 
-void sleep(struct proc *p) {
+void sleep(void *chan, struct spinlock *lk) {
   kinfo("sleeep\n");
 
-  acquire(&proctable.lk);
+  struct proc *p = myproc();
 
+  if(lk != &proctable.lk) {
+    acquire(&proctable.lk);
+    release(lk);
+  }
+
+  p->chan = chan;
   p->state = SLEEPING;
   cswitch(&p->context, &mycpu()->scheduler);
+
+  p->chan = NULL;
+
+  if(lk != &proctable.lk)
+    acquire(lk);
 }
 
 int wait(int *status) {
@@ -331,21 +342,21 @@ int wait(int *status) {
       }
     }
 
-    release(&proctable.lk);
+    // release(&proctable.lk);
 
-    sleep(p);
+    sleep(p, &proctable.lk);
     kinfo("from sleep\n");
   }
 }
 
-void wakeup(struct proc *proc) {
+void wakeup(void *chan) {
   kinfo("wakeup\n");
 
   acquire(&proctable.lk);
 
   for(int i = 0; i < NPROC; i++) {
     struct proc *p = &proctable.procs[i];
-    if(p->state == SLEEPING && p == proc)
+    if(p->state == SLEEPING && p->chan == chan)
       p->state = RUNNABLE;
   }
 

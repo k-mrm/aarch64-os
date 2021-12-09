@@ -5,6 +5,8 @@
 #include "printk.h"
 #include "log.h"
 
+struct buf bcache[NBUF];
+
 void buf_init() {
   for(int i = 0; i < NBUF; i++) {
     struct buf *b = &bcache[i];
