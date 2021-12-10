@@ -8,16 +8,25 @@
 #include "dirent.h"
 #include "cdev.h"
 #include "printk.h"
+#include "spinlock.h"
 
-struct file ftable[NFILE];
+struct ftable {
+  struct spinlock lk;
+  struct file file[NFILE];
+} ftable;
 
 struct file *alloc_file() {
+  acquire(&ftable.lk);
+
   for(int i = 0; i < NFILE; i++) {
-    if(ftable[i].ref == 0) {
-      ftable[i].ref = 1;
-      return &ftable[i];
+    if(ftable.file[i].ref == 0) {
+      ftable.file[i].ref = 1;
+      release(&ftable.lk);
+      return &ftable.file[i];
     }
   }
+
+  release(&ftable.lk);
 
   return NULL;
 }
@@ -88,7 +97,10 @@ int write_file(struct file *f, char *buf, u64 sz) {
 }
 
 struct file *dup_file(struct file *f) {
+  acquire(&ftable.lk);
   f->ref++;
+  release(&ftable.lk);
+
   return f;
 }
 
@@ -161,10 +173,14 @@ found:
 int close(int fd) {
   struct proc *p = myproc();
   struct file *f = p->ofile[fd];
+  acquire(&ftable.lk);
+
   if(f->ref == 0)
     return -1;
   if(--f->ref > 0)
     return 0;
+
+  release(&ftable.lk);
 
   p->ofile[fd] = NULL;
   memset(f, 0, sizeof(*f));
@@ -199,5 +215,6 @@ int dup(int fd) {
 }
 
 void file_init() {
-  memset(ftable, 0, sizeof(ftable));
+  lock_init(&ftable.lk);
+  memset(&ftable.file, 0, sizeof(ftable.file));
 }

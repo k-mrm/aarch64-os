@@ -4,27 +4,37 @@
 #include "driver/virtio.h"
 #include "printk.h"
 #include "log.h"
+#include "spinlock.h"
 
-struct buf bcache[NBUF];
+struct bcache {
+  struct spinlock lk;
+  struct buf buf[NBUF];
+} bcache;
 
 void buf_init() {
+  lock_init(&bcache.lk);
   for(int i = 0; i < NBUF; i++) {
-    struct buf *b = &bcache[i];
+    struct buf *b = &bcache.buf[i];
     memset(b, 0, sizeof(*b));
   }
 }
 
 static struct buf *get_buf(u32 bno) {
+  acquire(&bcache.lk);
+
   for(int i = 0; i < NBUF; i++) {
-    if(bcache[i].bno == bno)
-      return &bcache[i];
+    if(bcache.buf[i].bno == bno) {
+      release(&bcache.lk);
+      return &bcache.buf[i];
+    }
   }
 
   for(int i = 0; i < NBUF; i++) {
-    if(bcache[i].ref == 0) {
-      bcache[i].ref = 1;
-      bcache[i].bno = bno;
-      return &bcache[i];
+    if(bcache.buf[i].ref == 0) {
+      bcache.buf[i].ref = 1;
+      bcache.buf[i].bno = bno;
+      release(&bcache.lk);
+      return &bcache.buf[i];
     }
   }
 
@@ -51,17 +61,23 @@ void bio_write(struct buf *b) {
 }
 
 struct buf *bio_dup(struct buf *b) {
+  acquire(&bcache.lk);
   b->ref++;
+  release(&bcache.lk);
+
   return b;
 }
 
 void bio_free(struct buf *b) {
+  acquire(&bcache.lk);
+
   if(b->ref == 0)
     panic("bio_free");
 
   b->ref--;
 
-  if(b->ref == 0) {
+  if(b->ref == 0)
     memset(b, 0, sizeof(*b));
-  }
+
+  release(&bcache.lk);
 }
