@@ -73,6 +73,7 @@ struct inode {
   u32 inum;
   u32 major;
   u32 minor;
+  u32 ref;
 };
 
 void fs_init(void);

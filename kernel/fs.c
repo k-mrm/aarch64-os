@@ -4,18 +4,31 @@
 #include "string.h"
 #include "ext2.h"
 #include "printk.h"
+#include "spinlock.h"
 
-struct inode itable[NINODE];
+struct itable {
+  struct spinlock lk;
+  struct inode inode[NINODE];
+} itable;
 
 struct superblock sb;
 
 struct inode *alloc_inode() {
   struct inode *ino;
+
+  acquire(&itable.lk);
+
   for(int i = 0; i < NINODE; i++) {
-    ino = &itable[i];
-    if(ino->mode == 0)
+    ino = &itable.inode[i];
+    if(ino->ref == 0) {
+      ino->ref = 1;
+      release(&itable.lk);
+
       return ino;
+    }
   }
+
+  release(&itable.lk);
 
   return NULL;
 }
@@ -26,17 +39,28 @@ void free_inode(struct inode *ino) {
 
 struct inode *find_inode(int inum) {
   struct inode *ino;
+
+  acquire(&itable.lk);
+
   for(int i = 0; i < NINODE; i++) {
-    ino = &itable[i];
-    if(ino->inum == inum)
+    ino = &itable.inode[i];
+    if(ino->inum == inum) {
+      release(&itable.lk);
       return ino;
+    }
   }
+
+  release(&itable.lk);
 
   ino = alloc_inode();
   if(!ino)
     return NULL;
 
+  acquire(&itable.lk);
+
   ino->inum = inum;
+
+  release(&itable.lk);
 
   return ino;
 }
@@ -84,6 +108,7 @@ void dump_inode(struct inode *i) {
 void fs_init() {
   ext2_init();
 
-  memset(itable, 0, sizeof(struct inode) * NINODE);
+  lock_init(&itable.lk);
+  memset(itable.inode, 0, sizeof(itable.inode));
 }
 
