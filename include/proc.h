@@ -79,15 +79,13 @@ struct cpu *mycpu(void);
 struct proc *myproc(void);
 
 void proc_init(void);
+void userproc_init(void);
+
 void schedule(void);
+
 void sleep(void *chan, struct spinlock *lk);
 void wakeup(void *chan);
 
-void cswitch(struct context *old, struct context *new);
-
-void forkret(void);
-
 void yield(void);
-
 
 #endif

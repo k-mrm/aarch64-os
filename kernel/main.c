@@ -35,6 +35,7 @@ int main(void) {
     fs_init();
     file_init();
     proc_init();
+    userproc_init();
 
     isb();
 
@@ -50,10 +51,6 @@ int main(void) {
   kinfo("vbar_el1: %p\n", vbar_el1());
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
-
-  // enable_irq();
-
-  userproc_init();
 
   schedule();
 }

@@ -128,8 +128,6 @@ static int virtq_init(struct virtq *vq) {
 }
 
 static void virtio_blk_intr() {
-  kinfo("blkint\n");
-
   acquire(&disk.lk);
 
   while(disk.virtq.last_used_idx != disk.virtq.used->idx) {

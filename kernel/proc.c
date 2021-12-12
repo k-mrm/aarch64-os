@@ -12,6 +12,8 @@
 #include "fs.h"
 #include "spinlock.h"
 
+void cswitch(struct context *old, struct context *new);
+
 static struct pidallocator {
   struct spinlock lk;
   pid_t pid;
@@ -131,18 +133,21 @@ int getpid(void) {
   return myproc()->pid;
 }
 
+/* running per cpu */
 void schedule() {
   struct cpu *cpu = mycpu();
+  kinfo("scheduler %d\n", cpuid());
 
   for(;;) {
-    kinfo("sched a\n");
     acquire(&proctable.lk);
+
     for(int i = 0; i < NPROC; i++) {
       struct proc *p = &proctable.procs[i];
       if(p->state != RUNNABLE)
         continue;
 
       p->state = RUNNING;
+      cpu->proc = p;
 
       kinfo("sched release ptable lock\n");
       release(&proctable.lk);
@@ -156,14 +161,13 @@ void schedule() {
       kinfo("tf->sp %p tf->elr %p\n", p->tf->sp, p->tf->elr);
       kinfo("jump to %p\n", p->context.lr);
 
-      cpu->proc = p;
-
       cswitch(&cpu->scheduler, &p->context);  /* acquire proctable.lk */
 
       forget_userspace();
 
       cpu->proc = NULL;
     }
+
     release(&proctable.lk);
   }
 }
