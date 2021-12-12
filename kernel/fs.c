@@ -13,26 +13,6 @@ struct itable {
 
 struct superblock sb;
 
-struct inode *alloc_inode() {
-  struct inode *ino;
-
-  acquire(&itable.lk);
-
-  for(int i = 0; i < NINODE; i++) {
-    ino = &itable.inode[i];
-    if(ino->ref == 0) {
-      ino->ref = 1;
-      release(&itable.lk);
-
-      return ino;
-    }
-  }
-
-  release(&itable.lk);
-
-  return NULL;
-}
-
 void free_inode(struct inode *ino) {
   memset(ino, 0, sizeof(*ino));
 }
@@ -42,27 +22,30 @@ struct inode *find_inode(int inum) {
 
   acquire(&itable.lk);
 
+  struct inode *freei = NULL;
   for(int i = 0; i < NINODE; i++) {
     ino = &itable.inode[i];
     if(ino->inum == inum) {
       release(&itable.lk);
       return ino;
     }
+
+    if(!freei && ino->ref == 0)
+      freei = ino;
   }
 
-  release(&itable.lk);
-
-  ino = alloc_inode();
-  if(!ino)
+  if(!freei) {
+    printk("no inode\n");
+    release(&itable.lk);
     return NULL;
+  }
 
-  acquire(&itable.lk);
-
-  ino->inum = inum;
+  freei->ref++;
+  freei->inum = inum;
 
   release(&itable.lk);
 
-  return ino;
+  return freei;
 }
 
 struct inode *get_inode(int inum) {

@@ -51,7 +51,7 @@ int main(void) {
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
 
-  enable_irq();
+  // enable_irq();
 
   userproc_init();
 
