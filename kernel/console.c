@@ -59,7 +59,7 @@ void consoleintr(struct console *cs, int c) {
     goto end;
 
   switch(c) {
-    case C('P'):
+    case C('C'):
       printk("interrupt!");
       goto end;
   }
@@ -69,8 +69,21 @@ void consoleintr(struct console *cs, int c) {
 
   c = (c == '\r')? '\n' : c;
 
-  cs->readbuf[cs->bufc++] = (char)c;
-  csputc(cs, c);  /* echo back */
+  switch(c) {
+    case BACKSPACE:
+      if(cs->bufc > 0) {
+        cs->bufc--;
+        csputc(cs, c);  /* echo back */
+      }
+      break;
+    case C('D'):
+      break;
+    default:
+      cs->readbuf[cs->bufc++] = (char)c;
+      csputc(cs, c);  /* echo back */
+      break;
+  }
+
 
   if(c == '\n' || c == C('D') || cs->bufc == cs->bufsz)
     wakeup(cs->readbuf);
