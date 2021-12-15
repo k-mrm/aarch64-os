@@ -65,6 +65,7 @@
 #ifndef __ASSEMBLER__
 
 #include "fs.h"
+#include "memmap.h"
 
 int init_userspace(u64 *pgt, char *code, u64 size);
 int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size);
@@ -77,6 +78,8 @@ void dump_ustack(u64 *pgt);
 
 void kpgt_init(void);
 void pgt_init(void);
+
+u64 uva2pa(u64 va);
 
 #endif
 

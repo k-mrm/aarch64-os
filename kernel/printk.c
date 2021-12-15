@@ -30,7 +30,8 @@ static void printiu32(i32 num, int base, bool sign) {
   if(neg)
     *--cur = '-';
 
-  csputs(&cons1, cur);
+  while(*cur)
+    csputc(&cons1, *cur++);
 }
 
 static void printiu64(i64 num, int base, bool sign) {
@@ -54,7 +55,8 @@ static void printiu64(i64 num, int base, bool sign) {
   if(neg)
     *--cur = '-';
 
-  csputs(&cons1, cur);
+  while(*cur)
+    csputc(&cons1, *cur++);
 }
 
 static int vprintk(const char *fmt, va_list ap) {
@@ -86,7 +88,8 @@ static int vprintk(const char *fmt, va_list ap) {
           if(s == NULL)
             s = "(null)";
 
-          csputs(&cons1, s);
+          while(*s)
+            csputc(&cons1, *s++);
           break;
         }
         case '%':

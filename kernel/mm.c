@@ -28,15 +28,15 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
 }
 
 u64 va2pa(u64 va) {
-  kinfo("va2pa %p", va);
   u64 kpgtpa = ttbr1_el1();
   u64 *pte = pagewalk((u64 *)P2V(kpgtpa), va);
 
   return PTE_PA(*pte) + OFFSET(va);
 }
 
-u64 uva2pa(u64 *pgt, u64 va) {
-  u64 *pte = pagewalk(pgt, va);
+u64 uva2pa(u64 va) {
+  u64 upgtpa = ttbr0_el1();
+  u64 *pte = pagewalk((u64 *)P2V(upgtpa), va);
 
   return PTE_PA(*pte) + OFFSET(va);
 }
@@ -102,7 +102,7 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
       return -1;
     kinfo("map va %p to page %p\n", va, V2P(upage));
     read_inode(ino, upage, srcoff, size);
-    kinfo("upage pa %p\n", va2pa(upage));
+    kinfo("upage pa %p\n", va2pa((u64)upage));
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
 
@@ -120,7 +120,7 @@ char *map_ustack(u64 *pgt) {
 }
 
 void dump_ustack(u64 *pgt) {
-  char *page = (char *)P2V(uva2pa(pgt, USTACKBOTTOM));
+  char *page = (char *)P2V(uva2pa(USTACKBOTTOM));
   kinfo("dump ustack %p\n", page);
 
   for(int i = 0; i < PAGESIZE; i++)

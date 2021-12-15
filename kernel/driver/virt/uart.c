@@ -2,6 +2,8 @@
 #include "driver/virt/uart.h"
 #include "trap.h"
 #include "log.h"
+#include "proc.h"
+#include "console.h"
 
 /* pl011 */
 
@@ -24,22 +26,23 @@
 #define UART_IMSC (UARTBASE + 0x38)
 #define UART_ICR  (UARTBASE + 0x44)
 
-char uart_getc(void);
+int uart_getc(void);
 
-void disable_uart() {
+static void disable_uart() {
   REG(UART_CR) = 0;
 }
 
-void uartintr() {
-  // printk("uartintr");
-  if(!RXFE) {
+static void uartintr() {
+  int c;
+  while((c = uart_getc()) >= 0) {
+    consoleintr(&cons1, c);
   }
 
   REG(UART_ICR) = 1 << 4 | 1 << 5;  /* clear interrupt */
 }
 
 static void enable_uartintr() {
-  REG(UART_IMSC) = 0;
+  REG(UART_IMSC) = 0;   /* initialize */
   REG(UART_IMSC) = 1 << 4 | 1 << 5;  /* enable recieve/transmit intr */
 }
 
@@ -49,9 +52,10 @@ void uart_putc(char c) {
   REG(UART_DR) = c;
 }
 
-char uart_getc() {
-  while(REG(UART_FR) & FR_RXFE)
-    ;
+int uart_getc() {
+  if(REG(UART_FR) & FR_RXFE)
+    return -1;
+
   return REG(UART_DR);
 }
 

@@ -5,13 +5,13 @@
 #include "driver/uart.h"
 #include "file.h"
 #include "cdev.h"
+#include "proc.h"
+#include "mm.h"
 
 #define BACKSPACE 127
 #define C(x)  ((x)-'@')
 
 struct console cons1;
-
-#ifdef USE_UART
 
 void csputc(struct console *cs, char c) {
   if(c == BACKSPACE) {
@@ -23,15 +23,7 @@ void csputc(struct console *cs, char c) {
   }
 }
 
-void csputs(struct console *cs, char *s) {
-  uart_puts(s);
-}
-
-char csgetc(struct console *cs) {
-  return uart_getc();
-}
-
-int cswrite(struct console *cs, char *s, u64 size) {
+static int cswrite(struct console *cs, char *s, u64 size) {
   u64 i;
   for(i = 0; i < size; i++) {
     uart_putc(*s++);
@@ -40,76 +32,52 @@ int cswrite(struct console *cs, char *s, u64 size) {
   return i;
 }
 
-int csread(struct console *cs, char *buf, u64 size) {
-  u64 b = (u64)buf;
+static int csread(struct console *cs, char *buf, u64 size) {
+  acquire(&cs->lk);
 
-  for(u64 i = 0; i < size; i++) {
-    char c = csgetc(cs);
-    if(c == '\r')
-      c = '\n';
+  cs->readbuf = P2V(uva2pa(buf));
+  cs->bufc = 0;
+  cs->bufsz = size;
 
-    if(c == BACKSPACE) {
-      if(buf > b)
-        buf--;
-      else
-        continue;
-    } else if(c == C('D')) {
-      break;
-    } else {
-      *buf++ = c;
-    }
+  sleep(cs->readbuf, &cs->lk);
 
-    csputc(cs, c);
+  u64 sz = cs->bufc;
 
-    if(c == '\n')
-      break;
+  cs->readbuf = NULL;
+  cs->bufc = 0;
+  cs->bufsz = 0;
+
+  release(&cs->lk);
+
+  return sz;
+}
+
+void consoleintr(struct console *cs, int c) {
+  acquire(&cs->lk);
+  
+  if(!c)
+    goto end;
+  if(!cs->readbuf)
+    goto end;
+
+  c = (c == '\r')? '\n' : c;
+
+  cs->readbuf[cs->bufc++] = (char)c;
+  csputc(cs, c);
+
+  if(c == '\n' || c == C('D') || cs->bufc == cs->bufsz) {
+    wakeup(cs->readbuf);
   }
 
-  return (u64)buf - b;
+end:
+  release(&cs->lk);
 }
 
-#else
-
-static void csscroll(struct console *cs) {
-  memmove(cs->fb->buf, (char *)cs->fb->buf + cs->bpl, cs->fb->pitch * (cs->h - cs->lineh));
-  memset((char *)cs->fb->buf + cs->fb->pitch * (cs->h - cs->lineh), 0, cs->bpl);
-
-  cs->cur_x = cs->initx;
-  cs->cur_y = cs->h - cs->lineh;
-}
-
-static void csnewline(struct console *cs) {
-  if(cs->cur_y == cs->h) {
-    csscroll(cs);
-  } else {
-    cs->cur_x = cs->initx;
-    cs->cur_y += cs->lineh;
-  }
-}
-
-void csputc(struct console *cs, char c) {
-  if(c == '\n') {
-    csnewline(cs);
-    return;
-  }
-
-  drawchar(cs->fb, cs->font, cs->cur_x, cs->cur_y, c);
-  cs->cur_x += cs->font->w;
-}
-
-void csputs(struct console *cs, char *s) {
-  while(*s) {
-    csputc(cs, *s++);
-  }
-}
-
-#endif
-
-int console_write(struct file *f, char *buf, u64 size) {
+static int console_write(struct file *f, char *buf, u64 size) {
   return cswrite(&cons1, buf, size);
 }
 
-int console_read(struct file *f, char *buf, u64 size) {
+static int console_read(struct file *f, char *buf, u64 size) {
   return csread(&cons1, buf, size);
 }
 
@@ -119,21 +87,9 @@ struct cdevsw cons_devsw = {
 };
 
 void console_init() {
-#ifdef USE_UART
   uart_init();
-#else
-  fb_init();
-  font_init();
-  cons1.fb = &display_fb;
-  cons1.font = &default_font;
-  cons1.cur_x = 0;
-  cons1.cur_y = 0;
-  cons1.w = display_fb.w;
-  cons1.h = display_fb.h;
-  cons1.initx = 0;
-  cons1.lineh = 10;
-  cons1.bpl = display_fb.pitch * cons1.lineh;
-#endif
+
+  lock_init(&cons1.lk);
 
   register_cdev(CDEV_CONSOLE, &cons_devsw);
 }
