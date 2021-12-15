@@ -24,6 +24,8 @@ static struct buf *get_buf(u32 bno) {
 
   for(int i = 0; i < NBUF; i++) {
     if(bcache.buf[i].bno == bno) {
+      bcache.buf[i].ref++;
+
       release(&bcache.lk);
       return &bcache.buf[i];
     }
