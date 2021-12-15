@@ -94,4 +94,3 @@ void fs_init() {
   lock_init(&itable.lk);
   memset(itable.inode, 0, sizeof(itable.inode));
 }
-

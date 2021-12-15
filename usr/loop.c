@@ -19,8 +19,9 @@ int main(void) {
   unsigned long i = 0;
   int fd = open("README.md", O_RDWR);
   for(;;) {
-    // printf("loop%d", i++);
-    i++;
+    for(int c = 0; c < 100000000; c++)
+      ;
+    put64(fd, i++);
   }
 
   exit(0);

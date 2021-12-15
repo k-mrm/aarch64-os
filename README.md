@@ -6,6 +6,7 @@ a simple OS for aarch64(qemu virt board)
 
 ## Features
 - single processor
+  - multiprocessor: coming soon
 - preemptive multi tasking
 - process scheduler
   - round-robin
