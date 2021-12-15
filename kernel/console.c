@@ -35,7 +35,7 @@ static int cswrite(struct console *cs, char *s, u64 size) {
 static int csread(struct console *cs, char *buf, u64 size) {
   acquire(&cs->lk);
 
-  cs->readbuf = P2V(uva2pa(buf));
+  cs->readbuf = (char *)P2V(uva2pa((u64)buf));
   cs->bufc = 0;
   cs->bufsz = size;
 
@@ -54,20 +54,26 @@ static int csread(struct console *cs, char *buf, u64 size) {
 
 void consoleintr(struct console *cs, int c) {
   acquire(&cs->lk);
-  
+
   if(!c)
     goto end;
+
+  switch(c) {
+    case C('P'):
+      printk("interrupt!");
+      goto end;
+  }
+
   if(!cs->readbuf)
     goto end;
 
   c = (c == '\r')? '\n' : c;
 
   cs->readbuf[cs->bufc++] = (char)c;
-  csputc(cs, c);
+  csputc(cs, c);  /* echo back */
 
-  if(c == '\n' || c == C('D') || cs->bufc == cs->bufsz) {
+  if(c == '\n' || c == C('D') || cs->bufc == cs->bufsz)
     wakeup(cs->readbuf);
-  }
 
 end:
   release(&cs->lk);

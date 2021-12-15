@@ -25,7 +25,7 @@ int main(void) {
     console_init();
     printk("booting...\n");
     gicv2_init();
-    timer_init(200);
+    timer_init(100);
     kalloc_init1();
     kpgt_init();
     pgt_init();
