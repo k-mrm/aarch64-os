@@ -5,7 +5,7 @@
 
 #ifdef OS_DEBUG
 
-#define kinfo(...)  printk("[INFO] " __VA_ARGS__)
+#define kinfo(...)  do { printk("cpu%d @%s", cpuid(), __func__); printk("[INFO] " __VA_ARGS__); } while(0)
 
 #else
 

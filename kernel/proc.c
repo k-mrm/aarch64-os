@@ -405,8 +405,9 @@ void dumpps() {
   static const char *pstatemap[] = {
     [CREATED]   "created",
     [RUNNING]   "running",
-    [ZOMBIE]    "zombie",
+    [RUNNABLE]  "runnable",
     [SLEEPING]  "sleeping",
+    [ZOMBIE]    "zombie",
   };
 
   acquire(&proctable.lk);

@@ -65,8 +65,6 @@ static void printiu64(i64 num, int base, bool sign) {
 static int vprintk(const char *fmt, va_list ap) {
   acquire(&printk_lk);
 
-  csputc(&cons1, '0'+cpuid());
-
   for(int i = 0; fmt[i]; i++) {
     char c = fmt[i];
     if(c == '%') {
