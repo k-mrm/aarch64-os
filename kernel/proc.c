@@ -146,6 +146,7 @@ void schedule() {
       if(p->state != RUNNABLE)
         continue;
 
+      kinfo("arimashita^^\n");
       p->state = RUNNING;
       cpu->proc = p;
 
@@ -156,7 +157,7 @@ void schedule() {
 
       kinfo("scheduler cpu %d\n", cpuid());
       kinfo("load userspace %p\n", p->pgt);
-      kinfo("enter proc %d\n", p->pid);
+      kinfo("******enter proc %d %s\n", p->pid, p->name);
       kinfo("tf %p\n", p->tf);
       kinfo("tf->sp %p tf->elr %p\n", p->tf->sp, p->tf->elr);
       kinfo("jump to %p\n", p->context.lr);
@@ -201,6 +202,8 @@ int fork() {
   new->parent = p;
   new->state = RUNNABLE;
 
+  strcpy(new->name, p->name);
+
   for(int fd = 0; fd < NOFILE; fd++) {
     if(p->ofile[fd])
       new->ofile[fd] = dup_file(p->ofile[fd]);
@@ -213,11 +216,11 @@ err:
 }
 
 int kill(int pid, int sig) {
-  ;
+  return -1;
 }
 
 int exec(char *path, char **argv) {
-  kinfo("exec %s %p %p\n", path, path, argv);
+  kinfo("******exec %s %p %p\n", path, path, argv);
   struct inode *ino = path2inode(path);
   if(!ino)
     goto fail;
@@ -227,8 +230,10 @@ int exec(char *path, char **argv) {
   struct phdr ph;
   int memsize = 0;
 
+  kinfo("readinode\n");
   if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
     goto fail;
+  kinfo("readinode done\n");
   if(!is_elf(&eh))
     goto fail;
   if(eh.e_type != ET_EXEC)
@@ -289,7 +294,7 @@ int exec(char *path, char **argv) {
 
   load_userspace(p->pgt);
 
-  strcpy(p->name, path);
+  // strcpy(p->name, path);
 
   kinfo("exec complete!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
@@ -312,7 +317,7 @@ void sleep(void *chan, struct spinlock *lk) {
 
   p->chan = chan;
   p->state = SLEEPING;
-  cswitch(&p->context, &mycpu()->scheduler);
+  cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
 
   p->chan = NULL;
 
@@ -346,8 +351,6 @@ int wait(int *status) {
       }
     }
 
-    // release(&proctable.lk);
-
     sleep(p, &proctable.lk);
     kinfo("from sleep\n");
   }
@@ -380,7 +383,7 @@ void exit(int ret) {
   acquire(&proctable.lk);
   p->state = ZOMBIE;
 
-  cswitch(&p->context, &mycpu()->scheduler);
+  cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
 
   panic("unreachable");
 }
@@ -398,8 +401,31 @@ int chdir(char *path) {
   return 0;
 }
 
-void dump_proc(struct proc *p) {
-  ;
+void dumpps() {
+  static const char *pstatemap[] = {
+    [CREATED]   "created",
+    [RUNNING]   "running",
+    [ZOMBIE]    "zombie",
+    [SLEEPING]  "sleeping",
+  };
+
+  acquire(&proctable.lk);
+
+  for(int i = 0; i < NPROC; i++) {
+    struct proc *p = &proctable.procs[i];
+    if(p->state != UNUSED)
+      printk("%s %d %s\n", pstatemap[p->state], p->pid, p->name);
+  }
+  
+  release(&proctable.lk);
+
+  for(int i = 0; i < 2; i++) {
+    struct proc *p = cpus[i].proc;
+    if(p)
+      printk("cpu%d %s %d %s\n", i, pstatemap[p->state], p->pid, p->name);
+    else
+      printk("cpu%d no proc\n", i);
+  }
 }
 
 void dump_kstack(struct proc *p) {

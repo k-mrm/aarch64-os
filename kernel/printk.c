@@ -2,6 +2,9 @@
 #include "aarch64.h"
 #include "printk.h"
 #include "console.h"
+#include "spinlock.h"
+
+struct spinlock printk_lk;
 
 #define va_list __builtin_va_list
 #define va_start(v, l)  __builtin_va_start(v, l)
@@ -60,6 +63,10 @@ static void printiu64(i64 num, int base, bool sign) {
 }
 
 static int vprintk(const char *fmt, va_list ap) {
+  acquire(&printk_lk);
+
+  csputc(&cons1, '0'+cpuid());
+
   for(int i = 0; fmt[i]; i++) {
     char c = fmt[i];
     if(c == '%') {
@@ -105,6 +112,8 @@ static int vprintk(const char *fmt, va_list ap) {
     }
   }
 
+  release(&printk_lk);
+
   return 0;
 }
 
@@ -133,4 +142,8 @@ void panic(const char *s, ...) {
 
   for(;;)
     wfe();
+}
+
+void printk_init(void) {
+  lock_init(&printk_lk);
 }

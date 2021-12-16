@@ -21,7 +21,7 @@ int main(void) {
   for(;;) {
     for(int c = 0; c < 100000000; c++)
       ;
-    put64(fd, i++);
+    put64(1, i++);
   }
 
   exit(0);

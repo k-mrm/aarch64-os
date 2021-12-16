@@ -26,6 +26,7 @@ struct inode *find_inode(int inum) {
   for(int i = 0; i < NINODE; i++) {
     ino = &itable.inode[i];
     if(ino->inum == inum) {
+      ino->ref++;
       release(&itable.lk);
       return ino;
     }

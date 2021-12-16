@@ -23,6 +23,7 @@ int main(void) {
   if(cpuid() == 0) {  /* primary */
     trap_init();
     console_init();
+    printk_init();
     printk("booting...\n");
     gicv2_init();
     timer_init(100);

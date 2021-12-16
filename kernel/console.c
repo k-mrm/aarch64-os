@@ -60,7 +60,7 @@ void consoleintr(struct console *cs, int c) {
 
   switch(c) {
     case C('C'):
-      printk("interrupt!");
+      dumpps();
       goto end;
   }
 
