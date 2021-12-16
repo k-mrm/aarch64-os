@@ -48,15 +48,13 @@ void timerintr() {
 }
 
 void timer_init(u64 interval_ms) {
-  kinfo("timer init\n");
-
   atimer.interval_ms = interval_ms;
 
   new_irq(TIMER_IRQ, timerintr);
+}
 
+void timer_init_per_cpu() {
   disable_timer();
-  reload_timer(interval_ms);
+  reload_timer(atimer.interval_ms);
   enable_timer();
-
-  kinfo("timer enable: %s\n", timer_enabled()? "true" : "false");
 }

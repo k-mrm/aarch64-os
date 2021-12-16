@@ -77,6 +77,8 @@ struct inode {
 };
 
 void fs_init(void);
+void inode_init(void);
+
 struct inode *find_inode(int inum);
 struct inode *path2inode(char *path);
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size);

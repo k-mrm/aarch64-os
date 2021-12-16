@@ -140,8 +140,10 @@ void uirq_handler(struct trapframe *tf) {
 
   gic_eoi(iar);
 
-  if(myproc() && myproc()->state == RUNNING && intid == TIMER_IRQ)
+  if(myproc() && myproc()->state == RUNNING && intid == TIMER_IRQ) {
+    kinfo("yyyyyyyyield\n");
     yield();
+  }
 }
 
 void unknownint(int arg) {

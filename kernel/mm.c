@@ -100,9 +100,9 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
     char *upage = kalloc();
     if(!upage)
       return -1;
-    kinfo("allocus: map va %p to page %p\n", va, V2P(upage));
+    kinfo("map va %p to page %p\n", va, V2P(upage));
     read_inode(ino, upage, srcoff, size);
-    kinfo("allocus: upage pa %p\n", va2pa((u64)upage));
+    kinfo("upage pa %p\n", va2pa((u64)upage));
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
 

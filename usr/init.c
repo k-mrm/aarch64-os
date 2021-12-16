@@ -5,7 +5,7 @@
 #include "fcntl.h"
 
 int main() {
-  char *argv[] = {"sh", 0};
+  char *argv[] = {"loop", 0};
   char *argv2[] = {"loop", 0};
   int fd;
 
@@ -23,7 +23,7 @@ int main() {
 
   int pid = fork();
   if(pid == 0) {
-    exec("sh", argv);
+    exec("loop", argv);
   } else {
     int pid2 = fork();
     if(pid2 == 0)

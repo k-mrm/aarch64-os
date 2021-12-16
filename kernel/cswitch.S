@@ -37,3 +37,8 @@ cswitch: /* cswitch(struct context *old, struct context *new) */
   mov sp, x10
   
   ret /* lr(x30) == forkret */
+
+.global forkret
+forkret:
+  bl schedule_tail
+  b trapret

@@ -105,8 +105,10 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
 
   release(&disk.lk);
 
+  kinfo("tokimeki\n");
   while(!disk.virtq.info[d0].done)
     ;
+  kinfo("tokimeki heart\n");
 
   acquire(&disk.lk);
   free_desc(&disk.virtq, d0);
@@ -129,6 +131,8 @@ static int virtq_init(struct virtq *vq) {
 
 static void virtio_blk_intr() {
   acquire(&disk.lk);
+
+  kinfo("virtiointr\n");
 
   while(disk.virtq.last_used_idx != disk.virtq.used->idx) {
     int d0 = disk.virtq.used->ring[disk.virtq.used->idx % NQUEUE].id;

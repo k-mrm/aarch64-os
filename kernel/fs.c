@@ -89,9 +89,11 @@ void dump_inode(struct inode *i) {
     printk("i_block[%d]: %x\n", b, i->block[b]);
 }
 
-void fs_init() {
-  ext2_init();
-
+void inode_init() {
   lock_init(&itable.lk);
   memset(itable.inode, 0, sizeof(itable.inode));
+}
+
+void fs_init() {
+  ext2_init();
 }

@@ -2,6 +2,7 @@
 #include "proc.h"
 #include "syscall.h"
 #include "printk.h"
+#include "log.h"
 
 typedef int (*syscall_t)(struct trapframe *tf);
 
@@ -44,6 +45,7 @@ int sys_getpid(struct trapframe *tf) {
 }
 
 int sys_write(struct trapframe *tf) {
+  kinfo("writesyscall! %p\n", tf->elr);
   int fd = sysarg(tf, 0);
   u64 str = sysarg(tf, 1);
   u64 size = sysarg(tf, 2);

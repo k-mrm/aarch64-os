@@ -18,6 +18,7 @@
 void _start(void);
 
 volatile int started = 0;
+int ncpu_active = 1;
 
 int main(void) {
   if(cpuid() == 0) {  /* primary */
@@ -26,14 +27,15 @@ int main(void) {
     printk_init();
     printk("booting...\n");
     gicv2_init();
-    timer_init(100);
+    timer_init(200);
+    timer_init_per_cpu();
     kalloc_init1();
     kpgt_init();
     pgt_init();
     kalloc_init2();
     virtio_init();
     buf_init();
-    fs_init();
+    inode_init();
     file_init();
     proc_init();
     userproc_init();
@@ -44,7 +46,9 @@ int main(void) {
       printk("warn: cpu1 wakeup failed\n");
   } else {  /* secondary */
     pgt_init();
-    printk("core%d started\n", cpuid());
+    timer_init_per_cpu();
+    ncpu_active++;
+    printk("core%d started %d\n", cpuid(), ncpu_active);
   }
 
   kinfo("cpuid: %d\n", cpuid());

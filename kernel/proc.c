@@ -35,14 +35,6 @@ static pid_t newpid() {
   return pid;
 }
 
-void forkret() {
-  release(&proctable.lk);
-  trapret();
-  /*
-   *  FIXME: forkret return to trapret
-   */
-}
-
 struct cpu *mycpu() {
   return &cpus[cpuid()];
 }
@@ -50,6 +42,8 @@ struct cpu *mycpu() {
 struct proc *myproc() {
   return mycpu()->proc;
 }
+
+void forkret(void);
 
 struct proc *newproc() {
   struct proc *p;
@@ -86,7 +80,7 @@ found:
   if(!p->pgt)
     return NULL;
 
-  p->context.lr = (u64)trapret;
+  p->context.lr = (u64)forkret;
   p->context.sp = (u64)sp;    /* == p->tf */
 
   return p;
@@ -131,6 +125,14 @@ void userproc_init() {
 
 int getpid(void) {
   return myproc()->pid;
+}
+
+void schedule_tail() {
+  static int firstcall = 1;
+  if(firstcall) {
+    fs_init();
+    firstcall = 0;
+  }
 }
 
 /* running per cpu */
@@ -441,6 +443,7 @@ void proc_init() {
   }
 
   lock_init(&pidalloc.lk);
+
   pidalloc.pid = 0;
 
   lock_init(&proctable.lk);
