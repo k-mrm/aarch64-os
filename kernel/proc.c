@@ -80,6 +80,7 @@ found:
   if(!p->pgt)
     return NULL;
 
+  p->context.x0 = (u64)p;
   p->context.lr = (u64)forkret;
   p->context.sp = (u64)sp;    /* == p->tf */
 
@@ -110,10 +111,6 @@ void userproc_init() {
 
   memcpy(p->name, "proc0", 6);
 
-  p->cwd = path2inode("/");
-  if(!p->cwd)
-    panic("no filesystem");
-
   p->tf->elr = 0x1000;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */
   p->tf->sp = (u64)USTACKTOP; /* sp_el0 */
@@ -127,12 +124,17 @@ int getpid(void) {
   return myproc()->pid;
 }
 
-void schedule_tail() {
+void schedule_tail(struct proc *p) {
   static int firstcall = 1;
   if(firstcall) {
     fs_init();
     firstcall = 0;
   }
+
+  /* path2inode() must be called after fs_init() */
+  p->cwd = path2inode("/");
+  if(!p->cwd)
+    panic("no filesystem");
 }
 
 /* running per cpu */
@@ -296,8 +298,6 @@ int exec(char *path, char **argv) {
 
   load_userspace(p->pgt);
 
-  // strcpy(p->name, path);
-
   kinfo("exec complete!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
   return argc;  /* p->tf->x0 */
@@ -308,7 +308,7 @@ fail:
 }
 
 void sleep(void *chan, struct spinlock *lk) {
-  kinfo("sleeep\n");
+  kinfo("sleep\n");
 
   struct proc *p = myproc();
 
@@ -438,9 +438,8 @@ void dump_kstack(struct proc *p) {
 }
 
 void proc_init() {
-  for(int i = 0; i < NCPU; i++) {
+  for(int i = 0; i < NCPU; i++)
     memset(&cpus[i], 0, sizeof(cpus[i]));
-  }
 
   lock_init(&pidalloc.lk);
 

@@ -14,7 +14,7 @@ LDFLAGS = -nostdlib -nostartfiles
 QEMU = qemu-system-aarch64
 MACHINE = virt
 MACHINE_GIC = gic-version=2
-NCPU = 2
+NCPU = 1
 
 QCPU = cortex-a72
 QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128

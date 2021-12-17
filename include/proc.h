@@ -42,6 +42,7 @@ struct context {
 struct cpu {
   struct proc *proc;
   struct context scheduler;
+  int cli_depth;
 };
 
 struct cpu cpus[NCPU];
@@ -85,7 +86,8 @@ void schedule(void);
 
 void sleep(void *chan, struct spinlock *lk);
 void wakeup(void *chan);
-
 void yield(void);
+
+void dumpps(void);
 
 #endif

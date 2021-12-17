@@ -1,13 +1,17 @@
 #include "aarch64.h"
+#include "proc.h"
 #include "spinlock.h"
 #include "printk.h"
+
+void pushcli();
+void popcli();
 
 bool holding(struct spinlock *lk) {
   return lk->locked && lk->cpuid == cpuid();
 }
 
 void acquire(struct spinlock *lk) {
-  disable_irq();
+  pushcli();
 
   if(holding(lk))
     panic("already held %d", lk->cpuid);
@@ -31,7 +35,24 @@ void release(struct spinlock *lk) {
 
   asm volatile("str wzr, %0" : "=m"(lk->locked));
 
-  enable_irq();
+  popcli();
+}
+
+void pushcli() {
+  struct cpu *cpu = mycpu();
+
+  if(cpu->cli_depth++ == 0)
+    disable_irq();
+}
+
+void popcli() {
+  struct cpu *cpu = mycpu();
+
+  if(cpu->cli_depth == 0)
+    panic("popcli");
+
+  if(--cpu->cli_depth == 0)
+    enable_irq();
 }
 
 void lock_init(struct spinlock *lk) {

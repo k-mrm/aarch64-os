@@ -96,6 +96,7 @@ struct virtq {
   struct {
     u8 status;
     u8 done;
+    char *buf;
   } info[NQUEUE];
 };
 

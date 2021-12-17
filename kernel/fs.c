@@ -13,8 +13,13 @@ struct itable {
 
 struct superblock sb;
 
-void free_inode(struct inode *ino) {
-  memset(ino, 0, sizeof(*ino));
+void c_inode(struct inode *ino) {
+  if(ino->ref == 0)
+    panic("invalid ino");
+
+  if(--ino->ref == 0) {
+    memset(ino, 0, sizeof(*ino));
+  }
 }
 
 struct inode *find_inode(int inum) {

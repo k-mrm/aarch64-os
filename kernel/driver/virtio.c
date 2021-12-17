@@ -94,27 +94,44 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
   // kinfo("d0 %d d1 %d d2 %d\n", d0, d1, d2);
 
   disk.virtq.avail->ring[disk.virtq.avail->idx % NQUEUE] = d0;
-
   dsb();
-
   disk.virtq.avail->idx++;
-
   dsb();
+  disk.virtq.info[d0].buf = buf;
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
 
-  release(&disk.lk);
-
-  kinfo("tokimeki\n");
   while(!disk.virtq.info[d0].done)
-    ;
-  kinfo("tokimeki heart\n");
+    sleep(buf, &disk.lk);
 
-  acquire(&disk.lk);
   free_desc(&disk.virtq, d0);
+
   release(&disk.lk);
 
   return 0;
+}
+
+static void virtio_blk_intr() {
+  printk("virtiointr\n");
+
+  acquire(&disk.lk);
+
+  while(disk.virtq.last_used_idx != disk.virtq.used->idx) {
+    int d0 = disk.virtq.used->ring[disk.virtq.used->idx % NQUEUE].id;
+
+    if(disk.virtq.info[d0].status != 0)
+      panic("disk op error");
+
+    disk.virtq.info[d0].done = 1;
+    wakeup(disk.virtq.info[d0].buf);
+    disk.virtq.info[d0].buf = NULL;
+
+    disk.virtq.last_used_idx++;
+  }
+
+  REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
+
+  release(&disk.lk);
 }
 
 static int virtq_init(struct virtq *vq) {
@@ -127,27 +144,6 @@ static int virtq_init(struct virtq *vq) {
     panic("virtq init failed");
 
   return 0;
-}
-
-static void virtio_blk_intr() {
-  acquire(&disk.lk);
-
-  kinfo("virtiointr\n");
-
-  while(disk.virtq.last_used_idx != disk.virtq.used->idx) {
-    int d0 = disk.virtq.used->ring[disk.virtq.used->idx % NQUEUE].id;
-
-    if(disk.virtq.info[d0].status != 0)
-      panic("disk op error");
-
-    disk.virtq.info[d0].done = 1;
-
-    disk.virtq.last_used_idx++;
-  }
-
-  REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
-
-  release(&disk.lk);
 }
 
 #define LO(addr)  (u32)((addr) & 0xffffffff)

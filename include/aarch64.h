@@ -102,11 +102,11 @@ static inline u64 sp_el1() {
 }
 
 static inline void enable_irq() {
-  asm volatile("msr daifclr, #2");
+  asm volatile("msr daifclr, #0x2" ::: "memory");
 }
 
 static inline void disable_irq() {
-  asm volatile("msr daifset, #2");
+  asm volatile("msr daifset, #0x2" ::: "memory");
 }
 
 static inline u64 daif() {
