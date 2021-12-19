@@ -16,38 +16,45 @@ struct disk {
   struct virtq virtq;
 } disk;
 
+static void desc_init(struct virtq *virtq) {
+  for(int i = 0; i < NQUEUE; i++) {
+    if(i != NQUEUE - 1) {
+      virtq->desc[i].flags = VIRTQ_DESC_F_NEXT;
+      virtq->desc[i].next = i + 1;
+    }
+  }
+}
+
 static int alloc_desc(struct virtq *virtq) {
-  for(int i = 0; i < NQUEUE; i++) {
-    if(virtq->desc[i].addr == 0)
-      return i;
-  }
+  if(virtq->nfree == 0)
+    panic("virtq kokatu");
 
-  return -1;
+  u16 d = virtq->free_head;
+  if(virtq->desc[d].flags & VIRTQ_DESC_F_NEXT)
+    virtq->free_head = virtq->desc[d].next;
+  
+  virtq->nfree--;
+
+  return d;
 }
 
-static void descdump(struct virtq *virtq) __attribute__((unused));
+static void free_desc(struct virtq *virtq, u16 n) {
+  u16 head = n;
+  int empty = 0;
 
-static void descdump(struct virtq *virtq) {
-  for(int i = 0; i < NQUEUE; i++) {
-    if(virtq->desc[i].addr == 0)
-      continue;
+  if(virtq->nfree == 0)
+    empty = 1;
 
-    printk("ddd %p %d %p %d\n", virtq->desc[i].addr, virtq->desc[i].len, virtq->desc[i].flags, virtq->desc[i].next);
-  }
-}
-
-static void free_desc(struct virtq *virtq, int n) {
-  virtq->desc[n].addr = 0;
-  virtq->desc[n].len = 0;
-
-  if(virtq->desc[n].flags & VIRTQ_DESC_F_NEXT) {
-    free_desc(virtq, virtq->desc[n].next);
+  while(virtq->nfree++, (virtq->desc[n].flags & VIRTQ_DESC_F_NEXT)) {
+    n = virtq->desc[n].next;
   }
 
-  virtq->desc[n].flags = 0;
-  virtq->desc[n].next = 0;
-  virtq->info[n].status = 0;
-  virtq->info[n].done = 0;
+  virtq->desc[n].flags = VIRTQ_DESC_F_NEXT;
+  if(!empty)
+    virtq->desc[n].next = virtq->free_head;
+  virtq->free_head = head;
+
+  kinfo("freehead %d\n", head);
 }
 
 int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
@@ -78,7 +85,7 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
   disk.virtq.desc[d0].next = d1;
   disk.virtq.desc[d1].addr = (u64)V2P(buf);
   disk.virtq.desc[d1].len = 1024;
-  disk.virtq.desc[d1].flags |= VIRTQ_DESC_F_NEXT;
+  disk.virtq.desc[d1].flags = VIRTQ_DESC_F_NEXT;
   if(op == DREAD)
     disk.virtq.desc[d1].flags |= VIRTQ_DESC_F_WRITE;
 
@@ -91,18 +98,19 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
   disk.virtq.desc[d2].flags = VIRTQ_DESC_F_WRITE;
   disk.virtq.desc[d2].next = 0;
 
-  // kinfo("d0 %d d1 %d d2 %d\n", d0, d1, d2);
+  kinfo("d0 %d d1 %d d2 %d\n", d0, d1, d2);
 
   disk.virtq.avail->ring[disk.virtq.avail->idx % NQUEUE] = d0;
-  dsb();
   disk.virtq.avail->idx++;
-  dsb();
+
   disk.virtq.info[d0].buf = buf;
 
   REG(VIRTIO_REG_QUEUE_NOTIFY) = 0;
 
   while(!disk.virtq.info[d0].done)
     sleep(buf, &disk.lk);
+
+  disk.virtq.info[d0].done = 0;
 
   free_desc(&disk.virtq, d0);
 
@@ -112,12 +120,13 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
 }
 
 static void virtio_blk_intr() {
-  printk("virtiointr\n");
-
   acquire(&disk.lk);
 
+  int d0;
   while(disk.virtq.last_used_idx != disk.virtq.used->idx) {
-    int d0 = disk.virtq.used->ring[disk.virtq.used->idx % NQUEUE].id;
+    d0 = disk.virtq.used->ring[disk.virtq.last_used_idx % NQUEUE].id;
+
+    kinfo("d0 %d\n", d0);
 
     if(disk.virtq.info[d0].status != 0)
       panic("disk op error");
@@ -142,6 +151,10 @@ static int virtq_init(struct virtq *vq) {
   vq->used = kalloc();
   if(!vq->desc || !vq->avail || !vq->used)
     panic("virtq init failed");
+
+  vq->nfree = NQUEUE;
+
+  desc_init(vq);
 
   return 0;
 }

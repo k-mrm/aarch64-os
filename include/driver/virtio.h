@@ -39,26 +39,26 @@
 #define DEV_STATUS_DRIVER_OK  4
 #define DEV_STATUS_NEEDS_RESET  64
 
-#define VIRTIO_BLK_F_SIZE_MAX 1
-#define VIRTIO_BLK_F_SEG_MAX  2
-#define VIRTIO_BLK_F_GEOMETRY 4
-#define VIRTIO_BLK_F_RO 5
-#define VIRTIO_BLK_F_BLK_SIZE 6
-#define VIRTIO_BLK_F_FLUSH  9
-#define VIRTIO_BLK_F_TOPOLOGY 10
-#define VIRTIO_BLK_F_CONFIG_WCE 11
-#define VIRTIO_BLK_F_DISCARD  13
-#define VIRTIO_BLK_F_WRITE_ZEROES 14
-#define VIRTIO_F_ANY_LAYOUT 27
+#define VIRTIO_BLK_F_SIZE_MAX       1
+#define VIRTIO_BLK_F_SEG_MAX        2
+#define VIRTIO_BLK_F_GEOMETRY       4
+#define VIRTIO_BLK_F_RO             5
+#define VIRTIO_BLK_F_BLK_SIZE       6
+#define VIRTIO_BLK_F_FLUSH          9
+#define VIRTIO_BLK_F_TOPOLOGY       10
+#define VIRTIO_BLK_F_CONFIG_WCE     11
+#define VIRTIO_BLK_F_DISCARD        13
+#define VIRTIO_BLK_F_WRITE_ZEROES   14
+#define VIRTIO_F_ANY_LAYOUT         27
 #define VIRTIO_RING_F_INDIRECT_DESC 28
-#define VIRTIO_RING_F_EVENT_IDX 29
+#define VIRTIO_RING_F_EVENT_IDX     29
 
-#define VIRTIO_BLK_S_OK 0
+#define VIRTIO_BLK_S_OK     0
 #define VIRTIO_BLK_S_IOERR  1
 #define VIRTIO_BLK_S_UNSUPP 2
 
-#define VIRTQ_DESC_F_NEXT 1
-#define VIRTQ_DESC_F_WRITE  2 
+#define VIRTQ_DESC_F_NEXT     1
+#define VIRTQ_DESC_F_WRITE    2 
 #define VIRTQ_DESC_F_INDIRECT 4
 struct virtq_desc {
   u64 addr;
@@ -91,6 +91,7 @@ struct virtq {
   struct virtq_avail *avail;
   struct virtq_used *used;
   u16 free_head;
+  u16 nfree;
   u16 last_used_idx;
 
   struct {
@@ -100,16 +101,16 @@ struct virtq {
   } info[NQUEUE];
 };
 
-#define VIRTIO_BLK_T_IN 0
-#define VIRTIO_BLK_T_OUT  1
-#define VIRTIO_BLK_T_FLUSH  4
-#define VIRTIO_BLK_T_DISCARD  11
+#define VIRTIO_BLK_T_IN           0
+#define VIRTIO_BLK_T_OUT          1
+#define VIRTIO_BLK_T_FLUSH        4
+#define VIRTIO_BLK_T_DISCARD      11
 #define VIRTIO_BLK_T_WRITE_ZEROES 13
 struct virtio_blk_req_hdr {
   u32 type;
   u32 reserved;
   u64 sector;
-};
+} __attribute__((packed));
 
 enum diskop {
   DREAD,

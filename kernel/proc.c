@@ -48,7 +48,6 @@ void forkret(void);
 struct proc *newproc() {
   struct proc *p;
 
-  kinfo("newproc a\n");
   acquire(&proctable.lk);
 
   for(int i = 0; i < NPROC; i++) {
@@ -66,6 +65,8 @@ found:
   release(&proctable.lk);
 
   p->pid = newpid();
+  kinfo("newproc pid%d\n", p->pid);
+
   memset(&p->context, 0, sizeof(p->context));
 
   p->kstack = kalloc();
@@ -150,7 +151,7 @@ void schedule() {
       if(p->state != RUNNABLE)
         continue;
 
-      kinfo("arimashita^^\n");
+      kinfo("arimashita^^ %d\n", p->pid);
       p->state = RUNNING;
       cpu->proc = p;
 
@@ -159,7 +160,6 @@ void schedule() {
 
       load_userspace(p->pgt);
 
-      kinfo("scheduler cpu %d\n", cpuid());
       kinfo("load userspace %p\n", p->pgt);
       kinfo("******enter proc %d %s\n", p->pid, p->name);
       kinfo("tf %p\n", p->tf);
@@ -189,6 +189,8 @@ void yield() {
 }
 
 int fork() {
+  kinfo("fooooork\n");
+
   struct proc *p = myproc();
   struct proc *new = newproc();
   if(!new)
@@ -204,7 +206,6 @@ int fork() {
 
   new->cwd = p->cwd;
   new->parent = p;
-  new->state = RUNNABLE;
 
   strcpy(new->name, p->name);
 
@@ -212,6 +213,10 @@ int fork() {
     if(p->ofile[fd])
       new->ofile[fd] = dup_file(p->ofile[fd]);
   }
+
+  acquire(&proctable.lk);
+  new->state = RUNNABLE;
+  release(&proctable.lk);
 
   return new->pid;
 
@@ -298,7 +303,7 @@ int exec(char *path, char **argv) {
 
   load_userspace(p->pgt);
 
-  kinfo("exec complete!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+  kinfo("exec complete %d!!!!!!!!!!!!!!!!!!!!!!!!!!\n", p->pid);
 
   return argc;  /* p->tf->x0 */
 
@@ -308,9 +313,13 @@ fail:
 }
 
 void sleep(void *chan, struct spinlock *lk) {
-  kinfo("sleep\n");
+  register void *x30 asm ("x30");
+  void *a = x30;  /* save x30 */
+  kinfo("sleep caller%p\n", a);
 
   struct proc *p = myproc();
+
+  kinfo("sleep %d\n", p->pid);
 
   if(lk != &proctable.lk) {
     acquire(&proctable.lk);
@@ -359,14 +368,20 @@ int wait(int *status) {
 }
 
 void wakeup(void *chan) {
-  kinfo("wakeup\n");
+  register void *x30 asm("x30");
+  void *a = x30;  /* save x30 */
+  kinfo("wakeup caller %p chan %p\n", a, chan);
 
   acquire(&proctable.lk);
 
+  int found = 0;
   for(int i = 0; i < NPROC; i++) {
     struct proc *p = &proctable.procs[i];
-    if(p->state == SLEEPING && p->chan == chan)
+    if(p->state == SLEEPING && p->chan == chan) {
+      kinfo("pid %d wakeup!!!!!\n", p->pid);
       p->state = RUNNABLE;
+      found = 1;
+    }
   }
 
   release(&proctable.lk);
@@ -418,6 +433,8 @@ void dumpps() {
     struct proc *p = &proctable.procs[i];
     if(p->state != UNUSED)
       printk("%s %d %s\n", pstatemap[p->state], p->pid, p->name);
+    if(p->state == SLEEPING)
+      printk("chan %p\n", p->chan);
   }
   
   release(&proctable.lk);

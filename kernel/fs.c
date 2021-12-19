@@ -13,7 +13,7 @@ struct itable {
 
 struct superblock sb;
 
-void c_inode(struct inode *ino) {
+void release_inode(struct inode *ino) {
   if(ino->ref == 0)
     panic("invalid ino");
 

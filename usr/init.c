@@ -26,10 +26,13 @@ int main() {
     exec("loop", argv);
   } else {
     int pid2 = fork();
-    if(pid2 == 0)
+    if(pid2 == 0) {
       exec("loop", argv2);
-    else
+    }
+    else {
       wait(NULL);
+      exit(0);
+    }
     wait(NULL);
   }
 
