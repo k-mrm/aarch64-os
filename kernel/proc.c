@@ -35,7 +35,6 @@ static struct proctable {
 void trapret(void);
 
 static pid_t newpid() {
-  kinfo("newpid\n");
   acquire(&pidalloc.lk);
   pid_t pid = pidalloc.pid++;
   release(&pidalloc.lk);
