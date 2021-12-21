@@ -63,6 +63,7 @@ void consoleintr(struct console *cs, int c) {
   switch(c) {
     case C('C'):
       dumpps();
+      printk("%d KB free\n", freed_mem_kb());
       goto end;
   }
 

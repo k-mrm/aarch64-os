@@ -14,10 +14,10 @@ LDFLAGS = -nostdlib -nostartfiles
 QEMU = qemu-system-aarch64
 MACHINE = virt
 MACHINE_GIC = gic-version=2
-NCPU = 1
+NCPU = 2
 
 QCPU = cortex-a72
-QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 128
+QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 256
 QEMUOPTS += -global virtio-mmio.force-legacy=false
 QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=d0
 QEMUOPTS += -device virtio-blk-device,drive=d0,bus=virtio-mmio-bus.0

@@ -57,6 +57,20 @@ void kfree(void *va) {
   release(&kallocator.lk);
 }
 
+u64 freed_mem_kb() {
+  acquire(&kallocator.lk);
+
+  struct header *h = kallocator.freelist;
+
+  int c = 0;
+  for(; h; h = h->next)
+    c++;
+
+  release(&kallocator.lk);
+
+  return c * PAGESIZE / 1024;
+}
+
 static inline u64 ksecend() {
   return (((u64)kend + SECTIONSIZE - 1) & ~(SECTIONSIZE - 1));
 }
