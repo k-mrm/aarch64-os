@@ -12,6 +12,14 @@
 #include "fs.h"
 #include "spinlock.h"
 
+/* for debug */
+#define dump_caller() \
+  do {  \
+    register void *x30 asm("x30");  \
+    void *a = x30;  /* save x30 */  \
+    printk("%s caller %p\n", __func__, a);  \
+  } while(0);
+
 void cswitch(struct context *old, struct context *new);
 
 static struct pidallocator {
@@ -313,10 +321,6 @@ fail:
 }
 
 void sleep(void *chan, struct spinlock *lk) {
-  register void *x30 asm ("x30");
-  void *a = x30;  /* save x30 */
-  // printk("sleep caller %p chan %p\n", a, chan);
-
   struct proc *p = myproc();
 
   kinfo("sleep %d\n", p->pid);
@@ -378,10 +382,6 @@ void wakeup_acquired(void *chan) {
 }
 
 void wakeup(void *chan) {
-  register void *x30 asm("x30");
-  void *a = x30;  /* save x30 */
-  // printk("wakeup caller %p chan %p\n", a, chan);
-
   acquire(&proctable.lk);
 
   wakeup_acquired(chan);
