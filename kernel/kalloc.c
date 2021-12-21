@@ -79,13 +79,11 @@ void kalloc_init1() {
   lock_init(&kallocator.lk);
   kallocator.freelist = NULL;
 
-  for(char *p = kend; p + PAGESIZE <= (char *)ksecend(); p += PAGESIZE) {
+  for(char *p = kend; p + PAGESIZE <= (char *)ksecend(); p += PAGESIZE)
     kfree(p);
-  }
 }
 
 void kalloc_init2() {
-  for(char *p = (char *)ksecend(); p + PAGESIZE <= (char *)PHYMEMEND; p += PAGESIZE) {
+  for(char *p = (char *)ksecend(); p + PAGESIZE <= (char *)PHYMEMEND; p += PAGESIZE)
     kfree(p);
-  }
 }

@@ -315,7 +315,7 @@ fail:
 void sleep(void *chan, struct spinlock *lk) {
   register void *x30 asm ("x30");
   void *a = x30;  /* save x30 */
-  kinfo("sleep caller%p\n", a);
+  // printk("sleep caller %p chan %p\n", a, chan);
 
   struct proc *p = myproc();
 
@@ -367,22 +367,24 @@ int wait(int *status) {
   }
 }
 
-void wakeup(void *chan) {
-  register void *x30 asm("x30");
-  void *a = x30;  /* save x30 */
-  kinfo("wakeup caller %p chan %p\n", a, chan);
-
-  acquire(&proctable.lk);
-
-  int found = 0;
+void wakeup_acquired(void *chan) {
   for(int i = 0; i < NPROC; i++) {
     struct proc *p = &proctable.procs[i];
     if(p->state == SLEEPING && p->chan == chan) {
       kinfo("pid %d wakeup!!!!!\n", p->pid);
       p->state = RUNNABLE;
-      found = 1;
     }
   }
+}
+
+void wakeup(void *chan) {
+  register void *x30 asm("x30");
+  void *a = x30;  /* save x30 */
+  // printk("wakeup caller %p chan %p\n", a, chan);
+
+  acquire(&proctable.lk);
+
+  wakeup_acquired(chan);
 
   release(&proctable.lk);
 }
@@ -395,9 +397,10 @@ void exit(int ret) {
 
   p->ret = ret;
 
-  wakeup(p->parent);
-
   acquire(&proctable.lk);
+
+  wakeup_acquired(p->parent);
+
   p->state = ZOMBIE;
 
   cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
