@@ -18,18 +18,18 @@ struct timer {
 static void enable_timer() {
   u64 c = cntv_ctl_el0();
   c |= CNTV_CTL_ENABLE;
-  // c &= ~CNTV_CTL_IMASK;
+  c &= ~CNTV_CTL_IMASK;
   set_cntv_ctl_el0(c);
 }
 
 static void disable_timer() {
   u64 c = cntv_ctl_el0();
   c &= ~CNTV_CTL_ENABLE;
-  // c |= CNTV_CTL_IMASK;
+  c |= CNTV_CTL_IMASK;
   set_cntv_ctl_el0(c);
 }
 
-static bool timer_enabled() {
+bool timer_enabled() {
   u64 c = cntv_ctl_el0();
   return c & 1;
 }
@@ -42,6 +42,7 @@ static void reload_timer(u64 interval_ms) {
 }
 
 void timerintr() {
+  printk("timerintr!!! %d\n", cpuid());
   disable_timer();
   reload_timer(atimer.interval_ms);
   enable_timer();

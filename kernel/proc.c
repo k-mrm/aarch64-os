@@ -81,6 +81,7 @@ found:
     return NULL;
   char *sp = p->kstack + PAGESIZE;
   sp -= sizeof(struct trapframe);
+
   p->tf = (struct trapframe *)sp;
   memset(p->tf, 0, sizeof(*p->tf));
 

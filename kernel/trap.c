@@ -123,10 +123,8 @@ void kirq_handler(struct trapframe *tf) {
   gic_eoi(iar);
 
   /* disable preemption from kernel mode */
-  /*
   if(myproc() && myproc()->state == RUNNING && intid == TIMER_IRQ)
     yield();
-  */
 }
 
 void uirq_handler(struct trapframe *tf) {
@@ -140,10 +138,8 @@ void uirq_handler(struct trapframe *tf) {
 
   gic_eoi(iar);
 
-  if(myproc() && myproc()->state == RUNNING && intid == TIMER_IRQ) {
-    kinfo("yyyyyyyyield\n");
+  if(intid == TIMER_IRQ)
     yield();
-  }
 }
 
 void unknownint(int arg) {

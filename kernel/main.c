@@ -47,6 +47,7 @@ int main(void) {
   } else {  /* secondary */
     pgt_init();
     timer_init_per_cpu();
+    gicv2_init();
     ncpu_active++;
     printk("core%d started %d\n", cpuid(), ncpu_active);
   }
@@ -56,6 +57,9 @@ int main(void) {
   kinfo("vbar_el1: %p\n", vbar_el1());
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
+  kinfo("timer enabled?: %d\n", timer_enabled());
+  kinfo("gic?%d\n", gic_enabled());
 
-  schedule();
+  for(;;);
+  // schedule();
 }

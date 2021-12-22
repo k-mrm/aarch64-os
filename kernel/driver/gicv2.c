@@ -68,15 +68,13 @@ void gic_config(u32 intid, enum gicd_cfg cfg) {
   REG(GICD_ICFGR(intid / 16)) = icfgr | ((u32)cfg << (intid % 16 * 2));
 }
 
-void gic_setup_ppi(u32 intid, enum gicd_cfg cfg, int prio) {
-  gic_config(intid, cfg);
+void gic_setup_ppi(u32 intid, int prio) {
   gic_set_prio(intid, prio);
   gic_clear_pending(intid);
   gic_enable_int(intid);
 }
 
-void gic_setup_spi(u32 intid, enum gicd_cfg cfg, int prio) {
-  gic_config(intid, cfg);
+void gic_setup_spi(u32 intid, int prio) {
   gic_set_prio(intid, prio);
   gic_set_target(intid, 0);
   gic_clear_pending(intid);
@@ -102,13 +100,11 @@ void gicv2_init() {
   gicc_init();
   gicd_init();
 
-  gic_setup_ppi(TIMER_IRQ, GICD_CFG_EDGE, 0);
-  gic_setup_spi(UART_IRQ, GICD_CFG_LEVEL, 0);
-  gic_setup_spi(VIRTIO_BLK_IRQ, GICD_CFG_LEVEL, 0);
+  gic_setup_ppi(TIMER_IRQ, 0);
+  gic_setup_spi(UART_IRQ, 0);
+  gic_setup_spi(VIRTIO_BLK_IRQ, 0);
 
   gic_enable();
-
-  kinfo("gic enabled: %s\n", gic_enabled()? "true" : "false");
 }
 
 bool gic_enabled() {

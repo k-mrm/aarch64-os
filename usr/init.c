@@ -25,7 +25,6 @@ int main() {
   if(pid == 0) {
     exec("sh", argv);
   } else {
-#if 0 /* multi tasking test */
     int pid2 = fork();
     if(pid2 == 0) {
       exec("loop", argv2);
@@ -34,7 +33,6 @@ int main() {
       wait(NULL);
       exit(0);
     }
-#endif
     wait(NULL);
   }
 
