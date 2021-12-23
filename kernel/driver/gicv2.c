@@ -97,12 +97,15 @@ void gic_enable() {
 }
 
 void gicv2_init() {
+  gic_setup_spi(UART_IRQ, 0);
+  gic_setup_spi(VIRTIO_BLK_IRQ, 0);
+}
+
+void gicv2_init_percpu() {
   gicc_init();
   gicd_init();
 
   gic_setup_ppi(TIMER_IRQ, 0);
-  gic_setup_spi(UART_IRQ, 0);
-  gic_setup_spi(VIRTIO_BLK_IRQ, 0);
 
   gic_enable();
 }

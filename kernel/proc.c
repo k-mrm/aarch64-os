@@ -186,8 +186,6 @@ void schedule() {
 }
 
 void yield() {
-  kinfo("yield\n");
-
   struct proc *p = myproc();
 
   acquire(&proctable.lk);

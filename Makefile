@@ -6,7 +6,7 @@ OBJCOPY = $(PREFIX)objcopy
 CPU = cortex-a72+nofp
 
 CFLAGS = -Wall -Og -g -MD -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
-CFLAGS += -DOS_DEBUG
+#CFLAGS += -DOS_DEBUG
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
 LDFLAGS = -nostdlib -nostartfiles

@@ -42,7 +42,6 @@ static void reload_timer(u64 interval_ms) {
 }
 
 void timerintr() {
-  printk("timerintr!!! %d\n", cpuid());
   disable_timer();
   reload_timer(atimer.interval_ms);
   enable_timer();

@@ -27,6 +27,7 @@ int main(void) {
     printk_init();
     printk("booting...\n");
     gicv2_init();
+    gicv2_init_percpu();
     timer_init(200);
     timer_init_per_cpu();
     kalloc_init1();
@@ -47,7 +48,7 @@ int main(void) {
   } else {  /* secondary */
     pgt_init();
     timer_init_per_cpu();
-    gicv2_init();
+    gicv2_init_percpu();
     ncpu_active++;
     printk("core%d started %d\n", cpuid(), ncpu_active);
   }
@@ -60,6 +61,5 @@ int main(void) {
   kinfo("timer enabled?: %d\n", timer_enabled());
   kinfo("gic?%d\n", gic_enabled());
 
-  for(;;);
-  // schedule();
+  schedule();
 }
