@@ -195,21 +195,6 @@ void yield() {
   cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
 }
 
-struct proc *same_thgrp_proc(struct proc *pp) {
-  acquire(&proctable.lk);
-
-  for(int i = 0; i < NPROC; i++) {
-    struct proc *cp = &proctable.procs[i];
-    if(cp->parent == pp && cp->th == 1) {
-      release(&proctable.lk);
-      return cp;
-    }
-  }
-
-  release(&proctable.lk);
-  panic("no proc");
-}
-
 int clone(void *fn, void *stack) {
   struct proc *p = myproc();
   struct proc *new = newproc();
