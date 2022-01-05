@@ -22,3 +22,4 @@ SYSCALL chdir, SYS_chdir
 SYSCALL mkdir, SYS_mkdir
 SYSCALL mknod, SYS_mknod
 SYSCALL dup, SYS_dup
+SYSCALL clone, SYS_clone

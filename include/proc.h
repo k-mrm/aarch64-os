@@ -72,6 +72,8 @@ struct proc {
   struct inode *cwd;
   struct file *ofile[NOFILE];
   char name[16];
+  int has_th;
+  int th;
 };
 
 #define NPROC 256

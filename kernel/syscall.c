@@ -14,6 +14,7 @@ int write(int fd, char *s, u64 size);
 int read(int fd, char *buf, u64 size);
 int exit(int ret);
 int fork(void);
+int clone(void *fn, void *stack);
 int wait(int *status);
 int exec(char *path, char **argv);
 int open(char *path, int flags);
@@ -67,6 +68,12 @@ int sys_exit(struct trapframe *tf) {
 
 int sys_fork(struct trapframe *tf) {
   return fork();
+}
+
+int sys_clone(struct trapframe *tf) {
+  u64 fn = sysarg(tf, 0);
+  u64 stack = sysarg(tf, 1);
+  return clone((void *)fn, (void *)stack);
 }
 
 int sys_wait(struct trapframe *tf) {
@@ -140,6 +147,7 @@ syscall_t syscall_table[] = {
   sys_mkdir,
   sys_mknod,
   sys_dup,
+  sys_clone,
 };
 
 void syscall(struct trapframe *tf) {

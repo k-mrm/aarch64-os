@@ -12,6 +12,8 @@
 #include "fs.h"
 #include "spinlock.h"
 
+int fork(void);
+
 /* for debug */
 #define dump_caller() \
   do {  \
@@ -161,18 +163,15 @@ void schedule() {
       if(p->state != RUNNABLE)
         continue;
 
-      kinfo("arimashita^^ %d\n", p->pid);
       p->state = RUNNING;
       cpu->proc = p;
 
-      kinfo("sched release ptable lock\n");
       release(&proctable.lk);
 
       load_userspace(p->pgt);
 
       kinfo("load userspace %p\n", p->pgt);
       kinfo("******enter proc %d %s\n", p->pid, p->name);
-      kinfo("tf %p\n", p->tf);
       kinfo("tf->sp %p tf->elr %p\n", p->tf->sp, p->tf->elr);
       kinfo("jump to %p\n", p->context.lr);
 
@@ -196,9 +195,56 @@ void yield() {
   cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
 }
 
-int fork() {
-  kinfo("fooooork\n");
+struct proc *same_thgrp_proc(struct proc *pp) {
+  acquire(&proctable.lk);
 
+  for(int i = 0; i < NPROC; i++) {
+    struct proc *cp = &proctable.procs[i];
+    if(cp->parent == pp && cp->th == 1) {
+      release(&proctable.lk);
+      return cp;
+    }
+  }
+
+  release(&proctable.lk);
+  panic("no proc");
+}
+
+int clone(void *fn, void *stack) {
+  struct proc *p = myproc();
+  struct proc *new = newproc();
+  if(!new)
+    goto err;
+
+  new->pgt = p->pgt;
+  new->size = p->size;
+
+  *new->tf = *p->tf;
+  new->tf->elr = (u64)fn;
+  new->tf->sp = (u64)stack + PAGESIZE;
+
+  new->cwd = p->cwd;
+
+  for(int fd = 0; fd < NOFILE; fd++) {
+    if(p->ofile[fd])
+      new->ofile[fd] = dup_file(p->ofile[fd]);
+  }
+
+  strcpy(new->name, p->name);
+
+  acquire(&proctable.lk);
+  new->state = RUNNABLE;
+  new->parent = p;
+  new->th = 1;
+  release(&proctable.lk);
+
+  return new->pid;
+
+err:
+  return -1;
+}
+
+int fork() {
   struct proc *p = myproc();
   struct proc *new = newproc();
   if(!new)
@@ -208,22 +254,22 @@ int fork() {
     return -1;
 
   new->size = p->size;
-  *new->tf = *p->tf;
 
+  *new->tf = *p->tf;
   new->tf->x0 = 0;
 
   new->cwd = p->cwd;
-  new->parent = p;
-
-  strcpy(new->name, p->name);
 
   for(int fd = 0; fd < NOFILE; fd++) {
     if(p->ofile[fd])
       new->ofile[fd] = dup_file(p->ofile[fd]);
   }
 
+  strcpy(new->name, p->name);
+
   acquire(&proctable.lk);
   new->state = RUNNABLE;
+  new->parent = p;
   release(&proctable.lk);
 
   return new->pid;
@@ -374,18 +420,14 @@ int wait(int *status) {
 void wakeup_acquired(void *chan) {
   for(int i = 0; i < NPROC; i++) {
     struct proc *p = &proctable.procs[i];
-    if(p->state == SLEEPING && p->chan == chan) {
-      kinfo("pid %d wakeup!!!!!\n", p->pid);
+    if(p->state == SLEEPING && p->chan == chan)
       p->state = RUNNABLE;
-    }
   }
 }
 
 void wakeup(void *chan) {
   acquire(&proctable.lk);
-
   wakeup_acquired(chan);
-
   release(&proctable.lk);
 }
 
@@ -393,7 +435,8 @@ void exit(int ret) {
   kinfo("exit\n");
   struct proc *p = myproc();
 
-  free_userspace(p->pgt, p->size);
+  if(!p->th)
+    free_userspace(p->pgt, p->size);
 
   p->ret = ret;
 
