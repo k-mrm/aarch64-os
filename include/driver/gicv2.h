@@ -8,6 +8,8 @@
 #ifndef __ASSEMBLER__
 
 void gicv2_init(void);
+void gicv2_init_percpu(void);
+
 void gic_eoi(u32 iar);
 u32 gic_iar(void);
 

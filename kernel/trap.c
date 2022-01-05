@@ -55,7 +55,7 @@ void handle_inst_abort(int el, u64 esr) {
 }
 
 void ksync_handler(struct trapframe *tf) {
-  kinfo("kkkkkksync handler: tf %p elr %p sp %p\n", tf, tf->elr, tf->sp);
+  // kinfo("kkkkkksync handler: tf %p elr %p sp %p\n", tf, tf->elr, tf->sp);
 
   u64 esr = esr_el1();
   u64 ec = (esr >> 26) & 0x3f;
@@ -123,8 +123,10 @@ void kirq_handler(struct trapframe *tf) {
   gic_eoi(iar);
 
   /* disable preemption from kernel mode */
+  /*
   if(myproc() && myproc()->state == RUNNING && intid == TIMER_IRQ)
     yield();
+    */
 }
 
 void uirq_handler(struct trapframe *tf) {

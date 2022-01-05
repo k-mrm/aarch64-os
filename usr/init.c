@@ -6,7 +6,7 @@
 
 int main() {
   char *argv[] = {"sh", 0};
-  char *argv2[] = {"loop", 0};
+  // char *argv2[] = {"loop", 0};
   int fd;
 
   if((fd = open("tty0", O_RDWR)) < 0) {
@@ -25,6 +25,7 @@ int main() {
   if(pid == 0) {
     exec("sh", argv);
   } else {
+#if 0
     int pid2 = fork();
     if(pid2 == 0) {
       exec("loop", argv2);
@@ -33,6 +34,7 @@ int main() {
       wait(NULL);
       exit(0);
     }
+#endif
     wait(NULL);
   }
 

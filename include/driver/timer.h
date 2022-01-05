@@ -5,6 +5,6 @@
 
 void timer_init(u64 interval_ms);
 
-void timer_init_per_cpu(void);
+void timer_init_percpu(void);
 
 #endif

@@ -29,7 +29,7 @@ int main(void) {
     gicv2_init();
     gicv2_init_percpu();
     timer_init(200);
-    timer_init_per_cpu();
+    timer_init_percpu();
     kalloc_init1();
     kpgt_init();
     pgt_init();
@@ -47,7 +47,7 @@ int main(void) {
       printk("warn: cpu1 wakeup failed\n");
   } else {  /* secondary */
     pgt_init();
-    timer_init_per_cpu();
+    timer_init_percpu();
     gicv2_init_percpu();
     ncpu_active++;
     printk("core%d started %d\n", cpuid(), ncpu_active);

@@ -18,8 +18,10 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
       pgt = (u64 *)P2V(PTE_PA(*pte));
     } else {
       pgt = kalloc();
-      if(!pgt)
+      if(!pgt) {
+        printk("null pgt\n");
         return NULL;
+      }
       *pte = PTE_PA(V2P(pgt)) | PTE_TABLE | PTE_VALID;
     }
   }
@@ -30,6 +32,8 @@ static u64 *pagewalk(u64 *pgt, u64 va) {
 u64 va2pa(u64 va) {
   u64 kpgtpa = ttbr1_el1();
   u64 *pte = pagewalk((u64 *)P2V(kpgtpa), va);
+  if(!pte)
+    return 0;
 
   return PTE_PA(*pte) + OFFSET(va);
 }
@@ -37,8 +41,18 @@ u64 va2pa(u64 va) {
 u64 uva2pa(u64 va) {
   u64 upgtpa = ttbr0_el1();
   u64 *pte = pagewalk((u64 *)P2V(upgtpa), va);
+  if(!pte)
+    return 0;
 
   return PTE_PA(*pte) + OFFSET(va);
+}
+
+u64 uva2ka(u64 va) {
+  u64 pa = uva2pa(va);
+  if(!pa)
+    return 0;
+
+  return (u64)P2V(pa);
 }
 
 static void pagemap(u64 *pgt, u64 va, u64 pa, u64 size, u64 attr) {

@@ -59,6 +59,7 @@
 #define AI_DEVICE_nGnRnE_IDX  0x0
 #define AI_NORMAL_NC_IDX      0x1
 
+/* attr */
 #define AI_DEVICE_nGnRnE  0x0
 #define AI_NORMAL_NC      0x44
 
@@ -80,6 +81,7 @@ void kpgt_init(void);
 void pgt_init(void);
 
 u64 uva2pa(u64 va);
+u64 uva2ka(u64 va);
 
 #endif
 

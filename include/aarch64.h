@@ -37,18 +37,10 @@ static inline void dsb() {
   asm volatile("dsb sy");
 }
 
-static inline void dsb_ish() {
-  asm volatile("dsb ish");
-}
-
-static inline void tlbi_vmalle1is() {
-  asm volatile("tlbi vmalle1is");
-}
-
 static inline void flush_tlb() {
-  dsb_ish();
-  tlbi_vmalle1is();
-  dsb_ish();
+  asm volatile("dsb ishst");
+  asm volatile("tlbi vmalle1is");
+  asm volatile("dsb ish");
   isb();
 }
 
@@ -125,11 +117,11 @@ static inline u64 cntv_ctl_el0() {
   u64 c;
   asm volatile("mrs %0, cntv_ctl_el0" : "=r"(c));
   return c;
-};
+}
 
 static inline void set_cntv_ctl_el0(u64 c) {
   asm volatile("msr cntv_ctl_el0, %0" : : "r"(c));
-};
+}
 
 static inline u64 cntv_tval_el0() {
   u64 t;
@@ -155,7 +147,7 @@ static inline u64 cntvct_el0() {
   u64 c;
   asm volatile("mrs %0, cntvct_el0" : "=r"(c));
   return c;
-};
+}
 
 static inline u64 cntfrq_el0() {
   u64 f;

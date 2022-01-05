@@ -53,7 +53,7 @@ void timer_init(u64 interval_ms) {
   new_irq(TIMER_IRQ, timerintr);
 }
 
-void timer_init_per_cpu() {
+void timer_init_percpu() {
   disable_timer();
   reload_timer(atimer.interval_ms);
   enable_timer();

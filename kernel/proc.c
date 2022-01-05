@@ -141,7 +141,8 @@ void schedule_tail(struct proc *p) {
   }
 
   /* path2inode() must be called after fs_init() */
-  p->cwd = path2inode("/");
+  if(!p->cwd)
+    p->cwd = path2inode("/");
   if(!p->cwd)
     panic("no filesystem");
 }
@@ -152,6 +153,7 @@ void schedule() {
   kinfo("scheduler %d\n", cpuid());
 
   for(;;) {
+    enable_irq();
     acquire(&proctable.lk);
 
     for(int i = 0; i < NPROC; i++) {
@@ -437,8 +439,6 @@ void dumpps() {
     if(p->state == SLEEPING)
       printk("chan %p\n", p->chan);
   }
-  
-  release(&proctable.lk);
 
   for(int i = 0; i < 2; i++) {
     struct proc *p = cpus[i].proc;
@@ -447,6 +447,8 @@ void dumpps() {
     else
       printk("cpu%d no proc\n", i);
   }
+
+  release(&proctable.lk);
 }
 
 void dump_kstack(struct proc *p) {
@@ -456,11 +458,9 @@ void dump_kstack(struct proc *p) {
 }
 
 void proc_init() {
-  for(int i = 0; i < NCPU; i++)
-    memset(&cpus[i], 0, sizeof(cpus[i]));
+  memset(cpus, 0, sizeof(cpus));
 
   lock_init(&pidalloc.lk);
-
   pidalloc.pid = 0;
 
   lock_init(&proctable.lk);
