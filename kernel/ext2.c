@@ -216,8 +216,7 @@ static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
 struct buf *ext2_inode_block(struct inode *ino, int bi) {
   if(bi < 12) {
     return bio_read(ino->block[bi]);
-  }
-  else {
+  } else {
     struct buf *map = bio_read(ino->block[12]);
     struct buf *b = read_indirect_block((u32 *)map->data, bi);
     bio_free(map);

@@ -29,8 +29,7 @@ int main() {
     int pid2 = fork();
     if(pid2 == 0) {
       exec("loop", argv2);
-    }
-    else {
+    } else {
       wait(NULL);
       exit(0);
     }
