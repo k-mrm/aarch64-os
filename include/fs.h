@@ -84,6 +84,8 @@ struct inode *path2inode(char *path);
 int read_inode(struct inode *ino, char *buf, u64 off, u64 size);
 int write_inode(struct inode *ino, char *buf, u64 off, u64 size);
 
+int close(int fd);
+
 struct inode *fs_mkdir(char *path);
 struct inode *fs_mknod(char *path, int mode, int dev);
 

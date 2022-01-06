@@ -179,12 +179,19 @@ found:
 int close(int fd) {
   struct proc *p = myproc();
   struct file *f = p->ofile[fd];
+  if(!f)
+    return -1;
+
   acquire(&ftable.lk);
 
-  if(f->ref == 0)
+  if(f->ref == 0) {
+    release(&ftable.lk);
     return -1;
-  if(--f->ref > 0)
+  }
+  if(--f->ref > 0) {
+    release(&ftable.lk);
     return 0;
+  }
 
   release(&ftable.lk);
 

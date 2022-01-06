@@ -450,6 +450,9 @@ void exit(int ret) {
   if(!p->th)
     free_userspace(p->pgt, p->size);
 
+  for(int i = 0; i < NOFILE; i++)
+    close(i);
+
   p->ret = ret;
 
   acquire(&proctable.lk);
