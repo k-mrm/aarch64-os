@@ -171,7 +171,7 @@ int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size) {
 }
 
 void free_userspace(u64 *pgt, u64 size) {
-  kinfo("free userspace pgt %p size %d\n", pgt, size);
+  printk("free userspace pgt %p size %d\n", pgt, size);
 
   pageunmap(pgt, 0x1000, size);
   pageunmap(pgt, USTACKBOTTOM, PAGESIZE);
