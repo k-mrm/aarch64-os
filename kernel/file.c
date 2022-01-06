@@ -31,6 +31,13 @@ struct file *alloc_file() {
   return NULL;
 }
 
+struct file *fget(struct proc *p, int fd) {
+  if((u32)fd >= NOFILE)
+    return NULL;
+
+  return p->ofile[fd];
+}
+
 int allocfd(struct proc *p) {
   for(int newfd = 0; newfd < NOFILE; newfd++) {
     if(p->ofile[newfd] == NULL)
@@ -38,13 +45,6 @@ int allocfd(struct proc *p) {
   }
 
   return -1;
-}
-
-static bool validfd(int fd) {
-  if(fd >= 0 && fd < NOFILE)
-    return true;
-  else
-    return false;
 }
 
 int read_file(struct file *f, char *buf, u64 sz) {
@@ -113,9 +113,7 @@ struct file *dup_file(struct file *f) {
 
 int read(int fd, char *buf, u64 sz) {
   struct proc *p = myproc();
-  if(!validfd(fd))
-    return -1;
-  struct file *f = p->ofile[fd];
+  struct file *f = fget(p, fd);
   if(!f)
     return -1;
   return read_file(f, buf, sz);
@@ -123,9 +121,7 @@ int read(int fd, char *buf, u64 sz) {
 
 int write(int fd, char *buf, u64 sz) {
   struct proc *p = myproc();
-  if(!validfd(fd))
-    return -1;
-  struct file *f = p->ofile[fd];
+  struct file *f = fget(p, fd);
   if(!f)
     return -1;
   return write_file(f, buf, sz);
@@ -133,9 +129,7 @@ int write(int fd, char *buf, u64 sz) {
 
 int fstat(int fd, struct stat *st) {
   struct proc *p = myproc();
-  if(!validfd(fd))
-    return -1;
-  struct file *f = p->ofile[fd];
+  struct file *f = fget(p, fd);
   if(!f)
     return -1;
   struct inode *ino = f->ino;
@@ -197,9 +191,7 @@ found:
 
 int close(int fd) {
   struct proc *p = myproc();
-  if(!validfd(fd))
-    return -1;
-  struct file *f = p->ofile[fd];
+  struct file *f = fget(p, fd);
   if(!f)
     return -1;
 
@@ -239,15 +231,14 @@ int mkdir(char *path) {
 
 int dup(int fd) {
   struct proc *p = myproc();
-  if(!validfd(fd))
+  struct file *f = fget(p, fd);
+  if(!f)
     return -1;
   int newfd = allocfd(p);
   if(newfd < 0)
     return -1;
-  if(!p->ofile[fd])
-    return -1;
 
-  p->ofile[newfd] = dup_file(p->ofile[fd]);
+  p->ofile[newfd] = dup_file(f);
 
   return newfd;
 }
