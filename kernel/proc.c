@@ -207,7 +207,7 @@ int clone(void *fn, void *stack) {
   *new->tf = *p->tf;
   new->tf->elr = (u64)fn;
   new->tf->sp = (u64)stack + 256;
-  printk("clone %p %p\n", fn, new->tf->sp);
+  kinfo("clone %p %p\n", fn, new->tf->sp);
 
   new->cwd = p->cwd;
 
@@ -269,7 +269,7 @@ int kill(int pid, int sig) {
 }
 
 int exec(char *path, char **argv) {
-  printk("******exec %s %p %p\n", path, path, argv);
+  kinfo("******exec %s %p %p\n", path, path, argv);
   struct inode *ino = path2inode(path);
   if(!ino)
     goto fail;
@@ -343,7 +343,7 @@ int exec(char *path, char **argv) {
 
   load_userspace(p->pgt);
 
-  printk("exec complete %d!!!!!!!!!!!!!!!!!!!!!!!!!!\n", p->pid);
+  kinfo("exec complete %d!!!!!!!!!!!!!!!!!!!!!!!!!!\n", p->pid);
 
   return argc;  /* p->tf->x0 */
 
