@@ -31,6 +31,7 @@ void new_irq(int intid, handler_t handler) {
 }
 
 /* from EL0 */
+extern void exit(int);
 void fault_die(char *reason) {
   printk("%s\n", reason);
   exit(1);
@@ -40,6 +41,7 @@ void handle_data_abort(struct trapframe *tf, int el, u64 esr) {
   u64 dfsc = esr & 0x3f;
 
   /* TODO */
+  (void)dfsc;
 
   printk("elr %p far %p\n", elr_el1(), far_el1());
   if(el == 0) {
@@ -113,10 +115,9 @@ void usync_handler(struct trapframe *tf) {
 
 void kirq_handler(struct trapframe *tf) {
   u32 iar = gic_iar();
-  u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
 
-  // kinfo("kirq handler: elr %p %d %d\n", tf->elr, intid, targetcpuid);
+  // kinfo("kirq handler: elr %p %d\n", tf->elr, intid);
 
   irqhandler[intid]();
 
@@ -133,7 +134,6 @@ void uirq_handler(struct trapframe *tf) {
   // kinfo("uirq handler: elr %p EL%d\n", tf->elr, cur_el());
 
   u32 iar = gic_iar();
-  u32 targetcpuid = iar >> 10;
   u32 intid = iar & 0x3ff;
 
   irqhandler[intid]();

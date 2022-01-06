@@ -82,6 +82,7 @@ static struct buf *ext2_get_bg() {
 }
 
 /* for debug */
+/*
 void dump_dirent_block(char *blk) {
   struct dirent *d = (struct dirent *)blk;
   char *blk_end = blk + sb.bsize;
@@ -94,6 +95,7 @@ void dump_dirent_block(char *blk) {
     d = (struct dirent *)cd;
   }
 }
+*/
 
 static struct buf *read_indirect_block(u32 *map, int bnum) {
   int idx = bnum - 12;
@@ -450,7 +452,7 @@ static struct inode *ext2_new_inode(char *name, struct inode *dir, int mode, int
 }
 
 static int ext2_rm_inode(char *name, struct inode *pdir) {
-  ;
+  return -1;
 }
 
 struct inode *ext2_get_inode(int inum) {
@@ -474,6 +476,7 @@ struct inode *ext2_get_inode(int inum) {
 }
 
 /* for debug */
+__attribute__((unused))
 static void ls_inode(struct inode *ino) {
   printk("ls inode %d nblock: %d\n", ino->inum, ext2_inode_nblock(ino));
   if(ino == NULL) {
@@ -487,7 +490,7 @@ static void ls_inode(struct inode *ino) {
 
   for(int i = 0; i < ext2_inode_nblock(ino); i++) {
     struct buf *dent = ext2_inode_block(ino, i);
-    dump_dirent_block(dent->data);
+    // dump_dirent_block(dent->data);
     bio_free(dent);
   }
 }
@@ -526,7 +529,6 @@ int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
 int ext2_w_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   u32 bsize = sb.bsize;
   u64 sz = size;
-  char *base = buf;
 
   if(off > ino->size)
     return -1;

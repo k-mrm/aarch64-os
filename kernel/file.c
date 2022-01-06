@@ -119,7 +119,11 @@ int write(int fd, char *buf, u64 sz) {
 int fstat(int fd, struct stat *st) {
   struct proc *p = myproc();
   struct file *f = p->ofile[fd];
+  if(!f)
+    return -1;
   struct inode *ino = f->ino;
+  if(!ino)
+    return -1;
 
   st->st_dev = 0; /* TODO */
   st->st_ino = ino->inum;
@@ -127,6 +131,8 @@ int fstat(int fd, struct stat *st) {
   st->st_size = ino->size;
   st->st_nlink = ino->links_count;
   st->st_blksize = sb.bsize;
+
+  return 0;
 }
 
 int open(char *path, int flags) {

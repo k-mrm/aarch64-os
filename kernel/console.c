@@ -8,6 +8,7 @@
 #include "proc.h"
 #include "mm.h"
 #include "log.h"
+#include "kalloc.h"
 
 #define BACKSPACE 127
 #define C(x)  ((x)-'@')
