@@ -21,5 +21,7 @@ int chdir(char *path);
 int mkdir(char *path);
 int mknod(char *path, int mode, int dev);
 int dup(int fd);
+int clone(void *fn, void *stack);
+int waitpid(int pid, int *status);
 
 #endif
