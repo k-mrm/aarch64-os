@@ -25,6 +25,8 @@ int chdir(char *path);
 int mkdir(char *path);
 int mknod(char *path, int mode, int dev);
 int dup(int fd);
+int clone(void *fn, void *stack);
+int waitpid(int pid, int *status);
 
 u64 sysarg(struct trapframe *tf, int n) {
   switch(n) {
@@ -131,6 +133,12 @@ int sys_dup(struct trapframe *tf) {
   return dup(fd);
 }
 
+int sys_waitpid(struct trapframe *tf) {
+  int pid = sysarg(tf, 0);
+  u64 status = sysarg(tf, 1);
+  return waitpid(pid, (int *)status);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -148,6 +156,7 @@ syscall_t syscall_table[] = {
   sys_mknod,
   sys_dup,
   sys_clone,
+  sys_waitpid,
 };
 
 void syscall(struct trapframe *tf) {

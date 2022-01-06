@@ -371,12 +371,38 @@ void sleep(void *chan, struct spinlock *lk) {
     acquire(lk);
 }
 
-int wait(int *status) {
-  kinfo("wait\n");
+int waitpid(int pid, int *status) {
   struct proc *p = myproc();
 
   for(;;) {
-    kinfo("waita\n");
+    acquire(&proctable.lk);
+
+    for(int i = 0; i < NPROC; i++) {
+      struct proc *cp = &proctable.procs[i];
+      if(cp->pid != pid)
+        continue;
+
+      if(cp->state == ZOMBIE) {
+        int pid = cp->pid;
+        if(status)
+          *status = cp->ret;
+
+        freeproc(cp);
+
+        release(&proctable.lk);
+
+        return pid;
+      }
+    }
+
+    sleep(p, &proctable.lk);
+  }
+}
+
+int wait(int *status) {
+  struct proc *p = myproc();
+
+  for(;;) {
     acquire(&proctable.lk);
 
     for(int i = 0; i < NPROC; i++) {
