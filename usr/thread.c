@@ -8,7 +8,7 @@ int counter;
 
 int th_create(int *tid, void *fn, void *stack) {
   int t = clone(fn, stack);
-  if(tid < 0)
+  if(t < 0)
     return -1;
   *tid = t;
   return 0;
