@@ -40,6 +40,13 @@ int allocfd(struct proc *p) {
   return -1;
 }
 
+static bool validfd(int fd) {
+  if(fd >= 0 && fd < NOFILE)
+    return true;
+  else
+    return false;
+}
+
 int read_file(struct file *f, char *buf, u64 sz) {
   if(!f || !f->readable)
     return -1;
@@ -106,18 +113,28 @@ struct file *dup_file(struct file *f) {
 
 int read(int fd, char *buf, u64 sz) {
   struct proc *p = myproc();
+  if(!validfd(fd))
+    return -1;
   struct file *f = p->ofile[fd];
+  if(!f)
+    return -1;
   return read_file(f, buf, sz);
 }
 
 int write(int fd, char *buf, u64 sz) {
   struct proc *p = myproc();
+  if(!validfd(fd))
+    return -1;
   struct file *f = p->ofile[fd];
+  if(!f)
+    return -1;
   return write_file(f, buf, sz);
 }
 
 int fstat(int fd, struct stat *st) {
   struct proc *p = myproc();
+  if(!validfd(fd))
+    return -1;
   struct file *f = p->ofile[fd];
   if(!f)
     return -1;
@@ -141,6 +158,8 @@ int open(char *path, int flags) {
     return -1;
 
   struct file *f = alloc_file();
+  if(!f)
+    return -1;
   struct proc *p = myproc();
 
   f->ino = ino;
@@ -178,6 +197,8 @@ found:
 
 int close(int fd) {
   struct proc *p = myproc();
+  if(!validfd(fd))
+    return -1;
   struct file *f = p->ofile[fd];
   if(!f)
     return -1;
@@ -218,8 +239,12 @@ int mkdir(char *path) {
 
 int dup(int fd) {
   struct proc *p = myproc();
+  if(!validfd(fd))
+    return -1;
   int newfd = allocfd(p);
   if(newfd < 0)
+    return -1;
+  if(!p->ofile[fd])
     return -1;
 
   p->ofile[newfd] = dup_file(p->ofile[fd]);

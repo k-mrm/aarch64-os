@@ -3,6 +3,7 @@
 #include "syscall.h"
 #include "printk.h"
 #include "log.h"
+#include "file.h"
 
 typedef int (*syscall_t)(struct trapframe *tf);
 
