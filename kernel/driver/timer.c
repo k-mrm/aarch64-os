@@ -7,6 +7,8 @@
 
 /* aarch64 generic timer driver */
 
+u64 ticks;
+
 struct timer {
   u64 interval_ms;
 } atimer;
@@ -43,12 +45,15 @@ static void reload_timer(u64 interval_ms) {
 
 void timerintr() {
   disable_timer();
+  if(cpuid() == 0)
+    ticks++;
   reload_timer(atimer.interval_ms);
   enable_timer();
 }
 
 void timer_init(u64 interval_ms) {
   atimer.interval_ms = interval_ms;
+  ticks = 0;
 
   new_irq(TIMER_IRQ, timerintr);
 }
