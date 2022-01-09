@@ -23,5 +23,6 @@ int mknod(char *path, int mode, int dev);
 int dup(int fd);
 int clone(void *fn, void *stack);
 int waitpid(int pid, int *status);
+int ticks(void);
 
 #endif

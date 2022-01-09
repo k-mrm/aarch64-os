@@ -4,6 +4,7 @@
 #include "printk.h"
 #include "log.h"
 #include "file.h"
+#include "driver/timer.h"
 
 typedef int (*syscall_t)(struct trapframe *tf);
 
@@ -140,6 +141,11 @@ int sys_waitpid(struct trapframe *tf) {
   return waitpid(pid, (int *)status);
 }
 
+int sys_ticks(struct trapframe *tf) {
+  (void)tf;
+  return ticks;
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -158,6 +164,7 @@ syscall_t syscall_table[] = {
   sys_dup,
   sys_clone,
   sys_waitpid,
+  sys_ticks,
 };
 
 void syscall(struct trapframe *tf) {
