@@ -226,7 +226,7 @@ struct buf *ext2_inode_block(struct inode *ino, int bi) {
   return NULL;
 }
 
-int ext2_grow_inode_block(struct inode *ino, int nblock) {
+static int ext2_grow_inode_block(struct inode *ino, int nblock) {
   int n;
   for(n = 0; n < 12; n++) {
     if(ino->block[n] == 0)
@@ -248,7 +248,7 @@ found_free:
   return 0;
 }
 
-int ext2_append_inode_block(struct inode *ino, int blockn) {
+static int ext2_append_inode_block(struct inode *ino, int blockn) {
   int i;
   for(i = 0; i < 12; i++) {
     if(ino->block[i] == 0)

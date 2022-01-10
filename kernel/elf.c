@@ -11,7 +11,7 @@ bool is_elf(struct ehdr *e) {
     return false;
 }
 
-void dump_phdr(struct phdr *p) {
+static void dump_phdr(struct phdr *p) {
   printk("dump phdr\n");
   printk("sizeof *p: %d\n", sizeof(*p));
   printk("p_type %p\n", p->p_type);
@@ -22,7 +22,7 @@ void dump_phdr(struct phdr *p) {
   printk("p_memsz %d(%p)\n", p->p_memsz, p->p_memsz);
 }
 
-void dump_ehdr(struct ehdr *e) {
+static void dump_ehdr(struct ehdr *e) {
   printk("dump ehdr\n");
   printk("sizeof *e: %d\n", sizeof(*e));
   printk("e_entry: %d\n", e->e_entry);

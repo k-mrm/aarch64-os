@@ -163,7 +163,6 @@ static inline u64 ttbr0_el1() {
 
 static inline void set_ttbr0_el1(u64 t) {
   asm volatile("msr ttbr0_el1, %0" : : "r"(t));
-  flush_tlb();
 }
 
 static inline u64 ttbr1_el1() {
@@ -174,7 +173,6 @@ static inline u64 ttbr1_el1() {
 
 static inline void set_ttbr1_el1(u64 t) {
   asm volatile("msr ttbr1_el1, %0" : : "r"(t));
-  flush_tlb();
 }
 
 static inline void set_tcr_el1(u64 t) {
