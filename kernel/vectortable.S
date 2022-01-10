@@ -96,9 +96,9 @@ vectortable:
 
 /* Current EL with spx */
 .balign 0x80
-  b cur_sp_elx_sync
+  b el1h_sync
 .balign 0x80
-  b cur_sp_elx_irq
+  b el1h_irq
 .balign 0x80
   mov x0, 4
   b unknownint
@@ -108,9 +108,9 @@ vectortable:
 
 /* Lower EL using aarch64 */
 .balign 0x80
-  b lower_el_aarch64_sync
+  b el0_sync
 .balign 0x80
-  b lower_el_aarch64_irq
+  b el0_irq
 .balign 0x80
   mov x0, 8
   b unknownint
@@ -121,7 +121,7 @@ vectortable:
 /* Lower EL using aarch32 */
 .balign 0x80
   mov x0, 10
-  b debugtrap
+  b unknownint
 .balign 0x80
   mov x0, 11
   b unknownint
@@ -142,7 +142,7 @@ debugtrap:
 
   eret
 
-cur_sp_elx_sync:
+el1h_sync:
   ksavereg
 
   mov x0, sp
@@ -152,19 +152,17 @@ cur_sp_elx_sync:
 
   eret
 
-cur_sp_elx_irq:
+el1h_irq:
   ksavereg
 
   mov x0, sp
   bl  kirq_handler
 
-.global trapret
-trapret:
   restorereg
 
   eret
 
-lower_el_aarch64_sync:
+el0_sync:
   savereg
 
   mov x0, sp
@@ -174,12 +172,14 @@ lower_el_aarch64_sync:
 
   eret
 
-lower_el_aarch64_irq:
+el0_irq:
   savereg
 
   mov x0, sp
   bl  uirq_handler
 
+.global trapret
+trapret:
   restorereg
 
   eret
