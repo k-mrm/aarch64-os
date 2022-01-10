@@ -182,13 +182,14 @@ void free_userspace(u64 *pgt, u64 size) {
 void load_userspace(u64 *pgt) {
   if(pgt == NULL)
     panic("no pagetable");
-  kinfo("load pgt %p\n", pgt);
 
   set_ttbr0_el1(V2P(pgt));
+  flush_tlb();
 }
 
 void forget_userspace() {
   set_ttbr0_el1(0);
+  flush_tlb();
 }
 
 void kpgt_init() {
@@ -201,4 +202,5 @@ void kpgt_init() {
 void pgt_init() {
   set_ttbr1_el1(V2P(l1kpgt));
   set_ttbr0_el1(0);
+  flush_tlb();
 }

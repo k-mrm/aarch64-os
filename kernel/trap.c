@@ -37,21 +37,28 @@ void fault_die(char *reason) {
   exit(1);
 }
 
-void handle_data_abort(struct trapframe *tf, int el, u64 esr) {
+void handle_data_abort(struct trapframe *tf, int user, u64 esr) {
+  struct proc *p = myproc();
   u64 dfsc = esr & 0x3f;
+
+  if(p && p->fault_handler) {
+    tf->elr = (u64)p->fault_handler;
+    tf->x0 = (u64)p;
+    return;
+  }
 
   /* TODO */
   (void)dfsc;
 
   printk("elr %p far %p\n", elr_el1(), far_el1());
-  if(el == 0) {
+  if(user) {
     fault_die("data abort EL0");
   } else {
     panic("data abort EL1");
   }
 }
 
-void handle_inst_abort(int el, u64 esr) {
+void handle_inst_abort(int user, u64 esr) {
   printk("elr: %p far: %p\n", elr_el1(), far_el1());
   panic("instruction abort");
 }
@@ -64,20 +71,14 @@ void ksync_handler(struct trapframe *tf) {
 
   switch(ec) {
     case 0b100101:
-      handle_data_abort(tf, 1, esr);
+      handle_data_abort(tf, 0, esr);
       return;
     case 0b000111:
       return;
     case 0b100110:
       panic("sp alignment fault");
-    case 0b100100:
-      handle_data_abort(tf, 0, esr);
-      return;
-    case 0b100000:
-      handle_inst_abort(0, esr);
-      return;
     case 0b100001:
-      handle_inst_abort(1, esr);
+      handle_inst_abort(0, esr);
       return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());
@@ -101,10 +102,10 @@ void usync_handler(struct trapframe *tf) {
     case 0b100110:
       panic("sp alignment fault");
     case 0b100100:
-      handle_data_abort(tf, 0, esr);
+      handle_data_abort(tf, 1, esr);
       return;
     case 0b100000:
-      handle_inst_abort(0, esr);
+      handle_inst_abort(1, esr);
       return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());

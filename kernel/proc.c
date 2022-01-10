@@ -54,7 +54,7 @@ struct proc *myproc() {
 
 void forkret(void);
 
-struct proc *newproc() {
+static struct proc *newproc() {
   struct proc *p;
 
   acquire(&proctable.lk);
@@ -99,7 +99,7 @@ found:
 }
 
 /* already hold proctable.lk */
-void freeproc(struct proc *p) {
+static void freeproc(struct proc *p) {
   kinfo("freeproc\n");
   kfree(p->kstack);
   memset(p, 0, sizeof(*p));
@@ -143,10 +143,11 @@ void schedule_tail(struct proc *p) {
   }
 
   /* path2inode() must be called after fs_init() */
-  if(!p->cwd)
+  if(!p->cwd) {
     p->cwd = path2inode("/");
-  if(!p->cwd)
-    panic("no filesystem");
+    if(!p->cwd)
+      panic("no filesystem");
+  }
 }
 
 /* running per cpu */
@@ -273,22 +274,17 @@ int exec(char *path, char **argv) {
   struct inode *ino = path2inode(path);
   if(!ino)
     goto fail;
-  kinfo("exec: path2inode\n");
 
   struct ehdr eh;
   struct phdr ph;
   int memsize = 0;
 
-  kinfo("readinode\n");
   if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
     goto fail;
-  kinfo("readinode done\n");
   if(!is_elf(&eh))
     goto fail;
   if(eh.e_type != ET_EXEC)
     goto fail;
-
-  kinfo("exec: elf check\n");
 
   u64 *pgt = kalloc();
   if(!pgt)
@@ -303,8 +299,6 @@ int exec(char *path, char **argv) {
       continue;
     memsize += alloc_userspace(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_memsz);
   }
-
-  kinfo("exec: userspace setup\n");
 
   u64 ustack[9];
   char *stackbase = map_ustack(pgt);
@@ -429,7 +423,7 @@ int wait(int *status) {
   }
 }
 
-void wakeup_acquired(void *chan) {
+static void wakeup_acquired(void *chan) {
   for(int i = 0; i < NPROC; i++) {
     struct proc *p = &proctable.procs[i];
     if(p->state == SLEEPING && p->chan == chan)
@@ -513,6 +507,55 @@ void dump_kstack(struct proc *p) {
   for(int i = 0; i < PAGESIZE; i++) {
     printk("%x ", p->kstack[i]);
   }
+}
+
+int copyio_fault(struct proc *p) {
+  p->fault_handler = NULL;
+  return -1;
+}
+
+int copyout(struct proc *p, void *udst, const void *src, u64 sz) {
+  /* do not call function: avoiding rewrite x30 */
+  p->fault_handler = copyio_fault;
+
+  char *d = udst;
+  const char *s = src;
+
+  if(s > d) {
+    while(sz-- > 0)
+      *d++ = *s++;
+  } else {
+    d += sz;
+    s += sz;
+    while(sz-- > 0)
+      *--d = *--s;
+  }
+
+  p->fault_handler = NULL;
+
+  return 0;
+}
+
+int copyin(struct proc *p, void *dst, const void *usrc, u64 sz) {
+  /* do not call function: avoiding rewrite x30 */
+  p->fault_handler = copyio_fault;
+
+  char *d = dst;
+  const char *s = usrc;
+
+  if(s > d) {
+    while(sz-- > 0)
+      *d++ = *s++;
+  } else {
+    d += sz;
+    s += sz;
+    while(sz-- > 0)
+      *--d = *--s;
+  }
+
+  p->fault_handler = NULL;
+
+  return 0;
 }
 
 void proc_init() {
