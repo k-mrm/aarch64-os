@@ -50,11 +50,10 @@ int sys_getpid(struct trapframe *tf) {
 }
 
 int sys_write(struct trapframe *tf) {
-  kinfo("writesyscall! %p\n", tf->elr);
   int fd = sysarg(tf, 0);
-  u64 str = sysarg(tf, 1);
+  u64 buf = sysarg(tf, 1);
   u64 size = sysarg(tf, 2);
-  return write(fd, (char *)str, size);
+  return write(fd, (char *)buf, size);
 }
 
 int sys_read(struct trapframe *tf) {

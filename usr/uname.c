@@ -6,6 +6,5 @@ int main(void) {
   struct utsname u;
   uname(&u);
   puts(u.sysname);
-  uname(0xfffffffffffffffff);
   exit(0);
 }

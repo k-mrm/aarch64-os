@@ -380,7 +380,7 @@ int waitpid(int pid, int *status) {
       if(cp->state == ZOMBIE) {
         int pid = cp->pid;
         if(status)
-          *status = cp->ret;
+          copyout(p, status, &cp->ret, sizeof(*status));
 
         freeproc(cp);
 
@@ -408,7 +408,7 @@ int wait(int *status) {
       if(cp->state == ZOMBIE) {
         int pid = cp->pid;
         if(status)
-          *status = cp->ret;
+          copyout(p, status, &cp->ret, sizeof(*status));
 
         freeproc(cp);
 
@@ -509,7 +509,7 @@ void dump_kstack(struct proc *p) {
   }
 }
 
-int copyio_fault(struct proc *p) {
+static int copyio_fault(struct proc *p) {
   p->fault_handler = NULL;
   return -1;
 }

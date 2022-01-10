@@ -128,6 +128,7 @@ int write(int fd, char *buf, u64 sz) {
 }
 
 int fstat(int fd, struct stat *st) {
+  struct stat st1;
   struct proc *p = myproc();
   struct file *f = fget(p, fd);
   if(!f)
@@ -136,14 +137,14 @@ int fstat(int fd, struct stat *st) {
   if(!ino)
     return -1;
 
-  st->st_dev = 0; /* TODO */
-  st->st_ino = ino->inum;
-  st->st_mode = ino->mode;
-  st->st_size = ino->size;
-  st->st_nlink = ino->links_count;
-  st->st_blksize = sb.bsize;
+  st1.st_dev = 0; /* TODO */
+  st1.st_ino = ino->inum;
+  st1.st_mode = ino->mode;
+  st1.st_size = ino->size;
+  st1.st_nlink = ino->links_count;
+  st1.st_blksize = sb.bsize;
 
-  return 0;
+  return copyout(p, st, &st1, sizeof(*st));
 }
 
 int open(char *path, int flags) {
