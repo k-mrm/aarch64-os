@@ -75,6 +75,7 @@ struct proc {
   int has_th;
   int th;
   int (*fault_handler)(struct proc *);
+  u64 start_brk;
 };
 
 #define NPROC 256

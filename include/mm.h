@@ -68,13 +68,13 @@
 #include "fs.h"
 #include "memmap.h"
 
-int init_userspace(u64 *pgt, char *code, u64 size);
+int init_userspace(u64 *pgt, u64 va, char *code, u64 size);
 int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size);
 void load_userspace(u64 *pgt);
 void free_userspace(u64 *pgt, u64 size);
 void forget_userspace(void);
 char *map_ustack(u64 *pgt);
-int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 size);
+int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 va, u64 size);
 void dump_ustack(u64 *pgt);
 
 void kpgt_init(void);
@@ -82,6 +82,8 @@ void pgt_init(void);
 
 u64 uva2pa(u64 va);
 u64 uva2ka(u64 va);
+
+int grow_userspace(u64 *pgt, u64 va, u64 sz);
 
 #endif
 

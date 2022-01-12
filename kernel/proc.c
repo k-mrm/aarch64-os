@@ -116,7 +116,7 @@ void userproc_init() {
 
   char *ustart = _binary_usr_initcode_start;
   u64 size = (u64)_binary_usr_initcode_size;
-  p->size = init_userspace(p->pgt, ustart, size);
+  p->size = init_userspace(p->pgt, 0x1000, ustart, size);
 
   map_ustack(p->pgt);
 
@@ -237,7 +237,7 @@ int fork() {
   if(!new)
     goto err;
 
-  if(cp_userspace(new->pgt, p->pgt, p->size) < 0)
+  if(cp_userspace(new->pgt, p->pgt, 0x1000, p->size) < 0)
     return -1;
 
   new->size = p->size;
@@ -288,7 +288,7 @@ int exec(char *path, char **argv) {
 
   u64 *pgt = kalloc();
   if(!pgt)
-    return -1;
+    goto fail;
 
   int i = 0;
   u64 off = eh.e_phoff;
@@ -297,6 +297,7 @@ int exec(char *path, char **argv) {
       goto fail;
     if(ph.p_type != PT_LOAD)
       continue;
+
     memsize += alloc_userspace(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_memsz);
   }
 
@@ -313,6 +314,7 @@ int exec(char *path, char **argv) {
       goto fail;
     if(sp < stackbase)
       goto fail;
+
     memcpy(sp, argv[argc], strlen(argv[argc]));
     ustack[argc] = USTACKTOP - (top - sp);
   }
@@ -336,8 +338,6 @@ int exec(char *path, char **argv) {
   p->pgt = pgt;
 
   load_userspace(p->pgt);
-
-  kinfo("exec complete %d!!!!!!!!!!!!!!!!!!!!!!!!!!\n", p->pid);
 
   return argc;  /* p->tf->x0 */
 
@@ -378,15 +378,15 @@ int waitpid(int pid, int *status) {
         continue;
 
       if(cp->state == ZOMBIE) {
-        int pid = cp->pid;
-        if(status)
-          copyout(p, status, &cp->ret, sizeof(*status));
+        int ret = cp->pid;
+        if(status && copyout(p, status, &cp->ret, sizeof(*status)) < 0)
+          ret = -1;
 
         freeproc(cp);
 
         release(&proctable.lk);
 
-        return pid;
+        return ret;
       }
     }
 
@@ -406,20 +406,19 @@ int wait(int *status) {
         continue;
 
       if(cp->state == ZOMBIE) {
-        int pid = cp->pid;
-        if(status)
-          copyout(p, status, &cp->ret, sizeof(*status));
+        int ret = cp->pid;
+        if(status && copyout(p, status, &cp->ret, sizeof(*status)) < 0)
+          ret = -1;
 
         freeproc(cp);
 
         release(&proctable.lk);
 
-        return pid;
+        return ret;
       }
     }
 
     sleep(p, &proctable.lk);
-    kinfo("from sleep\n");
   }
 }
 
@@ -501,6 +500,17 @@ void dumpps() {
   }
 
   release(&proctable.lk);
+}
+
+void *sbrk(int incr) {
+  struct proc *p = myproc();
+
+  if(incr > 0) {
+    grow_userspace(p->pgt, p->size, p->size + incr);
+  } else {
+    /* TODO: shrink heap */
+  }
+  p->size += incr;
 }
 
 void dump_kstack(struct proc *p) {
