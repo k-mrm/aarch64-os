@@ -25,3 +25,4 @@ SYSCALL dup, SYS_dup
 SYSCALL clone, SYS_clone
 SYSCALL waitpid, SYS_waitpid
 SYSCALL ticks, SYS_ticks
+SYSCALL sbrk, SYS_sbrk

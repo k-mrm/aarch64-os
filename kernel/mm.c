@@ -124,8 +124,19 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
   return pgsize;
 }
 
-int grow_userspace(u64 *pgt, u64 va, u64 sz) {
-  return -1;
+void *grow_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz) {
+  oldsz = PAGEROUNDUP(oldsz);
+  u64 start;
+  va = start = va + oldsz;
+  for(u64 p = oldsz; p < newsz; p += PAGESIZE, va += PAGESIZE) {
+    char *upage = kalloc();
+    if(!upage)
+      return NULL;
+    printk("grow: %p\n", va);
+    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
+  }
+
+  return (void *)start;
 }
 
 char *map_ustack(u64 *pgt) {

@@ -504,13 +504,18 @@ void dumpps() {
 
 void *sbrk(int incr) {
   struct proc *p = myproc();
+  void *h;
 
   if(incr > 0) {
-    grow_userspace(p->pgt, p->size, p->size + incr);
+    h = grow_userspace(p->pgt, 0x1000, p->size, p->size + incr);
   } else {
     /* TODO: shrink heap */
+    h = NULL;
   }
+
   p->size += incr;
+
+  return h;
 }
 
 void dump_kstack(struct proc *p) {

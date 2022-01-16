@@ -29,6 +29,7 @@ int mknod(char *path, int mode, int dev);
 int dup(int fd);
 int clone(void *fn, void *stack);
 int waitpid(int pid, int *status);
+void *sbrk(int incr);
 
 u64 sysarg(struct trapframe *tf, int n) {
   switch(n) {
@@ -145,6 +146,11 @@ u64 sys_ticks(struct trapframe *tf) {
   return ticks;
 }
 
+u64 sys_sbrk(struct trapframe *tf) {
+  int incr = sysarg(tf, 0);
+  return (u64)sbrk(incr);
+}
+
 syscall_t syscall_table[] = {
   sys_getpid,
   sys_write,
@@ -164,6 +170,7 @@ syscall_t syscall_table[] = {
   sys_clone,
   sys_waitpid,
   sys_ticks,
+  sys_sbrk,
 };
 
 void syscall(struct trapframe *tf) {
