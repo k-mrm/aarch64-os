@@ -116,7 +116,8 @@ void userproc_init() {
 
   char *ustart = _binary_usr_initcode_start;
   u64 size = (u64)_binary_usr_initcode_size;
-  p->size = init_userspace(p->pgt, 0x1000, ustart, size);
+  init_userspace(p->pgt, 0x1000, ustart, size);
+  p->size = size;
 
   map_ustack(p->pgt);
 
