@@ -125,16 +125,16 @@ int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
 }
 
 void *grow_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz) {
+  u64 start = va + oldsz;
   oldsz = PAGEROUNDUP(oldsz);
-  u64 start;
-  va = start = va + oldsz;
+  va += oldsz;
   for(u64 p = oldsz; p < newsz; p += PAGESIZE, va += PAGESIZE) {
     char *upage = kalloc();
     if(!upage)
       return NULL;
-    printk("grow: %p\n", va);
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
+  kinfo("start %p va %p %d %d\n", start, va, oldsz, newsz);
 
   return (void *)start;
 }

@@ -8,6 +8,11 @@ int main(void) {
   for(int i = 0; i < 1000; i++)
     printf("%c", p[i]);
   printf("\n");
+  printf("%p\n", sbrk(1));
+  printf("%p\n", sbrk(1));
+  printf("%p\n", sbrk(1));
+  printf("%p\n", sbrk(1));
+  printf("%p\n", sbrk(1));
 
   exit(0);
 }
