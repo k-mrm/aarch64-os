@@ -6,7 +6,7 @@
 #include "file.h"
 #include "driver/timer.h"
 
-typedef int (*syscall_t)(struct trapframe *tf);
+typedef u64 (*syscall_t)(struct trapframe *tf);
 
 struct stat;
 struct utsname;
@@ -45,102 +45,102 @@ u64 sysarg(struct trapframe *tf, int n) {
   panic("invalid sysarg");
 }
 
-int sys_getpid(struct trapframe *tf) {
+u64 sys_getpid(struct trapframe *tf) {
   return getpid();
 }
 
-int sys_write(struct trapframe *tf) {
+u64 sys_write(struct trapframe *tf) {
   int fd = sysarg(tf, 0);
   u64 buf = sysarg(tf, 1);
   u64 size = sysarg(tf, 2);
   return write(fd, (char *)buf, size);
 }
 
-int sys_read(struct trapframe *tf) {
+u64 sys_read(struct trapframe *tf) {
   int fd = sysarg(tf, 0);
   u64 buf = sysarg(tf, 1);
   u64 size = sysarg(tf, 2);
   return read(fd, (char *)buf, size);
 }
 
-int sys_exit(struct trapframe *tf) {
+u64 sys_exit(struct trapframe *tf) {
   int ret = sysarg(tf, 0);
   exit(ret);
   return 0; /* unreachable */
 }
 
-int sys_fork(struct trapframe *tf) {
+u64 sys_fork(struct trapframe *tf) {
   return fork();
 }
 
-int sys_clone(struct trapframe *tf) {
+u64 sys_clone(struct trapframe *tf) {
   u64 fn = sysarg(tf, 0);
   u64 stack = sysarg(tf, 1);
   return clone((void *)fn, (void *)stack);
 }
 
-int sys_wait(struct trapframe *tf) {
+u64 sys_wait(struct trapframe *tf) {
   u64 addr = sysarg(tf, 0);
   return wait((int *)addr);
 }
 
-int sys_exec(struct trapframe *tf) {
+u64 sys_exec(struct trapframe *tf) {
   u64 path = sysarg(tf, 0);
   u64 argv = sysarg(tf, 1);
   return exec((char *)path, (char **)argv);
 }
 
-int sys_open(struct trapframe *tf) {
+u64 sys_open(struct trapframe *tf) {
   u64 path = sysarg(tf, 0);
   int flags = sysarg(tf, 1);
   return open((char *)path, flags);
 }
 
-int sys_close(struct trapframe *tf) {
+u64 sys_close(struct trapframe *tf) {
   int fd = sysarg(tf, 0);
   return close(fd);
 }
 
-int sys_fstat(struct trapframe *tf) {
+u64 sys_fstat(struct trapframe *tf) {
   int fd = sysarg(tf, 0);
   struct stat *addr = (struct stat *)sysarg(tf, 1);
   return fstat(fd, addr);
 }
 
-int sys_uname(struct trapframe *tf) {
+u64 sys_uname(struct trapframe *tf) {
   struct utsname *addr = (struct utsname *)sysarg(tf, 0);
   return uname(addr);
 }
 
-int sys_chdir(struct trapframe *tf) {
+u64 sys_chdir(struct trapframe *tf) {
   u64 path = sysarg(tf, 0);
   return chdir((char *)path);
 }
 
-int sys_mkdir(struct trapframe *tf) {
+u64 sys_mkdir(struct trapframe *tf) {
   u64 path = sysarg(tf, 0);
   return mkdir((char *)path);
 }
 
-int sys_mknod(struct trapframe *tf) {
+u64 sys_mknod(struct trapframe *tf) {
   u64 path = sysarg(tf, 0);
   int mode = sysarg(tf, 1);
   int dev = sysarg(tf, 2);
   return mknod((char *)path, mode, dev);
 }
 
-int sys_dup(struct trapframe *tf) {
+u64 sys_dup(struct trapframe *tf) {
   int fd = sysarg(tf, 0);
   return dup(fd);
 }
 
-int sys_waitpid(struct trapframe *tf) {
+u64 sys_waitpid(struct trapframe *tf) {
   int pid = sysarg(tf, 0);
   u64 status = sysarg(tf, 1);
   return waitpid(pid, (int *)status);
 }
 
-int sys_ticks(struct trapframe *tf) {
+u64 sys_ticks(struct trapframe *tf) {
   (void)tf;
   return ticks;
 }
@@ -167,7 +167,7 @@ syscall_t syscall_table[] = {
 };
 
 void syscall(struct trapframe *tf) {
-  int n = tf->x6;
+  u64 n = tf->x6;
 
   if(n < NSYSCALL && syscall_table[n]) {
     tf->x0 = syscall_table[n](tf);

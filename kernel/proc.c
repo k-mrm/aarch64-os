@@ -291,9 +291,8 @@ int exec(char *path, char **argv) {
   if(!pgt)
     goto fail;
 
-  int i = 0;
   u64 off = eh.e_phoff;
-  for(; i < eh.e_phnum; i++, off += sizeof(ph)) {
+  for(int i = 0; i < eh.e_phnum; i++, off += sizeof(ph)) {
     if(read_inode(ino, (char *)&ph, off, sizeof(ph)) != sizeof(ph))
       goto fail;
     if(ph.p_type != PT_LOAD)
