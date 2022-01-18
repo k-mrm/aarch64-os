@@ -1,9 +1,6 @@
 #ifndef AARCH64_OS_MEMMAP_H
 #define AARCH64_OS_MEMMAP_H
 
-#include "driver/gicv2.h"
-#include "driver/uart.h"
-
 #define VA_START    0xffffff8000000000
 
 #ifdef __ASSEMBLER__
@@ -27,7 +24,9 @@
 #define USTACKTOP   0x7ffffff000
 #define USTACKBOTTOM  (USTACKTOP - PAGESIZE)
 
-#define PVIRTIO0  0xa000000
+#define PGICV2_BASE 0x08000000
+#define PUARTBASE   0x09000000
+#define PVIRTIO0    0x0a000000
 
 #define GICV2_BASE  P2V(PGICV2_BASE)
 #define UARTBASE    P2V(PUARTBASE)

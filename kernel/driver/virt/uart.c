@@ -1,3 +1,4 @@
+#include "kernel.h"
 #include "memmap.h"
 #include "driver/virt/uart.h"
 #include "trap.h"

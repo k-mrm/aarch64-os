@@ -3,8 +3,6 @@
 
 #include "driver/virt/gicv2.h"
 
-#define PGICV2_BASE  VIRT_GICV2_BASE
-
 #ifndef __ASSEMBLER__
 
 void gicv2_init(void);

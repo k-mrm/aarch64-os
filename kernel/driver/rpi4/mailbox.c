@@ -1,4 +1,3 @@
-#include "mono.h"
 #include "mailbox.h"
 
 u32 mbox_read(int ch) {

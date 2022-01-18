@@ -23,9 +23,6 @@ void systimer1_handle_irq(void) {
   REG(SYSTIMER_C(1)) = t;
   REG(SYSTIMER_CS) = 1 << 1;
 
-  if(curproc && curproc->state == RUNNING)
-    yield();  // koko de buttobu
-
   printk("irq owari");
 }
 

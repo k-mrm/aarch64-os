@@ -3,6 +3,4 @@
 
 #include "kernel.h"
 
-#define VIRT_GICV2_BASE 0x08000000
-
 #endif
