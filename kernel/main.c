@@ -18,7 +18,6 @@
 void _start(void);
 
 volatile int started = 0;
-int ncpu_active = 1;
 
 int main(void) {
   if(cpuid() == 0) {  /* primary */
@@ -43,14 +42,13 @@ int main(void) {
 
     isb();
 
-    if(psci_cpu_on(1, V2P(_start)) < 0)
-      printk("warn: cpu1 wakeup failed\n");
+    for(int i = 0; i < NCPU; i++)
+      psci_cpu_on(i, V2P(_start));
   } else {  /* secondary */
     pgt_init();
     timer_init_percpu();
     gicv2_init_percpu();
-    ncpu_active++;
-    printk("core%d started %d\n", cpuid(), ncpu_active);
+    printk("core%d started\n", cpuid());
   }
 
   kinfo("cpuid: %d\n", cpuid());

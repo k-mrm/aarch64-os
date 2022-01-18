@@ -37,7 +37,7 @@ struct context {
   u64 lr;  /* x30 */
 } __attribute__((aligned(16)));
 
-#define NCPU 2
+#define NCPU 4
 
 struct cpu {
   struct proc *proc;

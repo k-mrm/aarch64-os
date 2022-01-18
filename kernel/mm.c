@@ -139,6 +139,9 @@ void *grow_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz) {
   return (void *)start;
 }
 
+void *shrink_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz) {
+}
+
 char *map_ustack(u64 *pgt) {
   char *ustack = kalloc();
   if(!ustack)

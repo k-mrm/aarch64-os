@@ -121,7 +121,7 @@ void userproc_init() {
 
   map_ustack(p->pgt);
 
-  memcpy(p->name, "proc0", 6);
+  strcpy(p->name, "proc0");
 
   p->tf->elr = 0x1000;  /* `eret` jump to elr */
   p->tf->spsr = 0x0;    /* switch EL1 to EL0 */

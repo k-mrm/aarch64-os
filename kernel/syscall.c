@@ -151,7 +151,7 @@ u64 sys_sbrk(struct trapframe *tf) {
   return (u64)sbrk(incr);
 }
 
-syscall_t syscall_table[] = {
+u64 (*syscall_table[])(struct trapframe *) = {
   sys_getpid,
   sys_write,
   sys_read,
