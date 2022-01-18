@@ -201,7 +201,7 @@ int clone(void *fn, void *stack) {
   struct proc *p = myproc();
   struct proc *new = newproc();
   if(!new)
-    goto err;
+    goto fail;
 
   new->pgt = p->pgt;
   new->size = p->size;
@@ -209,6 +209,7 @@ int clone(void *fn, void *stack) {
   *new->tf = *p->tf;
   new->tf->elr = (u64)fn;
   new->tf->sp = (u64)stack + 256;
+
   kinfo("clone %p %p\n", fn, new->tf->sp);
 
   new->cwd = p->cwd;
@@ -228,7 +229,7 @@ int clone(void *fn, void *stack) {
 
   return new->pid;
 
-err:
+fail:
   return -1;
 }
 
@@ -236,10 +237,10 @@ int fork() {
   struct proc *p = myproc();
   struct proc *new = newproc();
   if(!new)
-    goto err;
+    goto fail;
 
   if(cp_userspace(new->pgt, p->pgt, 0x1000, p->size) < 0)
-    return -1;
+    goto fail;
 
   new->size = p->size;
 
@@ -262,7 +263,9 @@ int fork() {
 
   return new->pid;
 
-err:
+fail:
+  if(new)
+    freeproc(new);
   return -1;
 }
 
@@ -272,6 +275,7 @@ int kill(int pid, int sig) {
 
 int exec(char *path, char **argv) {
   kinfo("******exec %s %p %p\n", path, path, argv);
+  u64 *pgt = NULL;
   struct inode *ino = path2inode(path);
   if(!ino)
     goto fail;
@@ -287,7 +291,7 @@ int exec(char *path, char **argv) {
   if(eh.e_type != ET_EXEC)
     goto fail;
 
-  u64 *pgt = kalloc();
+  pgt = kalloc();
   if(!pgt)
     goto fail;
 
@@ -342,6 +346,8 @@ int exec(char *path, char **argv) {
   return argc;  /* p->tf->x0 */
 
 fail:
+  if(pgt)
+    kfree(pgt);
   printk("kernel exec failed\n");
   return -1;
 }
