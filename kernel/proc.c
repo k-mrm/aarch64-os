@@ -208,7 +208,7 @@ int clone(void *fn, void *stack) {
 
   *new->tf = *p->tf;
   new->tf->elr = (u64)fn;
-  new->tf->sp = (u64)stack + 256;
+  new->tf->sp = (u64)stack + PAGESIZE;
 
   kinfo("clone %p %p\n", fn, new->tf->sp);
 
