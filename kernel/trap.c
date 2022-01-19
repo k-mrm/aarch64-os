@@ -7,6 +7,7 @@
 #include "syscall.h"
 #include "driver/gicv2.h"
 #include "log.h"
+#include "mm.h"
 
 void syscall(struct trapframe *tf);
 void dump_tf(struct trapframe *tf);
@@ -59,6 +60,8 @@ void handle_data_abort(struct trapframe *tf, int user, u64 esr) {
 }
 
 void handle_inst_abort(int user, u64 esr) {
+  if(user)
+    printk("user instruction abort: ");
   printk("elr: %p far: %p\n", elr_el1(), far_el1());
   panic("instruction abort");
 }

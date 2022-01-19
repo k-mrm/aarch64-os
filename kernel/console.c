@@ -37,7 +37,7 @@ static int cswrite(struct console *cs, char *s, u64 size) {
 static int csread(struct console *cs, char *buf, u64 size) {
   acquire(&cs->lk);
 
-  cs->readbuf = (char *)uva2ka((u64)buf);
+  cs->readbuf = (char *)uva2ka(myproc()->pgt, (u64)buf);
   cs->bufc = 0;
   cs->bufsz = size;
 

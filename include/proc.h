@@ -86,7 +86,7 @@ struct proc *myproc(void);
 void proc_init(void);
 void userproc_init(void);
 
-void schedule(void);
+void schedule(void) __attribute__((noreturn));
 
 void sleep(void *chan, struct spinlock *lk);
 void wakeup(void *chan);

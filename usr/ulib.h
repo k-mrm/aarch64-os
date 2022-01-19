@@ -27,4 +27,7 @@ void *memset(void *dst, int c, u64 n);
 void *memcpy(void *dst, const void *src, u64 n);
 void *memmove(void *dst, const void *src, u64 n);
 
+void *malloc(u64 nbytes);
+void free(void *ptr);
+
 #endif

@@ -39,17 +39,16 @@ u64 va2pa(u64 va) {
   return PTE_PA(*pte) + OFFSET(va);
 }
 
-u64 uva2pa(u64 va) {
-  u64 upgtpa = ttbr0_el1();
-  u64 *pte = pagewalk((u64 *)P2V(upgtpa), va);
+u64 uva2pa(u64 *pgt, u64 va) {
+  u64 *pte = pagewalk(pgt, va);
   if(!pte)
     return 0;
 
   return PTE_PA(*pte) + OFFSET(va);
 }
 
-u64 uva2ka(u64 va) {
-  u64 pa = uva2pa(va);
+u64 uva2ka(u64 *pgt, u64 va) {
+  u64 pa = uva2pa(pgt, va);
   if(!pa)
     return 0;
 
@@ -153,7 +152,7 @@ char *map_ustack(u64 *pgt) {
 }
 
 void dump_ustack(u64 *pgt) {
-  char *page = (char *)P2V(uva2pa(USTACKBOTTOM));
+  char *page = (char *)P2V(uva2pa(pgt, USTACKBOTTOM));
   kinfo("dump ustack %p\n", page);
 
   for(int i = 0; i < PAGESIZE; i++)

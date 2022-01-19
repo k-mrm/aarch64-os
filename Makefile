@@ -14,7 +14,7 @@ LDFLAGS = -nostdlib -nostartfiles
 QEMU = qemu-system-aarch64
 MACHINE = virt
 MACHINE_GIC = gic-version=2
-NCPU = 3
+NCPU = 2
 
 QCPU = cortex-a72
 QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE),$(MACHINE_GIC) -smp $(NCPU) -m 256
@@ -53,16 +53,18 @@ usr/initcode: usr/initcode.S
 
 -include: *.d
 
-ULIBS = usr/systable.o usr/ulib.o
+ULIBS = usr/systable.o usr/ulib.o usr/malloc.o
 
-UPROGS = rootfs/init rootfs/sh rootfs/cat rootfs/echo rootfs/ls rootfs/uname	\
-				 rootfs/mkdir rootfs/loop rootfs/writetest	\
-				 rootfs/thread rootfs/heap
+root = rootfs
 
-rootfs/%: usr/%.o $(ULIBS)
-	@mkdir -p rootfs
+UPROGS = $(root)/init $(root)/sh $(root)/cat $(root)/echo $(root)/ls $(root)/uname	\
+				 $(root)/mkdir $(root)/loop $(root)/writetest	$(root)/thread $(root)/heap 	\
+				 #$(root)/malloctest
+
+$(root)/%: usr/%.o $(ULIBS)
+	@mkdir -p $(root)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0x1000 -o $@ $^
-	cp README.md rootfs/
+	cp README.md $(root)/
 
 fs.img: $(UPROGS)
 	dd if=/dev/zero of=fs.img count=10000
@@ -93,6 +95,6 @@ raspi: kernel8.img fs.img
 clean:
 	$(RM) $(OBJS) $(ULIBS) $(UOBJS) $(UPROGS) usr/initcode.o usr/initcode.elf usr/initcode kernel8.elf kernel8.img fs.img
 	find ./ -name "*.d" | xargs $(RM)
-	$(RM) -rf rootfs
+	$(RM) -rf $(root)
 
 .PHONY: qemu gdb clean dts raspi

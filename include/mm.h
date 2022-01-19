@@ -86,8 +86,8 @@ void *grow_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz);
 void kpgt_init(void);
 void pgt_init(void);
 
-u64 uva2pa(u64 va);
-u64 uva2ka(u64 va);
+u64 uva2pa(u64 *pgt, u64 va);
+u64 uva2ka(u64 *pgt, u64 va);
 
 #endif
 

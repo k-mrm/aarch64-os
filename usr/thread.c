@@ -1,13 +1,10 @@
 #include "usys.h"
 #include "ulib.h"
 
-char stack0[256];
-char stack1[256];
-
-int counter;
+static int counter;
 
 int th_create(int *tid, void *fn) {
-  void *stack = sbrk(0x1000);
+  void *stack = malloc(0x1000);
   int t = clone(fn, stack);
   if(t < 0)
     return -1;
@@ -43,9 +40,9 @@ void fn3() {
   exit(0);
 }
 
-
 int main(void) {
   int tid0, tid1, tid2, tid3;
+  printf("counter %p %p\n", &counter, &tid0);
 
   int a = ticks();
 
