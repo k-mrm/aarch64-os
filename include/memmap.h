@@ -17,7 +17,7 @@
 
 #define PKERNBASE   0x40000000
 #define KERNBASE    (PKERNBASE + VA_START)
-#define PHYMEMEND   (KERNBASE + 256 * 1024 * 1024)   /* 128MB */
+#define PHYMEMEND   (KERNBASE + 256 * 1024 * 1024)   /* 256 MB */
 
 #define USEREND     0x7fffffffff
 

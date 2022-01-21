@@ -42,7 +42,6 @@ void fn3() {
 
 int main(void) {
   int tid0, tid1, tid2, tid3;
-  printf("counter %p %p\n", &counter, &tid0);
 
   int a = ticks();
 

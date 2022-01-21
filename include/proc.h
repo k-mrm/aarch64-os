@@ -8,6 +8,8 @@
 
 typedef int pid_t;
 
+#define NCPU 8
+
 struct context {
   u64 sp;
   /* callee register */
@@ -36,8 +38,6 @@ struct context {
   u64 x29;
   u64 lr;  /* x30 */
 } __attribute__((aligned(16)));
-
-#define NCPU 4
 
 struct cpu {
   struct proc *proc;

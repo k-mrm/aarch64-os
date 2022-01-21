@@ -1,12 +1,10 @@
 #include "usys.h"
 #include "ulib.h"
 
-u64 strlen(char *s) {
+u64 strlen(const char *s) {
   u64 i = 0;
-  while(*s) {
+  while(*s++)
     i++;
-    s++;
-  }
 
   return i;
 }
@@ -52,6 +50,14 @@ void *memmove(void *dst, const void *src, u64 n) {
   return dst;
 }
 
+char *strcpy(char *dst, const char *src) {
+  char *r = dst;
+
+  while((*dst++ = *src++) != 0)
+    ;
+
+  return r;
+}
 
 char *strchr(const char *s, int c) {
   char *p = (char *)s;
