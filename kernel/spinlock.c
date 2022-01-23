@@ -41,8 +41,10 @@ void release(struct spinlock *lk) {
 void pushcli() {
   struct cpu *cpu = mycpu();
 
-  if(cpu->cli_depth++ == 0)
+  if(cpu->cli_depth++ == 0) {
+    cpu->intr_enabled = irq_enabled();
     disable_irq();
+  }
 }
 
 void popcli() {
@@ -51,8 +53,10 @@ void popcli() {
   if(cpu->cli_depth == 0)
     panic("popcli");
 
-  if(--cpu->cli_depth == 0)
-    enable_irq();
+  if(--cpu->cli_depth == 0) {
+    if(cpu->intr_enabled)
+      enable_irq();
+  }
 }
 
 void lock_init(struct spinlock *lk) {

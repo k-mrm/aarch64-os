@@ -6,7 +6,7 @@ OBJCOPY = $(PREFIX)objcopy
 CPU = cortex-a72+nofp
 
 CFLAGS = -Wall -Og -g -MD -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
-#CFLAGS += -DOS_DEBUG
+#CFLAGS += -DKDBG
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
 LDFLAGS = -nostdlib -nostartfiles
@@ -15,7 +15,7 @@ QEMU = qemu-system-aarch64
 MACHINE = virt
 MACHINE_GIC = gic-version=2
 ifndef NCPU
-NCPU = 2
+NCPU = 4
 endif
 
 QCPU = cortex-a72

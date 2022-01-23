@@ -43,9 +43,8 @@ struct cpu {
   struct proc *proc;
   struct context scheduler;
   int cli_depth;
-};
-
-struct cpu cpus[NCPU];
+  int intr_enabled;
+} cpus[NCPU];
 
 enum procstate {
   UNUSED,
@@ -72,10 +71,8 @@ struct proc {
   struct inode *cwd;
   struct file *ofile[NOFILE];
   char name[16];
-  int has_th;
   int th;
   int (*fault_handler)(struct proc *);
-  u64 start_brk;
 };
 
 #define NPROC 256

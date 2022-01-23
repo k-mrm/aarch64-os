@@ -47,8 +47,13 @@ static inline void flush_tlb() {
 static inline u64 cpuid() {
   u64 mpidr;
   asm volatile("mrs %0, mpidr_el1" : "=r"(mpidr));
-
   return mpidr & 0xff;
+}
+
+static inline u64 r_sp() {
+  u64 sp;
+  asm volatile("mov %0, sp" : "=r"(sp));
+  return sp;
 }
 
 static inline u64 elr_el1() {
@@ -105,6 +110,16 @@ static inline u64 daif() {
   u64 d;
   asm volatile("mrs %0, daif" : "=r"(d));
   return d;
+}
+
+static inline int irq_enabled() {
+  return ((daif() >> 6) & 0x2) == 0;
+}
+
+static inline u64 midr_el1() {
+  u64 m;
+  asm volatile("mrs %0, midr_el1" : "=r"(m));
+  return m;
 }
 
 static inline u64 mpidr_el1() {

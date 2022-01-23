@@ -27,8 +27,10 @@ void *kalloc() {
   acquire(&kallocator.lk);
 
   struct header *new = kallocator.freelist;
-  if(!new)  /* no memory or uninitialized */
+  if(!new) { /* no memory or uninitialized */
+    printk("kalloc return NULL\n");
     return NULL;
+  }
 
   kallocator.freelist = new->next;
 

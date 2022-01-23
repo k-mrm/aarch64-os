@@ -3,11 +3,14 @@
 
 #include "aarch64.h"
 #include "printk.h"
+#include "spinlock.h"
 
-#ifdef OS_DEBUG
+#ifdef KDBG
+
+extern struct spinlock kinfo_lk;
 
 #define kinfo(...)  \
-  do { printk("[INFO] cpu%d @%s:\t", cpuid(), __func__); printk(__VA_ARGS__); } while(0)
+  do { acquire(&kinfo_lk); printk("[INFO] cpu%d @%s:\t", cpuid(), __func__); printk(__VA_ARGS__); release(&kinfo_lk); } while(0)
 
 #else
 

@@ -122,6 +122,8 @@ int virtio_blk_op(u64 bno, char *buf, enum diskop op) {
 static void virtio_blk_intr() {
   acquire(&disk.lk);
 
+  REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
+
   int d0;
   while(disk.virtq.last_used_idx != disk.virtq.used->idx) {
     d0 = disk.virtq.used->ring[disk.virtq.last_used_idx % NQUEUE].id;
@@ -137,8 +139,6 @@ static void virtio_blk_intr() {
 
     disk.virtq.last_used_idx++;
   }
-
-  REG(VIRTIO_REG_INTERRUPT_ACK) = REG(VIRTIO_REG_INTERRUPT_STATUS) & 0x3;
 
   release(&disk.lk);
 }

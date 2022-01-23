@@ -32,7 +32,12 @@ void *memset(void *dst, int c, u64 n) {
 }
 
 char *strcpy(char *dst, const char *src) {
-  return memcpy(dst, src, strlen(src)+1);
+  char *r = dst;
+
+  while((*dst++ = *src++) != 0)
+    ;
+
+  return r;
 }
 
 int strcmp(const char *s1, const char *s2) {
@@ -58,10 +63,8 @@ int strncmp(const char *s1, const char *s2, u64 len) {
 
 u64 strlen(const char *s) {
   u64 i = 0;
-  while(*s) {
+  while(*s++)
     i++;
-    s++;
-  }
 
   return i;
 }

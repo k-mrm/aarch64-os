@@ -100,7 +100,8 @@ found:
 
 /* already hold proctable.lk */
 static void freeproc(struct proc *p) {
-  kinfo("freeproc\n");
+  if(!holding(&proctable.lk))
+    panic("freeproc");
   kfree(p->kstack);
   memset(p, 0, sizeof(*p));
   p->state = UNUSED;
@@ -138,6 +139,9 @@ int getpid(void) {
 
 void schedule_tail(struct proc *p) {
   static int firstcall = 1;
+
+  release(&proctable.lk);
+
   if(firstcall) {
     fs_init();
     firstcall = 0;
@@ -165,10 +169,10 @@ void schedule() {
       if(p->state != RUNNABLE)
         continue;
 
+      kinfo("next proc: %d\n", p->pid);
+
       p->state = RUNNING;
       cpu->proc = p;
-
-      release(&proctable.lk);
 
       load_userspace(p->pgt);
 
@@ -177,7 +181,7 @@ void schedule() {
       kinfo("tf->sp %p tf->elr %p\n", p->tf->sp, p->tf->elr);
       kinfo("jump to %p\n", p->context.lr);
 
-      cswitch(&cpu->scheduler, &p->context);  /* acquire proctable.lk */
+      cswitch(&cpu->scheduler, &p->context);
 
       forget_userspace();
 
@@ -194,7 +198,9 @@ void yield() {
   acquire(&proctable.lk);
 
   p->state = RUNNABLE;
-  cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
+  cswitch(&p->context, &mycpu()->scheduler);
+
+  release(&proctable.lk);
 }
 
 int clone(void *fn, void *stack) {
@@ -264,8 +270,11 @@ int fork() {
   return new->pid;
 
 fail:
-  if(new)
+  if(new) {
+    acquire(&proctable.lk);
     freeproc(new);
+    release(&proctable.lk);
+  }
   return -1;
 }
 
@@ -364,9 +373,11 @@ void sleep(void *chan, struct spinlock *lk) {
 
   p->chan = chan;
   p->state = SLEEPING;
-  cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
+  cswitch(&p->context, &mycpu()->scheduler);
 
   p->chan = NULL;
+
+  release(&proctable.lk);
 
   if(lk != &proctable.lk)
     acquire(lk);
@@ -460,7 +471,7 @@ void exit(int ret) {
 
   p->state = ZOMBIE;
 
-  cswitch(&p->context, &mycpu()->scheduler);  /* release proctable.lk */
+  cswitch(&p->context, &mycpu()->scheduler);
 
   panic("unreachable");
 }
@@ -497,7 +508,7 @@ void dumpps() {
       printk("chan %p\n", p->chan);
   }
 
-  for(int i = 0; i < 2; i++) {
+  for(int i = 0; i < 4; i++) {
     struct proc *p = cpus[i].proc;
     if(p)
       printk("cpu%d %s %d %s\n", i, pstatemap[p->state], p->pid, p->name);

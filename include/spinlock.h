@@ -8,6 +8,7 @@ struct spinlock {
   int cpuid;
 };
 
+bool holding(struct spinlock *lk);
 void acquire(struct spinlock *lk);
 void release(struct spinlock *lk);
 void lock_init(struct spinlock *lk);

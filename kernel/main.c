@@ -42,7 +42,7 @@ int main(void) {
 
     isb();
 
-    for(int i = 0; i < NCPU; i++)
+    for(int i = 1; i < NCPU; i++)
       psci_cpu_on(i, V2P(_start));
   } else {  /* secondary */
     pgt_init();
@@ -51,12 +51,12 @@ int main(void) {
     printk("core%d started\n", cpuid());
   }
 
+  kinfo("sp: %p\n", r_sp());
   kinfo("cpuid: %d\n", cpuid());
   kinfo("current EL: %d\n", cur_el());
   kinfo("vbar_el1: %p\n", vbar_el1());
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
-  kinfo("timer enabled?: %d\n", timer_enabled());
   kinfo("gic?%d\n", gic_enabled());
 
   schedule();

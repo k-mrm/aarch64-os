@@ -3,8 +3,13 @@
 #include "printk.h"
 #include "console.h"
 #include "spinlock.h"
+#include "driver/psci.h"
 
 struct spinlock printk_lk;
+
+#ifdef KDBG
+struct spinlock kinfo_lk;
+#endif
 
 #define va_list __builtin_va_list
 #define va_start(v, l)  __builtin_va_start(v, l)
@@ -127,16 +132,18 @@ int printk(const char *fmt, ...) {
 }
 
 void panic(const char *s, ...) {
+  disable_irq();
+
   va_list ap;
   va_start(ap, s);
 
-  printk("[panic]: ");
+  printk("CPU%d [panic]: ", cpuid());
   vprintk(s, ap);
   printk("\n");
 
   va_end(ap);
 
-  disable_irq();
+  psci_shutdown();
 
   for(;;)
     wfe();
@@ -144,4 +151,7 @@ void panic(const char *s, ...) {
 
 void printk_init(void) {
   lock_init(&printk_lk);
+#ifdef KDBG
+  lock_init(&kinfo_lk);
+#endif
 }

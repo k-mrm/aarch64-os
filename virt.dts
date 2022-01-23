@@ -314,7 +314,7 @@
 	};
 
 	pmu {
-		interrupts = <0x01 0x07 0x304>;
+		interrupts = <0x01 0x07 0x1f04>;
 		compatible = "arm,armv8-pmuv3";
 	};
 
@@ -359,10 +359,31 @@
 			compatible = "arm,cortex-a72";
 			device_type = "cpu";
 		};
+
+		cpu@2 {
+			reg = <0x02>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@3 {
+			reg = <0x03>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@4 {
+			reg = <0x04>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
 	};
 
 	timer {
-		interrupts = <0x01 0x0d 0x304 0x01 0x0e 0x304 0x01 0x0b 0x304 0x01 0x0a 0x304>;
+		interrupts = <0x01 0x0d 0x1f04 0x01 0x0e 0x1f04 0x01 0x0b 0x1f04 0x01 0x0a 0x1f04>;
 		always-on;
 		compatible = "arm,armv8-timer\0arm,armv7-timer";
 	};

@@ -59,10 +59,11 @@ void handle_data_abort(struct trapframe *tf, int user, u64 esr) {
   }
 }
 
-void handle_inst_abort(int user, u64 esr) {
+void handle_inst_abort(struct trapframe *tf, int user, u64 esr) {
   if(user)
-    printk("user instruction abort: ");
-  printk("elr: %p far: %p\n", elr_el1(), far_el1());
+    printk("user ");
+  printk("instruction abort: elr: %p far: %p\n", elr_el1(), far_el1());
+  dump_tf(tf);
   panic("instruction abort");
 }
 
@@ -81,7 +82,7 @@ void ksync_handler(struct trapframe *tf) {
     case 0b100110:
       panic("sp alignment fault");
     case 0b100001:
-      handle_inst_abort(0, esr);
+      handle_inst_abort(tf, 0, esr);
       return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());
@@ -108,7 +109,7 @@ void usync_handler(struct trapframe *tf) {
       handle_data_abort(tf, 1, esr);
       return;
     case 0b100000:
-      handle_inst_abort(1, esr);
+      handle_inst_abort(tf, 1, esr);
       return;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());
@@ -121,9 +122,13 @@ void kirq_handler(struct trapframe *tf) {
   u32 iar = gic_iar();
   u32 intid = iar & 0x3ff;
 
-  // kinfo("kirq handler: elr %p %d\n", tf->elr, intid);
+  if(intid == 1023)
+    printk("warn: spurious interrupt\n");
 
-  irqhandler[intid]();
+  if(irqhandler[intid])
+    irqhandler[intid]();
+  else
+    panic("? intid: %d", intid);
 
   gic_eoi(iar);
 
@@ -135,12 +140,16 @@ void kirq_handler(struct trapframe *tf) {
 }
 
 void uirq_handler(struct trapframe *tf) {
-  // kinfo("uirq handler: elr %p EL%d\n", tf->elr, cur_el());
-
   u32 iar = gic_iar();
   u32 intid = iar & 0x3ff;
 
-  irqhandler[intid]();
+  if(intid == 1023)
+    printk("warn: spurious interrupt\n");
+
+  if(irqhandler[intid])
+    irqhandler[intid]();
+  else
+    panic("? intid: %d", intid);
 
   gic_eoi(iar);
 
