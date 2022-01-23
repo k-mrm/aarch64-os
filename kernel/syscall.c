@@ -179,7 +179,7 @@ void syscall(struct trapframe *tf) {
   if(n < NSYSCALL && syscall_table[n]) {
     tf->x0 = syscall_table[n](tf);
   } else {
-    panic("unknown syscall");
+    printk("unknown syscall\n");
     tf->x0 = -1;
   }
 }

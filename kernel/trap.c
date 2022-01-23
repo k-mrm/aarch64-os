@@ -21,14 +21,14 @@ static void default_handler() {
 }
 
 void trap_init() {
-  for(int i = 0; i < NIRQ; i++) {
+  for(int i = 0; i < NIRQ; i++)
     irqhandler[i] = default_handler;
-  }
 }
 
 void new_irq(int intid, handler_t handler) {
   kinfo("new irq: %d\n", intid);
-  irqhandler[intid] = handler;
+  if(intid < NIRQ)
+    irqhandler[intid] = handler;
 }
 
 /* from EL0 */
@@ -122,8 +122,10 @@ void kirq_handler(struct trapframe *tf) {
   u32 iar = gic_iar();
   u32 intid = iar & 0x3ff;
 
-  if(intid == 1023)
+  if(intid == 1023) {
     printk("warn: spurious interrupt\n");
+    return;
+  }
 
   if(irqhandler[intid])
     irqhandler[intid]();
@@ -141,8 +143,10 @@ void uirq_handler(struct trapframe *tf) {
   u32 iar = gic_iar();
   u32 intid = iar & 0x3ff;
 
-  if(intid == 1023)
+  if(intid == 1023) {
     printk("warn: spurious interrupt\n");
+    return;
+  }
 
   if(irqhandler[intid])
     irqhandler[intid]();
