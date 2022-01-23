@@ -7,7 +7,7 @@
 
 _start:
   mrs x1, mpidr_el1
-  and x1, x1, #3
+  and x1, x1, #0xff
   cbz x1, kernel_start  /* primary cpu */
   b secondary_entry     /* secondary cpu */
 
@@ -211,10 +211,11 @@ primary_entry:
 
   mrs x0, mpidr_el1
   and x0, x0, #0xff     /* current cpuid */
+  add x0, x0, 1
   mov x1, #PAGESIZE 
   mul x0, x0, x1
   ldr x2, =__kstack
-  sub x2, x2, x0
+  add x2, x2, x0
   mov sp, x2
 
   b main

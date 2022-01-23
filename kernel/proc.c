@@ -169,7 +169,7 @@ void schedule() {
       if(p->state != RUNNABLE)
         continue;
 
-      kinfo("next proc: %d\n", p->pid);
+      kinfo("************* next proc: %d\n", p->pid);
 
       p->state = RUNNING;
       cpu->proc = p;
@@ -508,7 +508,7 @@ void dumpps() {
       printk("chan %p\n", p->chan);
   }
 
-  for(int i = 0; i < 4; i++) {
+  for(int i = 0; i < NCPU; i++) {
     struct proc *p = cpus[i].proc;
     if(p)
       printk("cpu%d %s %d %s\n", i, pstatemap[p->state], p->pid, p->name);

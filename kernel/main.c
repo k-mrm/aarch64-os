@@ -15,6 +15,8 @@
 #include "file.h"
 #include "buf.h"
 
+__attribute__((aligned(16))) char __kstack[4096*NCPU];
+
 void _start(void);
 
 volatile int started = 0;

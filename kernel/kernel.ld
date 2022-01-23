@@ -31,10 +31,6 @@ SECTIONS {
     }
 
     . = ALIGN(4096);
-    . += 4096 * 8;
-    __kstack = .;
-
-    . = ALIGN(4096);
     kend = .;
 
     /DISCARD/ : {
