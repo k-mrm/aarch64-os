@@ -19,19 +19,16 @@ int ls(char *path) {
     puts(path);
   } else if(S_ISDIR(st.st_mode)) {
     while(read(fd, buf, sizeof(buf)) == sizeof(buf)) {
-      struct dirent *d = (struct dirent *)buf;
-      char *bend = buf + sizeof(buf);
-      char *cd;
       char namebuf[DIRENT_NAME_MAX];
 
-      while(d != bend && d->inode != 0) {
+      for(u64 bpos = 0; bpos < st.st_blksize; ) {
+        struct dirent *d = (struct dirent *)(buf + bpos);
+        if(d->rec_len == 0)
+          break;
         memset(namebuf, 0, DIRENT_NAME_MAX);
         memcpy(namebuf, d->name, d->name_len);
-        puts(namebuf);
-
-        cd = (char *)d;
-        cd += d->rec_len;
-        d = (struct dirent *)cd;
+        printf("%s\t%d\n", namebuf, d->inode);
+        bpos += d->rec_len;
       }
     }
   }
