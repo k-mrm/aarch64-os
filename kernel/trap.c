@@ -12,7 +12,7 @@
 void syscall(struct trapframe *tf);
 void dump_tf(struct trapframe *tf);
 
-#define NIRQ  256
+#define NIRQ  1024
 
 handler_t irqhandler[NIRQ];
 
@@ -127,8 +127,6 @@ void kirq_handler(struct trapframe *tf) {
 
   if(irqhandler[intid])
     irqhandler[intid]();
-  else
-    panic("? intid: %d", intid);
 
   gic_eoi(iar);
 
@@ -148,8 +146,6 @@ void uirq_handler(struct trapframe *tf) {
 
   if(irqhandler[intid])
     irqhandler[intid]();
-  else
-    panic("? intid: %d", intid);
 
   gic_eoi(iar);
 

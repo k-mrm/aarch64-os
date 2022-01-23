@@ -195,8 +195,7 @@ int printf(const char *fmt, ...) {
           write(1, &c, 1);
           break;
         default:
-          tmpc = '%';
-          write(1, &tmpc, 1);
+          write(1, "%", 1);
           write(1, &c, 1);
           break;
       }

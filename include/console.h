@@ -9,7 +9,7 @@
 struct console {
   struct spinlock lk;
   char *readbuf;
-  int bufc;
+  u64 bufc;
   u64 bufsz;
   int uartid;
 };
