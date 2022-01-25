@@ -30,7 +30,7 @@ a simple OS for aarch64(qemu virt board)
 ```
 $ make qemu
 ```
-specify the number of cores
+specify the number of cores (default ncore=4):
 ```
 $ make qemu NCPU=<ncore>
 ```

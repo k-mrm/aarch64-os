@@ -16,7 +16,7 @@ QEMU = $(QEMUPREFIX)qemu-system-aarch64
 MACHINE = virt
 MACHINE_GIC = gic-version=2
 ifndef NCPU
-NCPU = 1
+NCPU = 4
 endif
 
 QCPU = cortex-a72
