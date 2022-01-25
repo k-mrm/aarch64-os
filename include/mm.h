@@ -73,7 +73,8 @@ struct mm {
 };
 
 void init_userspace(u64 *pgt, u64 va, char *code, u64 size);
-int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size);
+int load_prg(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 filesz);
+int alloc_userspace(u64 *pgt, u64 va, u64 memsz);
 void load_userspace(u64 *pgt);
 void free_userspace(u64 *pgt, u64 size);
 void forget_userspace(void);

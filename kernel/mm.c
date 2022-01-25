@@ -98,8 +98,7 @@ void free_table(u64 *pgt) {
 }
 
 void init_userspace(u64 *pgt, u64 va, char *code, u64 size) {
-  u64 pgsize = PAGEROUNDUP(size);
-  for(u64 p = 0; p < pgsize; p += PAGESIZE, va += PAGESIZE) {
+  for(u64 p = 0; p < size; p += PAGESIZE, va += PAGESIZE) {
     char *upage = kalloc();
     if(!upage)
       panic("init_userspace");
@@ -108,19 +107,34 @@ void init_userspace(u64 *pgt, u64 va, char *code, u64 size) {
   }
 }
 
-int alloc_userspace(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 size) {
-  u64 pgsize = PAGEROUNDUP(size);
-  for(u64 p = 0; p < pgsize; p += PAGESIZE, va += PAGESIZE) {
+int load_prg(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 filesz) {
+  if(va % PAGESIZE != 0)
+    return -1;
+  u64 ka = uva2ka(pgt, va);
+  if(ka == 0)
+    return -1;
+
+  for(u64 p = 0; p < filesz; p += PAGESIZE) {
+    if(filesz > PAGESIZE)
+      panic("unimpl");
+
+    if(read_inode(ino, (char *)(ka+p), srcoff, filesz) != filesz)
+      return -1;
+  }
+
+  return 0;
+}
+
+int alloc_userspace(u64 *pgt, u64 va, u64 memsz) {
+  for(u64 p = 0; p < memsz; p += PAGESIZE, va += PAGESIZE) {
     char *upage = kalloc();
     if(!upage)
       return -1;
-    kinfo("map va %p to page %p\n", va, V2P(upage));
-    read_inode(ino, upage, srcoff, size);
-    kinfo("upage pa %p\n", va2pa((u64)upage));
+    kinfo("map va %p to page %p %d\n", va, V2P(upage), memsz);
     pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
   }
 
-  return pgsize;
+  return memsz;
 }
 
 void *grow_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz) {
@@ -139,6 +153,7 @@ void *grow_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz) {
 }
 
 void *shrink_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz) {
+  return NULL;
 }
 
 char *map_ustack(u64 *pgt) {

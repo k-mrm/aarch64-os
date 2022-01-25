@@ -13,7 +13,6 @@ bool is_elf(struct ehdr *e) {
 
 static void dump_phdr(struct phdr *p) {
   printk("dump phdr\n");
-  printk("sizeof *p: %d\n", sizeof(*p));
   printk("p_type %p\n", p->p_type);
   printk("p_flags %p\n", p->p_flags);
   printk("p_offset %p\n", p->p_offset);
@@ -24,8 +23,7 @@ static void dump_phdr(struct phdr *p) {
 
 static void dump_ehdr(struct ehdr *e) {
   printk("dump ehdr\n");
-  printk("sizeof *e: %d\n", sizeof(*e));
-  printk("e_entry: %d\n", e->e_entry);
+  printk("e_entry: %p\n", e->e_entry);
   printk("e_phnum: %d\n", e->e_phnum);
   printk("e_phoff: %d(%p)\n", e->e_phoff, e->e_phoff);
   printk("e_shoff: %d(%p)\n", e->e_shoff, e->e_shoff);
@@ -41,8 +39,10 @@ void dump_elf(struct inode *ino) {
 
   if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
     return;
-  if(!is_elf(&eh))
+  if(!is_elf(&eh)) {
+    printk("not elf file\n");
     return;
+  }
   if(eh.e_type != ET_EXEC)
     return;
 

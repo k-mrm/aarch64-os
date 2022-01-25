@@ -291,7 +291,7 @@ int exec(char *path, char **argv) {
 
   struct ehdr eh;
   struct phdr ph;
-  int memsize = 0;
+  u64 memsize = 0;
 
   if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
     goto fail;
@@ -311,7 +311,12 @@ int exec(char *path, char **argv) {
     if(ph.p_type != PT_LOAD)
       continue;
 
-    memsize += alloc_userspace(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_memsz);
+    int sz;
+    if((sz = alloc_userspace(pgt, ph.p_vaddr, ph.p_memsz)) < 0)
+      goto fail;
+    memsize += sz;
+    if(load_prg(pgt, ph.p_vaddr, ino, ph.p_offset, ph.p_filesz) < 0)
+      goto fail;
   }
 
   u64 ustack[9];

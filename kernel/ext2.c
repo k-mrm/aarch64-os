@@ -516,7 +516,7 @@ int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
     memcpy(buf, b->data + offblkoff, cpsize);
 
     buf += cpsize;
-    size = size > bsize? size - bsize : 0;
+    size -= cpsize;
     offblkoff = 0;
 
     bio_free(b);

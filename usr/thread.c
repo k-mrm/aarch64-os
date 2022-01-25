@@ -1,7 +1,7 @@
 #include "usys.h"
 #include "ulib.h"
 
-static int counter;
+int counter;
 
 int th_create(int *tid, void *fn) {
   void *stack = malloc(0x1000);

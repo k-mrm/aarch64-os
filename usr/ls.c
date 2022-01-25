@@ -4,8 +4,9 @@
 #include "fcntl.h"
 #include "dirent.h"
 
+char buf[1024];
+
 int ls(char *path) {
-  char buf[1024];
   int fd = open(path, O_RDONLY);
   if(fd < 0) {
     puts("No such file or directory");
