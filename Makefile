@@ -11,7 +11,8 @@ CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
 LDFLAGS = -nostdlib -nostartfiles
 
-QEMU = ~/qemu/build/qemu-system-aarch64
+QEMUPREFIX =
+QEMU = $(QEMUPREFIX)qemu-system-aarch64
 MACHINE = virt
 MACHINE_GIC = gic-version=2
 ifndef NCPU
