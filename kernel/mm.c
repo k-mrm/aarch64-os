@@ -103,7 +103,7 @@ void init_userspace(u64 *pgt, u64 va, char *code, u64 size) {
     if(!upage)
       panic("init_userspace");
     memcpy(upage, (char *)code, size);
-    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
+    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL|PTE_U);
   }
 }
 
@@ -131,7 +131,7 @@ int alloc_userspace(u64 *pgt, u64 va, u64 memsz) {
     if(!upage)
       return -1;
     kinfo("map va %p to page %p %d\n", va, V2P(upage), memsz);
-    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
+    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL|PTE_U);
   }
 
   return memsz;
@@ -145,7 +145,7 @@ void *grow_userspace(u64 *pgt, u64 va, u64 oldsz, u64 newsz) {
     char *upage = kalloc();
     if(!upage)
       return NULL;
-    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL | PTE_U);
+    pagemap(pgt, va, V2P(upage), PAGESIZE, PTE_NORMAL|PTE_U|PTE_UXN|PTE_PXN);
   }
   kinfo("start %p va %p %d %d\n", start, va, oldsz, newsz);
 
@@ -161,7 +161,7 @@ char *map_ustack(u64 *pgt) {
   if(!ustack)
     return NULL;
 
-  pagemap(pgt, USTACKBOTTOM, V2P(ustack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
+  pagemap(pgt, USTACKBOTTOM, V2P(ustack), PAGESIZE, PTE_NORMAL|PTE_U|PTE_UXN|PTE_PXN);
 
   return ustack;
 }
@@ -186,7 +186,7 @@ int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 va, u64 size) {
       return -1;
     memcpy(page, (char *)P2V(pa), PAGESIZE);
     
-    pagemap(newpgt, va, V2P(page), PAGESIZE, PTE_NORMAL | PTE_U);
+    pagemap(newpgt, va, V2P(page), PAGESIZE, PTE_NORMAL|PTE_U);
   }
 
   /* copy ustack */
@@ -197,7 +197,7 @@ int cp_userspace(u64 *newpgt, u64 *oldpgt, u64 va, u64 size) {
     return -1;
   memcpy(newstack, (char *)P2V(pa), PAGESIZE);
 
-  pagemap(newpgt, USTACKBOTTOM, V2P(newstack), PAGESIZE, PTE_NORMAL | PTE_U | PTE_UXN | PTE_PXN);
+  pagemap(newpgt, USTACKBOTTOM, V2P(newstack), PAGESIZE, PTE_NORMAL|PTE_U|PTE_UXN|PTE_PXN);
 
   return 0;
 }
@@ -228,7 +228,7 @@ void kpgt_init() {
   /* remap kernel */
   pagemap(l1kpgt, KERNBASE, PKERNBASE, (u64)kend - KERNBASE, PTE_NORMAL);
   /* map kend ~ PHYMEMEND */
-  pagemap(l1kpgt, (u64)kend, V2P(kend), PHYMEMEND - (u64)kend, PTE_NORMAL);
+  pagemap(l1kpgt, (u64)kend, V2P(kend), PHYMEMEND - (u64)kend, PTE_NORMAL|PTE_PXN|PTE_UXN);
 }
 
 void pgt_init() {

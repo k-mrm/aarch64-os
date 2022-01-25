@@ -5,8 +5,8 @@
 #include "driver/gicv2.h"
 #include "log.h"
 
-#define GICD_BASE (GICV2_BASE)
-#define GICC_BASE (GICV2_BASE + 0x10000)
+#define GICD_BASE (GICBASE)
+#define GICC_BASE (GICBASE + 0x10000)
 
 #define GICD_CTLR (GICD_BASE)
 #define GICD_TYPER  (GICD_BASE + 0x4)
