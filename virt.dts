@@ -562,6 +562,118 @@
 			compatible = "arm,cortex-a72";
 			device_type = "cpu";
 		};
+
+		cpu@32 {
+			reg = <0x200>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@33 {
+			reg = <0x201>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@34 {
+			reg = <0x202>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@35 {
+			reg = <0x203>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@36 {
+			reg = <0x204>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@37 {
+			reg = <0x205>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@38 {
+			reg = <0x206>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@39 {
+			reg = <0x207>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@40 {
+			reg = <0x208>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@41 {
+			reg = <0x209>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@42 {
+			reg = <0x20a>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@43 {
+			reg = <0x20b>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@44 {
+			reg = <0x20c>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@45 {
+			reg = <0x20d>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@46 {
+			reg = <0x20e>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
+
+		cpu@47 {
+			reg = <0x20f>;
+			enable-method = "psci";
+			compatible = "arm,cortex-a72";
+			device_type = "cpu";
+		};
 	};
 
 	timer {

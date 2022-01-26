@@ -5,7 +5,7 @@
 #include "printk.h"
 #include "proc.h"
 #include "syscall.h"
-#include "driver/gicv2.h"
+#include "driver/gicv3.h"
 #include "log.h"
 #include "mm.h"
 
@@ -68,8 +68,6 @@ void handle_inst_abort(struct trapframe *tf, int user, u64 esr) {
 }
 
 void ksync_handler(struct trapframe *tf) {
-  // kinfo("kkkkkksync handler: tf %p elr %p sp %p\n", tf, tf->elr, tf->sp);
-
   u64 esr = esr_el1();
   u64 ec = (esr >> 26) & 0x3f;
 
@@ -92,8 +90,6 @@ void ksync_handler(struct trapframe *tf) {
 }
 
 void usync_handler(struct trapframe *tf) {
-  // kinfo("uuuuuusync handler: tf %p elr %p proctf %p\n", tf, tf->elr, curproc->tf);
-
   u64 esr = esr_el1();
   u64 ec = (esr >> 26) & 0x3f;
 

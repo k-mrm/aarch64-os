@@ -81,17 +81,17 @@ void gic_setup_spi(u32 intid, int prio) {
   gic_enable_int(intid);
 }
 
-void gicc_init() {
+static void gicc_init() {
   REG(GICC_CTLR) = 0;
 
   REG(GICC_PMR) = 0xff;
 }
 
-void gicd_init() {
+static void gicd_init() {
   REG(GICD_CTLR) = 0;
 }
 
-void gic_enable() {
+static void gic_enable() {
   REG(GICC_CTLR) |= 0x1;
   REG(GICD_CTLR) |= 0x1;
 }

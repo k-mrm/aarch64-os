@@ -4,7 +4,7 @@
 #include "printk.h"
 #include "trap.h"
 #include "proc.h"
-#include "driver/gicv2.h"
+#include "driver/gicv3.h"
 #include "driver/timer.h"
 #include "driver/virtio.h"
 #include "driver/psci.h"
@@ -27,8 +27,8 @@ int main(void) {
     console_init();
     printk_init();
     printk("booting...\n");
-    gicv2_init();
-    gicv2_init_percpu();
+    gicv3_init();
+    gicv3_init_percpu();
     timer_init(100);
     timer_init_percpu();
     kalloc_init1();
@@ -49,7 +49,7 @@ int main(void) {
   } else {  /* secondary */
     pgt_init();
     timer_init_percpu();
-    gicv2_init_percpu();
+    gicv3_init_percpu();
     printk("core%d started\n", cpuid());
   }
 
@@ -59,7 +59,7 @@ int main(void) {
   kinfo("vbar_el1: %p\n", vbar_el1());
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
-  kinfo("gic?%d\n", gic_enabled());
+  printk("?%d", gic_enabled());
 
   schedule();
 }

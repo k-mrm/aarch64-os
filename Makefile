@@ -7,14 +7,14 @@ CPU = cortex-a72+nofp
 QCPU = cortex-a72
 
 CFLAGS = -Wall -Og -g -MD -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
-#CFLAGS += -DKDBG
+CFLAGS += -DKDBG
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
 LDFLAGS = -nostdlib -nostartfiles
 
 QEMUPREFIX =
 QEMU = $(QEMUPREFIX)qemu-system-aarch64
-GIC_VERSION = 2
+GIC_VERSION = 3
 MACHINE = virt,gic-version=$(GIC_VERSION)
 ifndef NCPU
 NCPU = 4
@@ -32,7 +32,7 @@ KOBJS = kernel/boot.o kernel/vectortable.o kernel/file.o kernel/buf.o \
 				kernel/cswitch.o kernel/syscall.o kernel/mm.o kernel/string.o kernel/elf.o	\
 				kernel/cdev.o kernel/spinlock.o
 
-DRIVER = kernel/driver/gicv2.o kernel/driver/timer.o kernel/driver/virtio.o	\
+DRIVER = kernel/driver/gicv3.o kernel/driver/timer.o kernel/driver/virtio.o	\
 				 kernel/driver/psci-if.o kernel/driver/psci.o
 
 VIRTDRV = $(DRIVER) kernel/driver/virt/uart.o

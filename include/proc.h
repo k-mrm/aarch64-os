@@ -8,7 +8,7 @@
 
 typedef int pid_t;
 
-#define NCPU 8
+#define NCPU 16
 
 struct context {
   u64 sp;

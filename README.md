@@ -5,7 +5,6 @@ a simple OS for aarch64(qemu virt board)
 ![sample](screenshot/shot.png)
 
 ## Features
-- single processor
 - multiprocessor
 - preemptive multi tasking
 - process scheduler
@@ -23,7 +22,7 @@ a simple OS for aarch64(qemu virt board)
 
 ## Required
 - aarch64-linux-gnu-toolchain
-- qemu-system-aarch64
+- qemu-system-aarch64(>= 5.0.0)
 
 ## Build & Run
 
