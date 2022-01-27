@@ -158,7 +158,6 @@ static void gicr_wait_rwp(u32 cpuid) {
 }
 
 void gic_setup_ppi(u32 cpu, u32 intid, int prio) {
-  printk("setup ppi %d\n", cpu);
   gicr_set_prio(cpu, intid, prio);
   gicr_clear_pending(cpu, intid);
   gicr_enable_int(cpu, intid);
@@ -223,7 +222,6 @@ void gicv3_init() {
   gicv3.gicd = (char *)GICBASE;
   for(int i = 0; i < NCPU; i++) {
     gicv3.rdist_addrs[i] = (char *)(GICBASE + 0xa0000 + (i) * 0x20000);
-    printk("rdist %p ", gicv3.rdist_addrs[i]);
   }
 
   gic_setup_spi(UART_IRQ, 0);

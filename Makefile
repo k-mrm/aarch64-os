@@ -7,7 +7,7 @@ CPU = cortex-a72+nofp
 QCPU = cortex-a72
 
 CFLAGS = -Wall -Og -g -MD -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu=$(CPU)
-CFLAGS += -DKDBG
+#CFLAGS += -DKDBG
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
 LDFLAGS = -nostdlib -nostartfiles

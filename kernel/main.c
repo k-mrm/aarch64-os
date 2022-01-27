@@ -59,7 +59,6 @@ int main(void) {
   kinfo("vbar_el1: %p\n", vbar_el1());
   kinfo("ttbr1_el1: %p\n", ttbr1_el1());
   kinfo("cntfrq_el0: %d\n", cntfrq_el0());
-  printk("?%d", gic_enabled());
 
   schedule();
 }

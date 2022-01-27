@@ -44,7 +44,6 @@ static void reload_timer(u64 interval_ms) {
 }
 
 void timerintr() {
-  printk("timerintr!\n");
   disable_timer();
   if(cpuid() == 0)
     ticks++;
