@@ -9,6 +9,7 @@ a simple OS for aarch64(qemu virt board)
 - preemptive multi tasking
 - process scheduler
   - round-robin
+- GICv3 interrupt controller
 - block device
   - virtio-blk
 - file system

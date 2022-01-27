@@ -215,6 +215,8 @@ void gicv3_init_percpu() {
   gic_dist_init();
   gic_redist_init(cpu);
 
+  gic_setup_ppi(cpuid(), TIMER_IRQ, 0);
+
   gic_enable();
 }
 
@@ -226,7 +228,6 @@ void gicv3_init() {
 
   gic_setup_spi(UART_IRQ, 0);
   gic_setup_spi(VIRTIO_BLK_IRQ, 0);
-  gic_setup_ppi(cpuid(), TIMER_IRQ, 0);
 }
 
 bool gic_enabled() {
