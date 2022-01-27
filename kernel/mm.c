@@ -74,7 +74,7 @@ static void pageunmap(u64 *pgt, u64 va, u64 size) {
   for(u64 p = 0; p < size; p += PAGESIZE, va += PAGESIZE) {
     u64 *pte = pagewalk(pgt, va);
     if(*pte == 0)
-      panic("bad unmap");
+      panic("bad unmap va:%p", va);
 
     u64 pa = PTE_PA(*pte);
 
@@ -110,15 +110,19 @@ void init_userspace(u64 *pgt, u64 va, char *code, u64 size) {
 int load_prg(u64 *pgt, u64 va, struct inode *ino, u64 srcoff, u64 filesz) {
   if(va % PAGESIZE != 0)
     return -1;
-  u64 ka = uva2ka(pgt, va);
-  if(ka == 0)
-    return -1;
 
   for(u64 p = 0; p < filesz; p += PAGESIZE) {
-    if(filesz > PAGESIZE)
-      panic("unimpl");
+    u64 ka = uva2ka(pgt, va+p);
+    if(ka == 0)
+      return -1;
 
-    if(read_inode(ino, (char *)(ka+p), srcoff, filesz) != filesz)
+    u64 cpsz;
+    if(filesz - p < PAGESIZE)
+      cpsz = filesz - p;
+    else
+      cpsz = PAGESIZE;
+
+    if(read_inode(ino, (char *)ka, srcoff+p, cpsz) != cpsz)
       return -1;
   }
 

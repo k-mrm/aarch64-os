@@ -311,6 +311,8 @@ int exec(char *path, char **argv) {
     if(ph.p_type != PT_LOAD)
       continue;
 
+    kinfo("exec memsz: %d filesz: %d", ph.p_memsz, ph.p_filesz);
+
     int sz;
     if((sz = alloc_userspace(pgt, ph.p_vaddr, ph.p_memsz)) < 0)
       goto fail;

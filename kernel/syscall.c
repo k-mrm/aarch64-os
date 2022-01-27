@@ -143,7 +143,7 @@ u64 sys_waitpid(struct trapframe *tf) {
 
 u64 sys_ticks(struct trapframe *tf) {
   (void)tf;
-  return ticks;
+  return cntvct_el0();
 }
 
 u64 sys_sbrk(struct trapframe *tf) {
