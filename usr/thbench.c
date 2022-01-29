@@ -3,7 +3,7 @@
 
 void worker_thread() {
   volatile u64 i;
-  for(i = 0; i < 1000000000; i++)
+  for(i = 0; i < 100000000; i++)
     ;
   printf("thread done! %d\n", i);
   exit(0);
@@ -20,14 +20,11 @@ int th_create(int *tid, void *fn) {
 
 int main() {
   int tid[16];
-  u64 ts = ticks();
   for(int i = 0; i < 16; i++)
     th_create(&tid[i], worker_thread);
 
   for(int i = 0; i < 16; i++)
     waitpid(tid[i], NULL);
-  u64 te = ticks();
-  printf("ts - te: %p\n", ts-te);
 
   exit(0);
 }

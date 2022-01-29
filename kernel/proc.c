@@ -12,8 +12,6 @@
 #include "fs.h"
 #include "spinlock.h"
 
-int fork(void);
-
 /* for debug */
 #define dump_caller() \
   do {  \
@@ -23,6 +21,8 @@ int fork(void);
   } while(0);
 
 void cswitch(struct context *old, struct context *new);
+int fork(void);
+static void exitproc(struct proc *p, int ret);
 
 static struct pidallocator {
   struct spinlock lk;
@@ -50,6 +50,24 @@ struct cpu *mycpu() {
 
 struct proc *myproc() {
   return mycpu()->proc;
+}
+
+static struct proc *pget(pid_t pid) {
+  struct proc *p;
+    
+  acquire(&proctable.lk);
+
+  for(int i = 0; i < NPROC; i++) {
+    p = &proctable.procs[i];
+    if(p->pid == pid)
+      goto found;
+  }
+  /* not found */
+  p = NULL;
+
+found:
+  release(&proctable.lk);
+  return p;
 }
 
 void forkret(void);
@@ -279,7 +297,25 @@ fail:
 }
 
 int kill(int pid, int sig) {
-  return -1;
+  (void)sig;    // TODO
+
+  struct proc *p = pget(pid);
+  if(!p)
+    return -1;
+
+  p->sig = 1;
+
+  acquire(&proctable.lk);
+  if(p->state == SLEEPING)  /* wakeup p */
+    p->state = RUNNABLE;
+  release(&proctable.lk);
+
+  return 0;
+}
+
+void sigcheck(struct proc *p) {
+  if(p->sig)
+    exitproc(p, 1);
 }
 
 int exec(char *path, char **argv) {
@@ -460,10 +496,7 @@ void wakeup(void *chan) {
   release(&proctable.lk);
 }
 
-void exit(int ret) {
-  kinfo("exit\n");
-  struct proc *p = myproc();
-
+static void exitproc(struct proc *p, int ret) {
   if(!p->th)
     free_userspace(p->pgt, p->size);
 
@@ -481,6 +514,12 @@ void exit(int ret) {
   cswitch(&p->context, &mycpu()->scheduler);
 
   panic("unreachable");
+}
+
+void exit(int ret) {
+  kinfo("exit\n");
+
+  exitproc(myproc(), ret);
 }
 
 int chdir(char *path) {

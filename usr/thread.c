@@ -43,8 +43,6 @@ void fn3() {
 int main(void) {
   int tid0, tid1, tid2, tid3;
 
-  int a = ticks();
-
   if(th_create(&tid0, fn0) < 0)
     exit(1);
   if(th_create(&tid1, fn1) < 0)
@@ -58,10 +56,6 @@ int main(void) {
   waitpid(tid1, NULL);
   waitpid(tid2, NULL);
   waitpid(tid3, NULL);
-
-  int b = ticks();
-
-  printf("counter: %d %d\n", counter, b-a);
 
   exit(0);
 }

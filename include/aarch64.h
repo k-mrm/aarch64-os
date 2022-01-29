@@ -170,6 +170,12 @@ static inline u64 cntfrq_el0() {
   return f;
 }
 
+static inline u64 pmccntr_el0() {
+  u64 p;
+  asm volatile("mrs %0, pmccntr_el0" : "=r"(p));
+  return p;
+}
+
 static inline u64 ttbr0_el1() {
   u64 t;
   asm volatile("mrs %0, ttbr0_el1" : "=r"(t));

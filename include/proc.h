@@ -73,6 +73,7 @@ struct proc {
   char name[16];
   int th;
   int (*fault_handler)(struct proc *);
+  int sig;
 };
 
 #define NPROC 256
@@ -93,5 +94,7 @@ void dumpps(void);
 
 int copyout(struct proc *p, void *udst, const void *src, u64 sz);
 int copyin(struct proc *p, void *dst, const void *usrc, u64 sz);
+
+void sigcheck(struct proc *p);
 
 #endif

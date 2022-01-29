@@ -44,6 +44,8 @@
 #define PTE_NS  (1 << 5)
 #define PTE_AP(ap)  (((ap) & 3) << 6)
 #define PTE_U   PTE_AP(1)
+#define PTE_RO  PTE_AP(2)
+#define PTE_URO PTE_AP(3)
 #define PTE_SH(sh)  (((sh) & 3) << 8)
 #define PTE_AF  (1 << 10)
 /* upper attribute */

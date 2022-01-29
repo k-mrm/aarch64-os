@@ -141,11 +141,6 @@ u64 sys_waitpid(struct trapframe *tf) {
   return waitpid(pid, (int *)status);
 }
 
-u64 sys_ticks(struct trapframe *tf) {
-  (void)tf;
-  return cntvct_el0();
-}
-
 u64 sys_sbrk(struct trapframe *tf) {
   int incr = sysarg(tf, 0);
   return (u64)sbrk(incr);
@@ -169,7 +164,6 @@ u64 (*syscall_table[])(struct trapframe *) = {
   sys_dup,
   sys_clone,
   sys_waitpid,
-  sys_ticks,
   sys_sbrk,
 };
 

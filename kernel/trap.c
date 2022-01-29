@@ -96,22 +96,24 @@ void usync_handler(struct trapframe *tf) {
   switch(ec) {
     case 0b010101:  /* svc */
       syscall(tf);
-      return;
+      break;
     case 0b000111:
-      return;
+      break;
     case 0b100110:
       panic("sp alignment fault");
     case 0b100100:
       handle_data_abort(tf, 1, esr);
-      return;
+      break;
     case 0b100000:
       handle_inst_abort(tf, 1, esr);
-      return;
+      break;
     default:
       printk("elr: %p far: %p\n", elr_el1(), far_el1());
       dump_tf(tf);
       panic("unknown ec: %d", ec);
   }
+
+  sigcheck(myproc());
 }
 
 void kirq_handler(struct trapframe *tf) {
@@ -136,6 +138,10 @@ void kirq_handler(struct trapframe *tf) {
 }
 
 void uirq_handler(struct trapframe *tf) {
+  struct proc *p = myproc();
+  if(!p)
+    panic("?");
+
   u32 iar = gic_iar();
   u32 intid = iar & 0x3ff;
 
@@ -149,8 +155,10 @@ void uirq_handler(struct trapframe *tf) {
 
   gic_eoi(iar);
 
-  if(intid == TIMER_IRQ)
+  if(!p->sig && intid == TIMER_IRQ)
     yield();
+
+  sigcheck(p);
 }
 
 void unknownint(int arg) {
