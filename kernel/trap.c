@@ -33,9 +33,9 @@ void new_irq(int intid, handler_t handler) {
 
 /* from EL0 */
 extern void exit(int);
-void fault_die(char *reason) {
-  printk("%s\n", reason);
-  exit(1);
+void fault_die(struct proc *p, char *why) {
+  printk("%s\n", why);
+  killproc(p, 1);
 }
 
 void handle_data_abort(struct trapframe *tf, int user, u64 esr) {
@@ -53,7 +53,7 @@ void handle_data_abort(struct trapframe *tf, int user, u64 esr) {
 
   printk("elr %p far %p\n", elr_el1(), far_el1());
   if(user) {
-    fault_die("data abort EL0");
+    fault_die(p, "data abort EL0");
   } else {
     panic("data abort EL1");
   }

@@ -296,14 +296,11 @@ fail:
   return -1;
 }
 
-int kill(int pid, int sig) {
-  (void)sig;    // TODO
-
-  struct proc *p = pget(pid);
+int killproc(struct proc *p, int sig) {
   if(!p)
     return -1;
 
-  p->sig = 1;
+  p->sig = sig;
 
   acquire(&proctable.lk);
   if(p->state == SLEEPING)  /* wakeup p */
@@ -311,6 +308,10 @@ int kill(int pid, int sig) {
   release(&proctable.lk);
 
   return 0;
+}
+
+int kill(int pid, int sig) {
+  return killproc(pget(pid), sig);
 }
 
 void sigcheck(struct proc *p) {

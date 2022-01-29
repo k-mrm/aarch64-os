@@ -62,7 +62,7 @@ root = rootfs
 
 UPROGS = $(root)/init $(root)/sh $(root)/cat $(root)/echo $(root)/ls $(root)/uname	\
 				 $(root)/mkdir $(root)/loop $(root)/writetest	$(root)/thread $(root)/heap 	\
-				 $(root)/thbench
+				 $(root)/thbench $(root)/bug
 
 $(root)/%: usr/%.o $(ULIBS)
 	@mkdir -p $(root)

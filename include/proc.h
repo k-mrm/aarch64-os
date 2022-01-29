@@ -83,6 +83,7 @@ struct proc *myproc(void);
 
 void proc_init(void);
 void userproc_init(void);
+int killproc(struct proc *p, int sig);
 
 void schedule(void) __attribute__((noreturn));
 
