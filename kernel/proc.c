@@ -34,6 +34,8 @@ static struct proctable {
   struct proc procs[NPROC];
 } proctable;
 
+const struct proc *initproc;    // alias &proctable.procs[0]
+
 void trapret(void);
 
 static pid_t newpid() {
@@ -130,6 +132,7 @@ extern u64 _binary_usr_initcode_size[];
 
 void userproc_init() {
   struct proc *p = newproc();
+  initproc = p;
   if(!p)
     panic("initproc");
 
@@ -508,7 +511,7 @@ void reparent(struct proc *pp) {
   for(int i = 0; i < NPROC; i++) {
     struct proc *p = &proctable.procs[i];
     if(p->parent == pp)
-      p->parent = &proctable.procs[0];
+      p->parent = (struct proc *)initproc;
   }
 }
 
