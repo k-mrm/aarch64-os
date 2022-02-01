@@ -504,10 +504,17 @@ void wakeup(void *chan) {
   release(&proctable.lk);
 }
 
+void reparent(struct proc *pp) {
+  for(int i = 0; i < NPROC; i++) {
+    struct proc *p = &proctable.procs[i];
+    if(p->parent == pp)
+      p->parent = &proctable.procs[0];
+  }
+}
+
 static void exitproc(struct proc *p, int ret) {
   if(!p)
     return;
-
   if(p->pid == 0)
     panic("init exit");
 
@@ -520,6 +527,8 @@ static void exitproc(struct proc *p, int ret) {
   p->ret = ret;
 
   acquire(&proctable.lk);
+
+  reparent(p);
 
   wakeup_acquired(p->parent);
 

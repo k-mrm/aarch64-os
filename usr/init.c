@@ -26,7 +26,11 @@ int main() {
     if(pid == 0) {
       exec("sh", argv);
     } else {
-      wait(NULL);
+      for(;;) {
+        int wpid = wait(NULL);
+        if(wpid == pid) // sh exited
+          break;
+      }
     }
   }
 
