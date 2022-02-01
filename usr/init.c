@@ -21,20 +21,13 @@ int main() {
   puts("init");
   puts("starting sh");
 
-  int pid = fork();
-  if(pid == 0) {
-    exec("sh", argv);
-  } else {
-#if 0
-    int pid2 = fork();
-    if(pid2 == 0) {
-      exec("loop", argv2);
+  for(;;) {
+    int pid = fork();
+    if(pid == 0) {
+      exec("sh", argv);
     } else {
       wait(NULL);
-      exit(0);
     }
-#endif
-    wait(NULL);
   }
 
   exit(0);

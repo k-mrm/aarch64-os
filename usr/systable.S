@@ -25,3 +25,4 @@ SYSCALL dup, SYS_dup
 SYSCALL clone, SYS_clone
 SYSCALL waitpid, SYS_waitpid
 SYSCALL sbrk, SYS_sbrk
+SYSCALL kill, SYS_kill

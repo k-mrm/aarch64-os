@@ -1,7 +1,7 @@
 #ifndef AARCH64_OS_SYSCALL_H
 #define AARCH64_OS_SYSCALL_H
 
-#define NSYSCALL    18
+#define NSYSCALL    19
 
 #define SYS_getpid  0
 #define SYS_write   1
@@ -21,5 +21,6 @@
 #define SYS_clone   15
 #define SYS_waitpid 16
 #define SYS_sbrk    17
+#define SYS_kill    18
 
 #endif

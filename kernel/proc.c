@@ -300,6 +300,8 @@ int killproc(struct proc *p, int sig) {
   if(!p)
     return -1;
 
+  kinfo("kill proc: %d %d\n", p->pid, sig);
+
   p->sig = sig;
 
   acquire(&proctable.lk);
@@ -315,8 +317,11 @@ int kill(int pid, int sig) {
 }
 
 void sigcheck(struct proc *p) {
-  if(p->sig)
+  if(p->sig) {
+    p->sig = 0;
+    kinfo("sig check! %d\n", p->pid);
     exitproc(p, 1);
+  }
 }
 
 int exec(char *path, char **argv) {
@@ -425,6 +430,8 @@ void sleep(void *chan, struct spinlock *lk) {
 
   if(lk != &proctable.lk)
     acquire(lk);
+
+  sigcheck(p);
 }
 
 int waitpid(int pid, int *status) {
@@ -498,6 +505,12 @@ void wakeup(void *chan) {
 }
 
 static void exitproc(struct proc *p, int ret) {
+  if(!p)
+    return;
+
+  if(p->pid == 0)
+    panic("init exit");
+
   if(!p->th)
     free_userspace(p->pgt, p->size);
 

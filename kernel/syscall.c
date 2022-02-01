@@ -28,6 +28,7 @@ int dup(int fd);
 int clone(void *fn, void *stack);
 int waitpid(int pid, int *status);
 void *sbrk(int incr);
+int kill(int pid, int sig);
 
 u64 sysarg(struct trapframe *tf, int n) {
   switch(n) {
@@ -144,6 +145,11 @@ u64 sys_sbrk(struct trapframe *tf) {
   return (u64)sbrk(incr);
 }
 
+u64 sys_kill(struct trapframe *tf) {
+  int pid = sysarg(tf, 0);
+  return (u64)kill(pid, 1);
+}
+
 u64 (*syscall_table[])(struct trapframe *) = {
   sys_getpid,
   sys_write,
@@ -163,6 +169,7 @@ u64 (*syscall_table[])(struct trapframe *) = {
   sys_clone,
   sys_waitpid,
   sys_sbrk,
+  sys_kill,
 };
 
 void syscall(struct trapframe *tf) {

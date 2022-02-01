@@ -25,5 +25,6 @@ int clone(void *fn, void *stack);
 int waitpid(int pid, int *status);
 int ticks(void);
 void *sbrk(int incr);
+int kill(int pid);
 
 #endif

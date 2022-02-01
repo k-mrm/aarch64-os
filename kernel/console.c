@@ -56,6 +56,7 @@ static int csread(struct console *cs, char *buf, u64 size) {
 
 void consoleintr(struct console *cs, int c) {
   acquire(&cs->lk);
+
   kinfo("consoleintr!\n");
 
   if(!c)
