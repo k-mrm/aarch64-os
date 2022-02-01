@@ -44,11 +44,9 @@ struct trapframe {
   u64 sp;
 } __attribute__((packed));
 
-typedef void (*handler_t)(void);
-
 void ksync_handler(struct trapframe *tf);
 void usync_handler(struct trapframe *tf);
-void new_irq(int intid, handler_t handler);
+void new_irq(int intid, void (*handler)(void));
 
 void trap_init(void);
 

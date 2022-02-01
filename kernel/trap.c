@@ -14,7 +14,7 @@ void dump_tf(struct trapframe *tf);
 
 #define NIRQ  1024
 
-handler_t irqhandler[NIRQ];
+void (*irqhandler[NIRQ])(void);
 
 static void default_handler() {
   panic("unknown irq");
@@ -25,7 +25,7 @@ void trap_init() {
     irqhandler[i] = default_handler;
 }
 
-void new_irq(int intid, handler_t handler) {
+void new_irq(int intid, void (*handler)(void)) {
   kinfo("new irq: %d\n", intid);
   if(intid < NIRQ)
     irqhandler[intid] = handler;

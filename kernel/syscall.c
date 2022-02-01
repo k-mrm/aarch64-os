@@ -6,8 +6,6 @@
 #include "file.h"
 #include "driver/timer.h"
 
-typedef u64 (*syscall_t)(struct trapframe *tf);
-
 struct stat;
 struct utsname;
 
