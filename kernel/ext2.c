@@ -324,11 +324,10 @@ static int ext2_dirlink(struct inode *pdir, struct dirent *de) {
     d = (struct dirent *)b->data;
     bend = b->data + sb.bsize;
 
-    for(u64 bpos = 0; bpos < sb.bsize; ) {
+    for(u64 bpos = 0; bpos < sb.bsize; bpos += d->rec_len) {
       d = (struct dirent *)(b->data + bpos);
       if(d->rec_len == 0) /* empty block */
         goto empty_block;
-      bpos += d->rec_len;
     }
 
     /* can append de */
@@ -614,15 +613,13 @@ static int search_dirent_block(char *blk, char *path) {
   struct dirent *d;
   char buf[DIRENT_NAME_MAX];
 
-  for(u64 bpos = 0; bpos < sb.bsize; ) {
+  for(u64 bpos = 0; bpos < sb.bsize; bpos += d->rec_len) {
     d = (struct dirent *)(blk + bpos);
 
     memset(buf, 0, DIRENT_NAME_MAX);
     memcpy(buf, d->name, d->name_len);
     if(strcmp(buf, path) == 0)
       return d->inode;
-
-    bpos += d->rec_len;
   }
 
   return -1;

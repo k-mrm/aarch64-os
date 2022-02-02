@@ -22,14 +22,14 @@ int ls(char *path) {
     while(read(fd, buf, sizeof(buf)) == sizeof(buf)) {
       char namebuf[DIRENT_NAME_MAX];
 
-      for(u64 bpos = 0; bpos < st.st_blksize; ) {
-        struct dirent *d = (struct dirent *)(buf + bpos);
+      struct dirent *d;
+      for(u64 bpos = 0; bpos < st.st_blksize; bpos += d->rec_len) {
+        d = (struct dirent *)(buf + bpos);
         if(d->rec_len == 0)
           break;
         memset(namebuf, 0, DIRENT_NAME_MAX);
         memcpy(namebuf, d->name, d->name_len);
         printf("%s\t%d\n", namebuf, d->inode);
-        bpos += d->rec_len;
       }
     }
   }
