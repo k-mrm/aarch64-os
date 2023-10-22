@@ -17,8 +17,7 @@ QEMU = $(QEMUPREFIX)qemu-system-aarch64
 GIC_VERSION = 3
 MACHINE = virt,gic-version=$(GIC_VERSION)
 ifndef NCPU
-#NCPU = 4
-NCPU = 1
+NCPU = 4
 endif
 
 QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE) -smp $(NCPU) -m 256

@@ -335,16 +335,14 @@ int exec(char *path, char **argv) {
   u64 memsize = 0;
   u64 *pgt = NULL;
   struct inode *ino = path2inode(path);
-  int a;
 
   kinfo("******exec %s %p %p\n", path, path, argv);
 
   if(!ino)
     goto fail;
 
-  if((a = read_inode(ino, (char *)&eh, 0, sizeof(eh))) != sizeof(eh)) {
+  if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
     goto fail;
-  }
   if(!is_elf(&eh))
     goto fail;
   if(eh.e_type != ET_EXEC)
