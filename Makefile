@@ -10,14 +10,15 @@ CFLAGS = -Wall -Og -g -MD -ffreestanding -nostdinc -nostdlib -nostartfiles -mcpu
 #CFLAGS += -DKDBG
 CFLAGS += -DUSE_ARMVIRT
 CFLAGS += -I ./include/
-LDFLAGS = -nostdlib -nostartfiles
+LDFLAGS = -nostdlib
 
 QEMUPREFIX =
 QEMU = $(QEMUPREFIX)qemu-system-aarch64
 GIC_VERSION = 3
 MACHINE = virt,gic-version=$(GIC_VERSION)
 ifndef NCPU
-NCPU = 4
+#NCPU = 4
+NCPU = 1
 endif
 
 QEMUOPTS = -cpu $(QCPU) -machine $(MACHINE) -smp $(NCPU) -m 256
@@ -60,9 +61,9 @@ ULIBS = usr/systable.o usr/ulib.o usr/malloc.o
 
 root = rootfs
 
-UPROGS = $(root)/init $(root)/sh $(root)/cat $(root)/echo $(root)/ls $(root)/uname	\
-				 $(root)/mkdir $(root)/loop $(root)/writetest	$(root)/thread $(root)/heap 	\
-				 $(root)/thbench $(root)/bug $(root)/kill
+UPROGS = $(root)/sh $(root)/cat $(root)/echo $(root)/ls $(root)/uname	\
+	 $(root)/mkdir $(root)/loop $(root)/writetest	$(root)/thread $(root)/heap 	\
+	 $(root)/thbench $(root)/bug $(root)/kill $(root)/init
 
 $(root)/%: usr/%.o $(ULIBS)
 	@mkdir -p $(root)

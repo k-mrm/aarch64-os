@@ -9,7 +9,7 @@ initcode:
 
 init:
   .asciz "/init"
-.align 3
+.p2align 3
 argv:
   .quad init
   .quad 0

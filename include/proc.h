@@ -44,7 +44,7 @@ struct cpu {
   struct context scheduler;
   int cli_depth;
   int intr_enabled;
-} cpus[NCPU];
+};
 
 enum procstate {
   UNUSED,

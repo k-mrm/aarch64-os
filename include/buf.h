@@ -6,7 +6,7 @@
 #define NBUF  32
 
 struct buf {
-  char data[1024];
+  unsigned char data[1024];
   u32 bno;
   u32 ref;
   u8 dirty;

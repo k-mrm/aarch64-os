@@ -17,7 +17,7 @@ static void put64(int fd, u64 num) {
 
 int main(void) {
   unsigned long i = 0;
-  int fd = open("README.md", O_RDWR);
+  // int fd = open("README.md", O_RDWR);
   for(;;) {
     for(int c = 0; c < 100000000; c++)
       ;

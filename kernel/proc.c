@@ -34,6 +34,8 @@ static struct proctable {
   struct proc procs[NPROC];
 } proctable;
 
+static struct cpu cpus[NCPU];
+
 const struct proc *initproc;    // alias &proctable.procs[0]
 
 void trapret(void);
@@ -328,18 +330,21 @@ void sigcheck(struct proc *p) {
 }
 
 int exec(char *path, char **argv) {
-  kinfo("******exec %s %p %p\n", path, path, argv);
-  u64 *pgt = NULL;
-  struct inode *ino = path2inode(path);
-  if(!ino)
-    goto fail;
-
   struct ehdr eh;
   struct phdr ph;
   u64 memsize = 0;
+  u64 *pgt = NULL;
+  struct inode *ino = path2inode(path);
+  int a;
 
-  if(read_inode(ino, (char *)&eh, 0, sizeof(eh)) != sizeof(eh))
+  kinfo("******exec %s %p %p\n", path, path, argv);
+
+  if(!ino)
     goto fail;
+
+  if((a = read_inode(ino, (char *)&eh, 0, sizeof(eh))) != sizeof(eh)) {
+    goto fail;
+  }
   if(!is_elf(&eh))
     goto fail;
   if(eh.e_type != ET_EXEC)

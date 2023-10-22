@@ -4,7 +4,7 @@
 #include "kernel.h"
 
 struct spinlock {
-  u8 locked;
+  u8 lock;
   int cpuid;
 };
 

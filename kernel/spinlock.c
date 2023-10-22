@@ -7,18 +7,26 @@ void pushcli();
 void popcli();
 
 bool holding(struct spinlock *lk) {
-  return lk->locked && lk->cpuid == cpuid();
+  return lk->lock && lk->cpuid == cpuid();
 }
 
 void acquire(struct spinlock *lk) {
+  u8 tmp, l = 1;
+
   pushcli();
 
   if(holding(lk))
     panic("already held %d", lk->cpuid);
 
-  /* TODO: don't depend on gcc builtin-function */
-  while(__sync_lock_test_and_set(&lk->locked, 1) != 0)
-    ;
+  asm volatile(
+    "sevl\n"
+    "1: wfe\n"
+    "2: ldaxrb %w0, [%1]\n"
+    "cbnz   %w0, 1b\n"
+    "stxrb  %w0, %w2, [%1]\n"
+    "cbnz   %w0, 2b\n"
+    : "=&r"(tmp) : "r"(&lk->lock), "r"(l) : "memory"
+  );
 
   isb();
 
@@ -33,7 +41,7 @@ void release(struct spinlock *lk) {
 
   isb();
 
-  asm volatile("str wzr, %0" : "=m"(lk->locked));
+  asm volatile("stlrb wzr, [%0]" :: "r"(&lk->lock) : "memory");
 
   popcli();
 }
@@ -60,6 +68,6 @@ void popcli() {
 }
 
 void lock_init(struct spinlock *lk) {
-  lk->locked = 0;
+  lk->lock = 0;
   lk->cpuid = -1;
 }

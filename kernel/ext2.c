@@ -82,7 +82,6 @@ static struct buf *ext2_get_bg() {
 }
 
 /* for debug */
-/*
 void dump_dirent_block(char *blk) {
   struct dirent *d = (struct dirent *)blk;
   char *blk_end = blk + sb.bsize;
@@ -95,7 +94,6 @@ void dump_dirent_block(char *blk) {
     d = (struct dirent *)cd;
   }
 }
-*/
 
 static struct buf *read_indirect_block(u32 *map, int bnum) {
   int idx = bnum - 12;
@@ -204,8 +202,8 @@ static int ext2_alloc_block() {
 }
 
 static struct ext2_inode *ext2_raw_inode(int inum, struct buf **b) {
-  u32 bgrp = (inum - 1) / (sb.bsize / sizeof(struct ext2_inode));
-  u64 offset = ((inum - 1) % (sb.bsize / sizeof(struct ext2_inode))) * sizeof(struct ext2_inode);
+  u32 bgrp = (inum - 1) / (sb.bsize / sb.inode_size);
+  u64 offset = ((inum - 1) % (sb.bsize / sb.inode_size)) * sb.inode_size;
   struct buf *itable = bio_read(sb.inode_table + bgrp);
   if(b)
     *b = itable;
@@ -458,6 +456,9 @@ struct inode *ext2_get_inode(int inum) {
   struct buf *b;
   struct ext2_inode *e = ext2_raw_inode(inum, &b);
 
+  if (!i)
+    return NULL;
+
   i->mode = e->i_mode;
   i->size = e->i_size;
   i->atime = e->i_atime;
@@ -475,7 +476,7 @@ struct inode *ext2_get_inode(int inum) {
 
 /* for debug */
 __attribute__((unused))
-static void ls_inode(struct inode *ino) {
+void ls_inode(struct inode *ino) {
   printk("ls inode %d nblock: %d\n", ino->inum, ext2_inode_nblock(ino));
   if(ino == NULL) {
     printk("null inode\n");
@@ -488,7 +489,7 @@ static void ls_inode(struct inode *ino) {
 
   for(int i = 0; i < ext2_inode_nblock(ino); i++) {
     struct buf *dent = ext2_inode_block(ino, i);
-    // dump_dirent_block(dent->data);
+    dump_dirent_block(dent->data);
     bio_free(dent);
   }
 }
@@ -505,7 +506,6 @@ int ext2_read_inode(struct inode *ino, char *buf, u64 off, u64 size) {
   u32 offblk = off / bsize;
   u32 lastblk = (size + off) / bsize;
   u32 offblkoff = off % bsize;
-
   for(int i = offblk; i < ext2_inode_nblock(ino) && i <= lastblk; i++) {
     struct buf *b = ext2_inode_block(ino, i);
     u64 cpsize = min(size, bsize);
@@ -609,7 +609,7 @@ static char *skippath(char *path, char *name, int *err) {
   return path;
 }
 
-static int search_dirent_block(char *blk, char *path) {
+static int search_dirent_block(unsigned char *blk, char *path) {
   struct dirent *d;
   char buf[DIRENT_NAME_MAX];
 

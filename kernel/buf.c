@@ -48,6 +48,8 @@ struct buf *bio_read(u32 bno) {
   if(!b)
     return NULL;
 
+  kinfo("bio_read bno=%d\n", bno);
+
   if(!b->valid) {
     if(virtio_blk_op(bno, b->data, DREAD) < 0)
       panic("disk read failed");
